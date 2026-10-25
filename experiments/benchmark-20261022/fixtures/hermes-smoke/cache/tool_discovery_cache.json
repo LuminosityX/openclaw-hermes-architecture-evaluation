@@ -1,0 +1,1422 @@
+{
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/annotate_preview_tool.py": [
+1792649806292541424,
+4115,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/ansi_strip.py": [
+1792649743114284240,
+4341,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval.py": [
+1792649806292541424,
+67007,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_context.py": [
+1792649806292541424,
+18508,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_detection.py": [
+1792649806293541412,
+92862,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_floors.py": [
+1792649806293541412,
+9684,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_gateway_wait.py": [
+1792649806293541412,
+13748,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_human_wait.py": [
+1792649806293541412,
+8491,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_prompt.py": [
+1792649806293541412,
+19398,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_smart.py": [
+1792649806293541412,
+8785,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/approval_yolo.py": [
+1792649806293541412,
+5304,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/arg_coercion.py": [
+1792649806293541412,
+10105,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/async_delegation.py": [
+1792649806293541412,
+75387,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/async_delegation_recovery_hints.py": [
+1792649806293541412,
+3059,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/async_delegation_worker.py": [
+1792649806293541412,
+3546,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/audio_container.py": [
+1792649806293541412,
+2682,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/binary_extensions.py": [
+1792649743116284217,
+3952,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/blueprints.py": [
+1792649806294541400,
+9268,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/bot_failure_reasons.py": [
+1792649806294541400,
+7395,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/bot_live_delivery.py": [
+1792649806295541389,
+23733,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/bot_mode_dm.py": [
+1792649806295541389,
+50211,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/bot_mode_probe.py": [
+1792649806295541389,
+22474,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/bot_relay.py": [
+1792649806295541389,
+36085,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_camofox.py": [
+1792649806295541389,
+28528,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_camofox_state.py": [
+1792649806295541389,
+1139,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_cdp_tool.py": [
+1792649806295541389,
+22933,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_dialog_tool.py": [
+1792649806296541377,
+4560,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_extension_router.py": [
+1792649806296541377,
+6355,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_harness_dirs.py": [
+1792649806296541377,
+6013,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_lightpanda.py": [
+1792649806296541377,
+13525,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_supervisor.py": [
+1792649806296541377,
+29008,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_supervisor_capture.py": [
+1792649806296541377,
+8210,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_supervisor_dialogs.py": [
+1792649806296541377,
+15371,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_supervisor_frames.py": [
+1792649806296541377,
+8335,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool.py": [
+1792649806296541377,
+68463,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_cdp.py": [
+1792649806296541377,
+9099,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_cloud.py": [
+1792649806297541365,
+13076,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_eval_policy.py": [
+1792649806297541365,
+8744,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_install.py": [
+1792649806297541365,
+7665,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_lifecycle.py": [
+1792649806297541365,
+36487,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_lightpanda_fallback.py": [
+1792649806297541365,
+10417,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_origin.py": [
+1792649743118284194,
+2913,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_real_profile.py": [
+1792649806297541365,
+18628,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_session.py": [
+1792649806297541365,
+52404,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_snapshot.py": [
+1792649806297541365,
+5761,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_tool_vision.py": [
+1792649806297541365,
+7245,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_use_cli.py": [
+1792649806298541353,
+53332,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/browser_vault_tool.py": [
+1792649806298541353,
+34278,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/budget_config.py": [
+1792649806298541353,
+5663,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/checkpoint_maintenance.py": [
+1792649806298541353,
+25172,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/checkpoint_manager.py": [
+1792649806298541353,
+69210,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/checkpoint_manager_profile_rename.py": [
+1792649806298541353,
+5602,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/checkpoint_pruning.py": [
+1792649806298541353,
+5949,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/clarify_batch.py": [
+1792649806298541353,
+1947,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/clarify_gateway.py": [
+1792649806299541342,
+14170,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/clarify_tool.py": [
+1792649806299541342,
+9776,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/close_preview_tool.py": [
+1792649806299541342,
+724,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/close_terminal_tool.py": [
+1792649743120284170,
+2056,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/code_execution_env.py": [
+1792649806299541342,
+16386,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/code_execution_rpc.py": [
+1792649806299541342,
+12222,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/code_execution_tool.py": [
+1792649806299541342,
+50769,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/code_kernel.py": [
+1792649806299541342,
+41233,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/code_kernel_remote.py": [
+1792649806299541342,
+20623,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/computer_use/tool.py": [
+1792649806301541318,
+64612,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/computer_use_tool.py": [
+1792649806301541318,
+1104,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/connectors/tool.py": [
+1792649806303541295,
+9362,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/credential_files.py": [
+1792649806303541295,
+20123,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/cronjob_job_args.py": [
+1792649806304541283,
+26715,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/cronjob_prompt_scan.py": [
+1792649743124284123,
+7861,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/cronjob_tools.py": [
+1792649806304541283,
+62779,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/daemon_pool.py": [
+1792649806304541283,
+2781,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/debug_helpers.py": [
+1792649806304541283,
+2187,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool.py": [
+1792649806304541283,
+46461,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_child_run.py": [
+1792649806306541259,
+63735,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_config.py": [
+1792649806307541248,
+35901,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_dispatch.py": [
+1792649806307541248,
+28752,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_progress.py": [
+1792649806307541248,
+24085,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_registry.py": [
+1792649806307541248,
+15610,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_results.py": [
+1792649806307541248,
+23430,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_tasks.py": [
+1792649806308541236,
+8343,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegate_tool_toolsets.py": [
+1792649806308541236,
+5882,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegation_live_log.py": [
+1792649806308541236,
+15057,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegation_output_schema.py": [
+1792649806308541236,
+5346,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/delegation_redaction.py": [
+1792649806308541236,
+9017,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/desktop_ui.py": [
+1792649806308541236,
+3712,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/discord_tool.py": [
+1792649806308541236,
+30877,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/drive_preview_tool.py": [
+1792649806308541236,
+7191,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/env_passthrough.py": [
+1792649806308541236,
+9589,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/env_probe.py": [
+1792649806309541224,
+11064,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/escape_drift_autocorrect.py": [
+1792649806312541189,
+7779,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/fal_common.py": [
+1792649806312541189,
+12050,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/feishu_doc_tool.py": [
+1792649806312541189,
+2621,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/feishu_drive_tool.py": [
+1792649806312541189,
+7709,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/feishu_lark.py": [
+1792649743129284064,
+3248,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_operations.py": [
+1792649806312541189,
+94063,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_operations_common.py": [
+1792649806312541189,
+12258,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_operations_lint.py": [
+1792649806313541177,
+20695,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_operations_native.py": [
+1792649806313541177,
+4406,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_operations_search.py": [
+1792649806313541177,
+60382,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_state.py": [
+1792649806313541177,
+10383,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_tools.py": [
+1792649806313541177,
+73551,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_tools_paths.py": [
+1792649806313541177,
+16751,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_tools_read_tracking.py": [
+1792649806314541165,
+19453,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/file_tools_write_guards.py": [
+1792649806314541165,
+33204,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/focus_pane_tool.py": [
+1792649806314541165,
+1678,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/fuzzy_match.py": [
+1792649806314541165,
+34529,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/hook_output_spill.py": [
+1792649806314541165,
+4894,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/human_input_hooks.py": [
+1792649806314541165,
+3082,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/image_generation_catalog.py": [
+1792649806314541165,
+19998,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/image_generation_managed.py": [
+1792649806314541165,
+4420,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/image_generation_tool.py": [
+1792649806315541154,
+48897,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/image_source.py": [
+1792649806315541154,
+14712,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/interpreter_shutdown.py": [
+1792649743131284041,
+1225,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/interrupt.py": [
+1792649743131284041,
+5371,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/kanban_tools.py": [
+1792649806315541154,
+67763,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/kanban_tools_schemas.py": [
+1792649806315541154,
+24179,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/kanban_toolset_context.py": [
+1792649743131284041,
+1013,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/lazy_deps.py": [
+1792649806315541154,
+1261,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/managed_gateway_auth.py": [
+1792649806315541154,
+2983,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/managed_gateway_identity.py": [
+1792649806315541154,
+5078,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/managed_tool_gateway.py": [
+1792649806315541154,
+8441,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_dashboard_oauth.py": [
+1792649806315541154,
+8988,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_death_supervisor.py": [
+1792649743132284029,
+9341,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_liveness.py": [
+1792649806315541154,
+8466,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_oauth.py": [
+1792649806316541142,
+67845,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_oauth_device.py": [
+1792649743132284029,
+11983,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_oauth_manager.py": [
+1792649806316541142,
+27510,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_oauth_provider.py": [
+1792649806316541142,
+34983,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_schema_cache.py": [
+1792649806316541142,
+4501,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_agent.py": [
+1792649806317541130,
+19326,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_common.py": [
+1792649806317541130,
+6234,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_config.py": [
+1792649806317541130,
+36592,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_content.py": [
+1792649806317541130,
+17884,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_costs.py": [
+1792649806317541130,
+10870,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_discovery.py": [
+1792649806317541130,
+49650,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_errors.py": [
+1792649806317541130,
+28793,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_handlers.py": [
+1792649806318541118,
+46130,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_health.py": [
+1792649806318541118,
+16846,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_lifecycle.py": [
+1792649806318541118,
+22724,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_loop.py": [
+1792649806318541118,
+13300,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_node_abi.py": [
+1792649806318541118,
+4546,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_registration.py": [
+1792649806318541118,
+36538,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_sampling.py": [
+1792649806318541118,
+18901,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_schema.py": [
+1792649806318541118,
+14417,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_scope.py": [
+1792649806318541118,
+5393,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_server_run.py": [
+1792649806319541107,
+34743,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/mcp_tool_transport.py": [
+1792649806319541107,
+45921,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/memory_tool.py": [
+1792649806319541107,
+26389,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/memory_tool_store.py": [
+1792649806319541107,
+41338,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/microsoft_graph_auth.py": [
+1792649806319541107,
+7434,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/microsoft_graph_client.py": [
+1792649806319541107,
+9990,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/neutts_synth.py": [
+1792649806319541107,
+3225,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/open_preview_tool.py": [
+1792649806319541107,
+3269,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/openrouter_client.py": [
+1792649806320541095,
+654,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/osv_check.py": [
+1792649806320541095,
+10593,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/patch_parser.py": [
+1792649806320541095,
+23856,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/path_security.py": [
+1792649806320541095,
+1169,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/plugin_guard.py": [
+1792649806320541095,
+20694,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/plugin_guard_context.py": [
+1792649806320541095,
+47668,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/preview_tool.py": [
+1792649806320541095,
+3048,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry.py": [
+1792649806321541083,
+150042,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_awaiting.py": [
+1792649806321541083,
+5489,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_checkpoint.py": [
+1792649806321541083,
+8673,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_env_log.py": [
+1792649806321541083,
+2094,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_notifications.py": [
+1792649806321541083,
+25886,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_output_log.py": [
+1792649806321541083,
+5849,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_results.py": [
+1792649806321541083,
+4650,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_termination.py": [
+1792649806321541083,
+8784,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_wait_policy.py": [
+1792649806321541083,
+9832,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/process_registry_wsl.py": [
+1792649806321541083,
+1183,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/project_tools.py": [
+1792649806321541083,
+8169,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/pty_query_responder.py": [
+1792649743140283935,
+4709,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/react_to_message_tool.py": [
+1792649806321541083,
+5604,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/read_extract.py": [
+1792649806322541071,
+28668,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/read_preview_tool.py": [
+1792649806322541071,
+1176,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/read_terminal_tool.py": [
+1792649806322541071,
+3036,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/read_window_tool.py": [
+1792649806322541071,
+1763,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/schema_sanitizer.py": [
+1792649806322541071,
+22235,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/self_repo_guard.py": [
+1792649806322541071,
+26222,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/send_message_senders.py": [
+1792649806322541071,
+25436,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/send_message_targets.py": [
+1792649806323541060,
+6619,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/send_message_tool.py": [
+1792649806323541060,
+41324,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/session_search_tool.py": [
+1792649806323541060,
+44230,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/set_theme_tool.py": [
+1792649806323541060,
+4529,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/setup_beat_tool.py": [
+1792649806323541060,
+10864,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/shell_heredoc.py": [
+1792649743142283911,
+9713,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_ledger.py": [
+1792649806323541060,
+28847,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_linter.py": [
+1792649806323541060,
+11374,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_manager_batch.py": [
+1792649806323541060,
+17516,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_manager_guards.py": [
+1792649806324541048,
+11883,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_manager_tool.py": [
+1792649806324541048,
+47255,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_provenance.py": [
+1792649743143283899,
+1885,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skill_usage.py": [
+1792649806324541048,
+37613,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skillevaluator_scan.py": [
+1792649806324541048,
+6845,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_ast_audit.py": [
+1792649806324541048,
+4132,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_guard.py": [
+1792649806325541036,
+66759,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub.py": [
+1792649806325541036,
+17322,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_clawhub.py": [
+1792649806325541036,
+28092,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_github.py": [
+1792649806325541036,
+33405,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_install.py": [
+1792649806325541036,
+15990,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_models.py": [
+1792649806325541036,
+15508,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_official.py": [
+1792649806325541036,
+20074,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_search.py": [
+1792649806325541036,
+12809,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_skillssh.py": [
+1792649806325541036,
+18773,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_hub_sources.py": [
+1792649806326541024,
+20841,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_sync.py": [
+1792649806326541024,
+23296,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_sync_bundled_ops.py": [
+1792649806326541024,
+14462,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_sync_optional.py": [
+1792649806326541024,
+11373,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_tool.py": [
+1792649806326541024,
+41772,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_tool_dedup.py": [
+1792649806326541024,
+2812,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_tool_plugin.py": [
+1792649806326541024,
+8427,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/skills_tool_setup.py": [
+1792649806326541024,
+7365,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/slash_confirm.py": [
+1792649806326541024,
+3540,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/spill_safety.py": [
+1792649806326541024,
+3113,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/stt_lease.py": [
+1792649806327541013,
+6228,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/subagent_worktree.py": [
+1792649806327541013,
+13528,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_hints.py": [
+1792649806327541013,
+8396,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_scope.py": [
+1792649806327541013,
+10386,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool.py": [
+1792649806327541013,
+82527,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_backends.py": [
+1792649806327541013,
+21618,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_background.py": [
+1792649806327541013,
+15390,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_config.py": [
+1792649806327541013,
+10266,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_guards.py": [
+1792649806328541001,
+16679,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_lifecycle.py": [
+1792649806328541001,
+14785,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_macos_open.py": [
+1792649806328541001,
+8266,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_result.py": [
+1792649806328541001,
+15024,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/terminal_tool_sudo.py": [
+1792649806328541001,
+23589,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/thread_context.py": [
+1792649743147283852,
+3381,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/threat_patterns.py": [
+1792649806328541001,
+10616,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tip_tool.py": [
+1792649743147283852,
+3222,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/todo_tool.py": [
+1792649806328541001,
+15371,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_backend_helpers.py": [
+1792649806328541001,
+14188,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_labels.py": [
+1792649806328541001,
+6165,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_output_limits.py": [
+1792649806328541001,
+2710,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_output_truncate.py": [
+1792649743148283841,
+1448,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_result_storage.py": [
+1792649806329540989,
+24469,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_search.py": [
+1792649806329540989,
+32263,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_search_catalog.py": [
+1792649806329540989,
+15072,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tool_search_validation.py": [
+1792649806329540989,
+13966,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tour_presets.py": [
+1792649806329540989,
+448,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tour_tool.py": [
+1792649806329540989,
+7841,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_audio.py": [
+1792649806329540989,
+14442,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_chunking.py": [
+1792649806329540989,
+8387,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_cloud.py": [
+1792649806329540989,
+26694,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_command.py": [
+1792649806330540977,
+15808,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_common.py": [
+1792649806330540977,
+6303,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_local.py": [
+1792649806330540977,
+17713,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_streaming.py": [
+1792649806330540977,
+23151,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_tools.py": [
+1792649806330540977,
+31959,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/transcription_whisper_cpp.py": [
+1792649806330540977,
+3262,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_command_provider.py": [
+1792649806330540977,
+17309,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_streaming.py": [
+1792649806330540977,
+25496,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_text_normalize.py": [
+1792649806330540977,
+15185,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool.py": [
+1792649806331540966,
+35266,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_delivery.py": [
+1792649806331540966,
+19944,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_lifecycle.py": [
+1792649806331540966,
+10433,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_local.py": [
+1792649806331540966,
+9545,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_openai.py": [
+1792649806331540966,
+8479,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_plugins.py": [
+1792649806331540966,
+6661,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_providers.py": [
+1792649806331540966,
+31017,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/tts_tool_speaker.py": [
+1792649806331540966,
+19336,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/url_safety.py": [
+1792649806332540954,
+28619,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/video_generation_tool.py": [
+1792649806332540954,
+17022,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/vision_tools.py": [
+1792649806332540954,
+59118,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/vision_tools_history_budget.py": [
+1792649743151283805,
+8064,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/vision_tools_image_prep.py": [
+1792649806332540954,
+16600,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/voice_client_config.py": [
+1792649806332540954,
+12665,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/voice_live.py": [
+1792649806332540954,
+9332,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/voice_mode.py": [
+1792649806333540942,
+71381,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/voice_mode_transcript.py": [
+1792649806333540942,
+5527,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/wake_word.py": [
+1792649806333540942,
+41695,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/wake_word_engines.py": [
+1792649806333540942,
+12383,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/web_result_cache.py": [
+1792649806333540942,
+12707,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/web_tools.py": [
+1792649806333540942,
+29848,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/web_tools_extract.py": [
+1792649806334540930,
+11383,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/web_tools_rescue.py": [
+1792649806334540930,
+7517,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/web_tools_truncate.py": [
+1792649806334540930,
+9887,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/website_policy.py": [
+1792649806334540930,
+8364,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/working_diff.py": [
+1792649806334540930,
+5310,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/write_approval.py": [
+1792649806334540930,
+18928,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/x_search_tool.py": [
+1792649806334540930,
+14975,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/xai_http.py": [
+1792649806334540930,
+10589,
+false
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/xai_video_tools.py": [
+1792649806334540930,
+4413,
+true
+],
+"/root/output/openclaw-hermes-benchmark-20261022/sources/hermes/tools/yuanbao_tools.py": [
+1792649806334540930,
+21491,
+true
+]
+}

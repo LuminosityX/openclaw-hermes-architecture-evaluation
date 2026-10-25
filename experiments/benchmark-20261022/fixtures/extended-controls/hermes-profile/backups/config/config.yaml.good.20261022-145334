@@ -1,0 +1,5 @@
+approvals:
+  mode: off
+  deny: ["*"]
+terminal:
+  backend: local
