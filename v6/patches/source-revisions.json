@@ -14,7 +14,7 @@
   {
     "source_repository": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-mcp-lock-ablation",
     "base": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable",
-    "patch": "patches/hermes-mcp-lock-ablation.patch",
+    "patch": "v6/patches/hermes-mcp-lock-ablation.patch",
     "tracked_diff_bytes": 564,
     "scope": "Intentional isolated counterfactual, not baseline product behavior."
   }

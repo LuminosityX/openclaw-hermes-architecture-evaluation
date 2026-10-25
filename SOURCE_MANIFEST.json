@@ -3228,9 +3228,9 @@
     },
     {
       "archive_path": "v6/patches/source-revisions.json",
-      "git_blob_sha": "329063aa12e2d2d3a3a838bedf43f486a83a4d0c",
-      "bytes": 806,
-      "sha256": "7e539cc76f56b3a773be48faa77a8fe36863b1627a5987da8ddf21532bd6ab48"
+      "git_blob_sha": "a49ec8b64a1585363903630603cf5fd0ec01ed2d",
+      "bytes": 810,
+      "sha256": "3656a4ad4d1f90966c04a76e431d622989c4bcaf4d47d5f17ee8d43be954e579"
     },
     {
       "archive_path": "v6/private-fixtures/W3-v1-expected.json",
@@ -3836,9 +3836,9 @@
     },
     {
       "archive_path": "v6/references/source-index.json",
-      "git_blob_sha": "9fa825634e2acc3782edc915fa35a384361183ef",
-      "bytes": 21308,
-      "sha256": "128d5ace722c379a1fe2846a6eebb5d001340da6177a126d8d8486743d53bc7a"
+      "git_blob_sha": "783e20baca941c7a60e3dd080ef5140546d6943c",
+      "bytes": 21450,
+      "sha256": "2f03dc2ad5eb6a9280085d1d734d281ee328e1855f5de6df51e287c25a186171"
     },
     {
       "archive_path": "v6/scripts/activation.py",
