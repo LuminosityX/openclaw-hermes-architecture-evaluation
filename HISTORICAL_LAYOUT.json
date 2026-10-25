@@ -9,7 +9,8 @@
     "/root/output/openclaw-hermes-benchmark-20261022/scripts/mcp_fixture.py": "v6/support/native-fixtures/mcp_fixture.py",
     "/root/output/openclaw-hermes-nonfunctional-20261022/scripts/heartbeat.py": "v6/support/native-fixtures/heartbeat.py",
     "/root/output/oc-hermes-comparison-20261024-v5/scripts/prepare.py": "v6/support/data-generator/prepare.py",
-    "/root/output/oc-hermes-comparison-20261024-v5/evidence/data-checker-selftest/workspace/reconcile_data.py": "v6/support/data-generator/reconcile_data.py"
+    "/root/output/oc-hermes-comparison-20261024-v5/evidence/data-checker-selftest/workspace/reconcile_data.py": "v6/support/data-generator/reconcile_data.py",
+    "/root/output/oc-hermes-execution-20261024-v6/private": "v6/private-fixtures"
   },
   "runtime_note": "Runtime binaries, application installations, package caches and wheels are intentionally excluded. Restore the pinned versions in the runtime paths required by each script."
 }

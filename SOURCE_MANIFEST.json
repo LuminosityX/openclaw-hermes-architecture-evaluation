@@ -2,12 +2,6 @@
   "version": "V6",
   "files": [
     {
-      "archive_path": ".gitignore",
-      "git_blob_sha": "1fd0e9ab35ea1b674246fb304296294b614104a3",
-      "bytes": 147,
-      "sha256": "2d00d6ee5ac2dceacffa7e6192e5e5e779758a3aa6499028e8d594b1aa250276"
-    },
-    {
       "archive_path": "v6/dependencies/hermes-pyproject.toml",
       "git_blob_sha": "210ab6d483b7f7a4758160dae2958ac9259ac9e7",
       "source": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/pyproject.toml",
@@ -176,20 +170,6 @@
       "sha256": "d0d39111c202fb65274089f674f85bbf530acf1a4e8431a95e5f41daa3cb2be9"
     },
     {
-      "archive_path": "v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "bytes": 616,
-      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
-    },
-    {
-      "archive_path": "v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/setup.py",
-      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/setup.py",
-      "bytes": 195,
-      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
-    },
-    {
       "archive_path": "v6/fixtures/W1-v1/project/docs/examples/eggsample/eggsample/__init__.py",
       "git_blob_sha": "b2d9d8301facc8583dcd503be8f7f2004b137cac",
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v1/project/docs/examples/eggsample/eggsample/__init__.py",
@@ -223,6 +203,20 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v1/project/docs/examples/eggsample/setup.py",
       "bytes": 243,
       "sha256": "a87fb9c73c4159916b16647caa71abdd6dde0add76f0c4052c25a7cf925c6fc0"
+    },
+    {
+      "archive_path": "v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "bytes": 616,
+      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
+    },
+    {
+      "archive_path": "v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/setup.py",
+      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v1/project/docs/examples/eggsample-spam/setup.py",
+      "bytes": 195,
+      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
     },
     {
       "archive_path": "v6/fixtures/W1-v1/project/docs/examples/toy-example.py",
@@ -631,20 +625,6 @@
       "sha256": "d0d39111c202fb65274089f674f85bbf530acf1a4e8431a95e5f41daa3cb2be9"
     },
     {
-      "archive_path": "v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "bytes": 616,
-      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
-    },
-    {
-      "archive_path": "v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/setup.py",
-      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/setup.py",
-      "bytes": 195,
-      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
-    },
-    {
       "archive_path": "v6/fixtures/W1-v2/project/docs/examples/eggsample/eggsample/__init__.py",
       "git_blob_sha": "b2d9d8301facc8583dcd503be8f7f2004b137cac",
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v2/project/docs/examples/eggsample/eggsample/__init__.py",
@@ -678,6 +658,20 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v2/project/docs/examples/eggsample/setup.py",
       "bytes": 243,
       "sha256": "a87fb9c73c4159916b16647caa71abdd6dde0add76f0c4052c25a7cf925c6fc0"
+    },
+    {
+      "archive_path": "v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "bytes": 616,
+      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
+    },
+    {
+      "archive_path": "v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/setup.py",
+      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v2/project/docs/examples/eggsample-spam/setup.py",
+      "bytes": 195,
+      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
     },
     {
       "archive_path": "v6/fixtures/W1-v2/project/docs/examples/toy-example.py",
@@ -1086,20 +1080,6 @@
       "sha256": "d0d39111c202fb65274089f674f85bbf530acf1a4e8431a95e5f41daa3cb2be9"
     },
     {
-      "archive_path": "v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "bytes": 616,
-      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
-    },
-    {
-      "archive_path": "v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/setup.py",
-      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/setup.py",
-      "bytes": 195,
-      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
-    },
-    {
       "archive_path": "v6/fixtures/W1-v3/project/docs/examples/eggsample/eggsample/__init__.py",
       "git_blob_sha": "b2d9d8301facc8583dcd503be8f7f2004b137cac",
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v3/project/docs/examples/eggsample/eggsample/__init__.py",
@@ -1133,6 +1113,20 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v3/project/docs/examples/eggsample/setup.py",
       "bytes": 243,
       "sha256": "a87fb9c73c4159916b16647caa71abdd6dde0add76f0c4052c25a7cf925c6fc0"
+    },
+    {
+      "archive_path": "v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "bytes": 616,
+      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
+    },
+    {
+      "archive_path": "v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/setup.py",
+      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W1-v3/project/docs/examples/eggsample-spam/setup.py",
+      "bytes": 195,
+      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
     },
     {
       "archive_path": "v6/fixtures/W1-v3/project/docs/examples/toy-example.py",
@@ -1548,20 +1542,6 @@
       "sha256": "d0d39111c202fb65274089f674f85bbf530acf1a4e8431a95e5f41daa3cb2be9"
     },
     {
-      "archive_path": "v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "bytes": 616,
-      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
-    },
-    {
-      "archive_path": "v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/setup.py",
-      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/setup.py",
-      "bytes": 195,
-      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
-    },
-    {
       "archive_path": "v6/fixtures/W2-v1/project/docs/examples/eggsample/eggsample/__init__.py",
       "git_blob_sha": "b2d9d8301facc8583dcd503be8f7f2004b137cac",
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v1/project/docs/examples/eggsample/eggsample/__init__.py",
@@ -1595,6 +1575,20 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v1/project/docs/examples/eggsample/setup.py",
       "bytes": 243,
       "sha256": "a87fb9c73c4159916b16647caa71abdd6dde0add76f0c4052c25a7cf925c6fc0"
+    },
+    {
+      "archive_path": "v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "bytes": 616,
+      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
+    },
+    {
+      "archive_path": "v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/setup.py",
+      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v1/project/docs/examples/eggsample-spam/setup.py",
+      "bytes": 195,
+      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
     },
     {
       "archive_path": "v6/fixtures/W2-v1/project/docs/examples/toy-example.py",
@@ -2010,20 +2004,6 @@
       "sha256": "d0d39111c202fb65274089f674f85bbf530acf1a4e8431a95e5f41daa3cb2be9"
     },
     {
-      "archive_path": "v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "bytes": 616,
-      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
-    },
-    {
-      "archive_path": "v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/setup.py",
-      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/setup.py",
-      "bytes": 195,
-      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
-    },
-    {
       "archive_path": "v6/fixtures/W2-v2/project/docs/examples/eggsample/eggsample/__init__.py",
       "git_blob_sha": "b2d9d8301facc8583dcd503be8f7f2004b137cac",
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v2/project/docs/examples/eggsample/eggsample/__init__.py",
@@ -2057,6 +2037,20 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v2/project/docs/examples/eggsample/setup.py",
       "bytes": 243,
       "sha256": "a87fb9c73c4159916b16647caa71abdd6dde0add76f0c4052c25a7cf925c6fc0"
+    },
+    {
+      "archive_path": "v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "bytes": 616,
+      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
+    },
+    {
+      "archive_path": "v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/setup.py",
+      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v2/project/docs/examples/eggsample-spam/setup.py",
+      "bytes": 195,
+      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
     },
     {
       "archive_path": "v6/fixtures/W2-v2/project/docs/examples/toy-example.py",
@@ -2472,20 +2466,6 @@
       "sha256": "d0d39111c202fb65274089f674f85bbf530acf1a4e8431a95e5f41daa3cb2be9"
     },
     {
-      "archive_path": "v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
-      "bytes": 616,
-      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
-    },
-    {
-      "archive_path": "v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/setup.py",
-      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
-      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/setup.py",
-      "bytes": 195,
-      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
-    },
-    {
       "archive_path": "v6/fixtures/W2-v3/project/docs/examples/eggsample/eggsample/__init__.py",
       "git_blob_sha": "b2d9d8301facc8583dcd503be8f7f2004b137cac",
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v3/project/docs/examples/eggsample/eggsample/__init__.py",
@@ -2519,6 +2499,20 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v3/project/docs/examples/eggsample/setup.py",
       "bytes": 243,
       "sha256": "a87fb9c73c4159916b16647caa71abdd6dde0add76f0c4052c25a7cf925c6fc0"
+    },
+    {
+      "archive_path": "v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "git_blob_sha": "500d885d55b91663ad489bd5acfbccee8c7129c7",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/eggsample_spam.py",
+      "bytes": 616,
+      "sha256": "2d8f7477e2874a785a6bbc9f1884c4995f95ee6bc08368d969701bae4ac09e5a"
+    },
+    {
+      "archive_path": "v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/setup.py",
+      "git_blob_sha": "557aa5c1f1358dd0075259345b4ef9b58a0f171c",
+      "source": "/root/output/oc-hermes-execution-20261024-v6/fixtures/W2-v3/project/docs/examples/eggsample-spam/setup.py",
+      "bytes": 195,
+      "sha256": "a4965ad61d2e71a707394a922094a4929022f6b344c67bb5fec5d9ebbbc3cb2e"
     },
     {
       "archive_path": "v6/fixtures/W2-v3/project/docs/examples/toy-example.py",
@@ -4695,6 +4689,13 @@
       "sha256": "ec5bf76c476e669bb2b9e121be51a0f423e14f201c1f37353c2f396c70bc2a72"
     },
     {
+      "archive_path": "v6/support/data-generator/reconcile_data.py",
+      "source": "V6 records: evidence/grader-W3-v1/workspace/reconcile_data.py",
+      "bytes": 1545,
+      "sha256": "ac4962ab359d775f8ddffed93ae61ab58707aad3646a6e0fe33c27182b627a1e",
+      "git_blob_sha": "a695cf6c4e9f8befebaf457c04c2ee0f9d745196"
+    },
+    {
       "archive_path": "v6/support/handoff/tools/prepare_run.py",
       "git_blob_sha": "8888b598eb07e0466f98bd2245d71df7be6823b3",
       "source": "/root/Downloads/1023magnitude/agent_eval_handoff/tools/prepare_run.py",
@@ -4716,11 +4717,13 @@
       "sha256": "6f76b23e05703ca44e79afd86ccb0d44dd6524c89e8bc24ada3a10b06c810c34"
     },
     {
-      "archive_path": "v6/windows-native-bundle/README.txt",
-      "git_blob_sha": "fd9d7765ed0446caf0611dace6bb9674e3e7d6a7",
+      "archive_path": "v6/windows-native-bundle/README.md",
+      "git_blob_sha": "4a0c9864bc6fdce2779081d8a01566e00f8e6aba",
       "source": "/root/output/oc-hermes-execution-20261024-v6/results/windows-native-bundle/README.txt",
-      "bytes": 2088,
-      "sha256": "29ea3a7ce85ee03b7a5524b33364287720023d305a7290180c226c100ef0cbb2"
+      "bytes": 2552,
+      "sha256": "9582f173d4ffdbf8f3ef7efcabee411d646cce35b9ad10cb32214fad2fcb4dca",
+      "original_archive_path": "v6/windows-native-bundle/README.txt",
+      "original_sha256": "29ea3a7ce85ee03b7a5524b33364287720023d305a7290180c226c100ef0cbb2"
     },
     {
       "archive_path": "v6/windows-native-bundle/Run-Windows.ps1",
@@ -4731,10 +4734,11 @@
     },
     {
       "archive_path": "v6/windows-native-bundle/bundle-manifest.json",
-      "git_blob_sha": "a5bc8b63443f5047dc12e30846e46b07c7ae07f7",
+      "git_blob_sha": "646af8f6ec88770b26527e217fe931900ca6c416",
       "source": "/root/output/oc-hermes-execution-20261024-v6/results/windows-native-bundle/bundle-manifest.json",
-      "bytes": 681,
-      "sha256": "58a8d2dea10b270a69645ed75a1b89ed27e7743fdcf3320cd87be59c87ea6a5c"
+      "bytes": 725,
+      "sha256": "ff5448ad1150592aef9626dc4f94c587b5cae42c1ccdce2d9c015272201a5baa",
+      "original_sha256": "58a8d2dea10b270a69645ed75a1b89ed27e7743fdcf3320cd87be59c87ea6a5c"
     },
     {
       "archive_path": "v6/windows-native-bundle/pins.json",
@@ -4749,12 +4753,8 @@
       "source": "/root/output/oc-hermes-execution-20261024-v6/results/windows-native-bundle/windows-native.mjs",
       "bytes": 11738,
       "sha256": "039d66b5fbcf438e8115e4e57ad7f2c9ca94b0b0e0ed182c60e97dd37ff61833"
-    },
-    {
-      "archive_path": "v6/support/data-generator/reconcile_data.py",
-      "source": "V6 records: evidence/grader-W3-v1/workspace/reconcile_data.py",
-      "bytes": 1545,
-      "sha256": "ac4962ab359d775f8ddffed93ae61ab58707aad3646a6e0fe33c27182b627a1e"
     }
-  ]
+  ],
+  "schema_version": 1,
+  "scope": "v6/**"
 }

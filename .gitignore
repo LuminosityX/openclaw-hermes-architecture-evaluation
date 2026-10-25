@@ -15,3 +15,24 @@ __pycache__/
 *.pem
 *.key
 runtime-secrets/
+
+# Local tooling and operating-system files.
+.DS_Store
+Thumbs.db
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.idea/
+.vscode/
+
+# Generated experiment and packaging outputs.
+/outputs/
+/results/
+/work/
+*.tar
+*.tar.gz
+*.tar.zst
+*.zip

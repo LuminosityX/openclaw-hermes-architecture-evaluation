@@ -1,21 +1,54 @@
-# OpenClaw / Hermes V6 架构评估代码
+# OpenClaw and Hermes Architecture Evaluation
 
-本仓库当前内容仅保留 V6 的实验代码、测试夹具、评分协议、版本锁定信息及引用源码。早期版本、独立的四家 Agent 评估材料和重复的控制脚本快照已移除。
+V6 experiment harnesses, task fixtures, scoring rules, and source references for evaluating the architecture of OpenClaw and Hermes.
 
-## 目录
+This repository is a **source archive**. Repository checks run offline with Python 3.11 or later. Repeating the product experiments requires reconstructing the pinned runtimes; cloning this repository does not install or start either product.
 
-- `v6/scripts/`：V6 实验、分析及审计脚本。
-- `v6/fixtures/`、`v6/private-fixtures/`：任务输入、合成数据和验收代码。
-- `v6/windows-native-bundle/`：V6 Windows 侧执行材料。
-- `v6/protocol/`：V6 使用的冻结协议、评分与校验代码。
-- `v6/support/`：V6 直接引用的公共协调、隔离、数据生成和原生工具测试脚本，仅保留所需文件。
-- `v6/dependencies/`：版本与依赖锁文件。
-- `v6/references/`、`v6/patches/`：V6 引用的上游源码、许可证及对照实验补丁。
+## Evaluated versions
 
-## 使用说明
+| Product | Main evaluation version | Source commit |
+| --- | --- | --- |
+| OpenClaw | `2026.10.6` | `fe06181dc5ecc01cf8904abbfc26925925efefbc` |
+| Hermes | `0.22.5` | `bf0203a794a07aac3ff764972ab9087baa4e4f4e` |
 
-这是 V6 源码归档，未包含安装后的运行环境。原脚本中的历史路径保持原样，重跑前按 `HISTORICAL_LAYOUT.json` 准备路径或调整配置，并安装锁定版本的应用、依赖及工具。`support/` 中的公共脚本属于 V6 的依赖，不包含旧版评估流程和运行结果。
+These are historical experiment pins, not recommendations for current deployments. Upgrade cases use the additional versions recorded in [the version lock](v6/protocol/version_lock.json).
 
-V6 的 102 份原始结果文件及压缩后的日志、数据库和任务记录保留在原机器 `/root/output/oc-hermes-execution-20261024-v6`，未上传本仓库；真实服务凭据也未上传。实验入口可能调用真实模型，重跑前须配置模型通道和预算。
+## Quick start
 
-`SOURCE_MANIFEST.json` 记录所保留源码的原始位置、归档位置和校验值，`references/` 中的上游代码按各自许可证使用。
+```sh
+git clone https://github.com/zyw02/agent-architecture-evaluation-20261025.git
+cd agent-architecture-evaluation-20261025
+python3 tools/check_repository.py
+```
+
+The check validates archive hashes, source references, Windows bundle integrity, Python syntax, JSON structure, documentation links, and the existing scorer self-tests. It does not install dependencies, contact model APIs, start containers, or run product experiments.
+
+## Repository layout
+
+| Path | Contents |
+| --- | --- |
+| [`v6/scripts/`](v6/scripts/) | Experiment controllers, analysis scripts, and audit utilities |
+| [`v6/fixtures/`](v6/fixtures/) | Public task inputs and pinned project fixtures |
+| [`v6/private-fixtures/`](v6/private-fixtures/) | Synthetic evaluator inputs and acceptance oracles; no service credentials |
+| [`v6/protocol/`](v6/protocol/) | Frozen protocol, observation template, scorer, and version lock |
+| [`v6/support/`](v6/support/) | Shared scripts required by V6 |
+| [`v6/dependencies/`](v6/dependencies/) | Archived product dependency declarations and lock files |
+| [`v6/references/`](v6/references/) | Referenced upstream source files, claim index, and licenses |
+| [`v6/patches/`](v6/patches/) | Controlled counterfactual patch and source revision records |
+| [`v6/windows-native-bundle/`](v6/windows-native-bundle/README.md) | Separate native Windows verification bundle |
+| [`docs/`](docs/) | Methodology, reproduction, and provenance documentation |
+| [`tools/`](tools/) | Offline repository validation and manifest maintenance |
+
+Earlier experiment versions and duplicate controller snapshots are excluded from the current source tree. Historical upgrade targets and shared support scripts remain where V6 requires them.
+
+## Scope and reproduction
+
+The evaluation covers eleven architecture dimensions, from recovery and isolation to extensibility and compatibility. See [methodology](docs/methodology.md) for the scope and [reproduction](docs/reproduction.md) for the distinction between offline validation and product execution.
+
+Raw logs, state databases, result records, installed applications, package caches, and real credentials are not distributed here. They are maintained separately from the source archive. The Windows bundle was prepared on Linux; its presence does not establish successful native Windows execution.
+
+Repository documentation is written in English. Frozen protocol fields, synthetic task prompts, multilingual test strings, and quoted upstream source are preserved in their original language because changing them would alter experiment inputs or provenance.
+
+## Contributing and licensing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for archive-preserving changes and [SECURITY.md](SECURITY.md) for private reporting. The original evaluation materials remain all rights reserved under [LICENSE](LICENSE). Included third-party materials retain their own licenses, listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
