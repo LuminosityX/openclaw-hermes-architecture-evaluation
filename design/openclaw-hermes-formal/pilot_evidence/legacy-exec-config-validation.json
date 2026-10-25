@@ -1,6 +1,0 @@
-{
-  "exit_code": 0,
-  "stdout": "{\"valid\":true,\"path\":\"/state/openclaw.json\",\"warnings\":[]}\n",
-  "stderr": "",
-  "meaning": "Canonical mode probe passed. Preserve legacy-path semantic observation separately; do not automatically label it evaluator error or whole-product permission failure."
-}

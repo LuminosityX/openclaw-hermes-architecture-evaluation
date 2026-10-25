@@ -1,2 +1,0 @@
-2026-10-22 14:18:37,462 WARNING agent.ssl_verify: truststore unavailable (No module named 'truststore'); falling back to OpenSSL's default trust paths. Certificates trusted only by the OS store — a corporate root, for instance — will not verify.
-2026-10-22 14:18:38,185 WARNING agent.model_metadata: Could not determine context length for model 'bench-scripted' (base_url=http://127.0.0.1:18081/v1) — falling back to 256,000 tokens. Set model.context_length in config.yaml to override.

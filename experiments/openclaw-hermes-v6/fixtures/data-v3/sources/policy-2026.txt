@@ -1,1 +1,0 @@
-文档ID ACTIVE-2026，当前有效。跨全部分片按record_id去重，取最高数字revision；同版本重复为同一记录。去重后去掉status=void；先将gross和refund分别用Decimal ROUND_HALF_UP舍入两位，再求净额。gross/refund不可解析、任一为负或refund>gross的当前active记录为invalid，不计入分组；作废记录不参加金额验证。按region,currency分组，合计record_count、units、gross、refund、net。不能跨币种相加。

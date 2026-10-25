@@ -1,1 +1,0 @@
-读取当前工作目录的 orders.csv，仅统计 status 为 paid 的记录。按 region 汇总 amount_cents（整数分）及订单数量，把结果写入当前目录 result.json，严格使用以下 JSON 结构：{"paid_amount_cents_by_region":{"east":整数,"west":整数,"north":整数,"south":整数},"paid_count_by_region":{"east":整数,"west":整数,"north":整数,"south":整数}}。请实际生成文件并检查结果。只访问当前任务目录，不访问网络，不安装依赖。

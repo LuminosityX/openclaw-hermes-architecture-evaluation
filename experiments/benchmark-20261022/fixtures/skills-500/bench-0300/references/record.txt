@@ -1,2 +1,0 @@
-record=300
-marker=fd417740d8fb53c309f740ecd9d74f45940ef3d8af7b3ddbcea1f6d0172c85e8

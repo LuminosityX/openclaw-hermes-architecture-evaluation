@@ -1,7 +1,0 @@
-2026-10-22 14:18:37,462 WARNING agent.ssl_verify: truststore unavailable (No module named 'truststore'); falling back to OpenSSL's default trust paths. Certificates trusted only by the OS store — a corporate root, for instance — will not verify.
-2026-10-22 14:18:37,895 INFO run_agent: OpenAI client created (agent_init, shared=True) thread=MainThread:137607283118208 provider=custom base_url=http://127.0.0.1:18081/v1 model=bench-scripted
-2026-10-22 14:18:38,008 INFO tools.tool_search: tool_search activated (tier 1): 1 core/visible tools kept, 1 deferred (~380 tokens), listing full (budget ~4000 tokens)
-2026-10-22 14:18:38,185 INFO agent.model_metadata: Could not detect context length for model 'bench-scripted' at http://127.0.0.1:18081/v1 — defaulting to 256,000 tokens (probe-down). Set model.context_length in config.yaml to override.
-2026-10-22 14:18:38,185 WARNING agent.model_metadata: Could not determine context length for model 'bench-scripted' (base_url=http://127.0.0.1:18081/v1) — falling back to 256,000 tokens. Set model.context_length in config.yaml to override.
-2026-10-22 14:18:38,191 INFO run_agent: OpenAI client closed (agent_close, shared=True, tcp_force_closed=0) thread=MainThread:137607283118208 provider=custom base_url=http://127.0.0.1:18081/v1 model=bench-scripted
-2026-10-22 14:18:38,260 INFO hermes_cli.mem_trim: memory trim: reason=agent close malloc_trim=1 rss_kib=110084->107196 rss_anon_kib=91188->88300 threads=2 duration_ms=63.6
