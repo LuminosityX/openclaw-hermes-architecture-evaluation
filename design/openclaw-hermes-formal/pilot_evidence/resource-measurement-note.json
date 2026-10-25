@@ -1,0 +1,7 @@
+{
+  "outer_time_resource_accounting_valid": false,
+  "reason": "/usr/bin/time measured the outer bubblewrap launcher, not the isolated product process tree; 2 MiB max RSS cannot be used as product memory",
+  "wall_and_quality_valid": true,
+  "replacement": "read-only /proc process-tree PSS sampling; only complete-from-start paired samples compared",
+  "no_additional_model_runs": true
+}

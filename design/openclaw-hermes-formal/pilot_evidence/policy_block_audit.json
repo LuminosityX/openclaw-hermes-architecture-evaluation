@@ -1,0 +1,144 @@
+[
+  {
+    "task": "code-v1",
+    "family": "hermes",
+    "unique_tool_results": 56,
+    "policy_blocks": [
+      {
+        "tool_call_id": "call_00_72ijF9D7TReq71Og1Kwx4847",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via -e/-c flag) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_YkpqEf4l4j57ZtpXrQ2h5846",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via -e/-c flag) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_DUaG7UzSn17eZftCLCIa9644",
+        "error": "BLOCKED: execute_code runs arbitrary local Python (including subprocess calls that bypass shell-string approval checks). Single-query mode (-q) runs without a user present to approve it. Use normal tools instead, or set approvals.single_query_mode: approve only if this single-query run is intentionally trusted.",
+        "status": "error"
+      },
+      {
+        "tool_call_id": "call_00_xqvFxcL6AqjPgh6yBey93442",
+        "error": "BLOCKED: Command flagged as dangerous (recursive delete) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      }
+    ]
+  },
+  {
+    "task": "code-v2",
+    "family": "hermes",
+    "unique_tool_results": 49,
+    "policy_blocks": [
+      {
+        "tool_call_id": "call_00_D5Dwn2tL5cvFNlOXornQ7177",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via heredoc) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_BlWpX6jxOFuIoRxKN6531523",
+        "error": "BLOCKED: execute_code runs arbitrary local Python (including subprocess calls that bypass shell-string approval checks). Single-query mode (-q) runs without a user present to approve it. Use normal tools instead, or set approvals.single_query_mode: approve only if this single-query run is intentionally trusted.",
+        "status": "error"
+      },
+      {
+        "tool_call_id": "call_00_pBdro41ScxsrhT9h2jhq2280",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via -e/-c flag) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_01_PVHruArDc8b7BdAxkIXK0191",
+        "error": "BLOCKED: Command flagged as dangerous (recursive delete) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      }
+    ]
+  },
+  {
+    "task": "code-v3",
+    "family": "hermes",
+    "unique_tool_results": 58,
+    "policy_blocks": [
+      {
+        "tool_call_id": "call_00_SzXukP1aPuSlepZtj4Xk6372",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via -e/-c flag) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_ac7Flp8dJ6L72jsHzJxI9592",
+        "error": "BLOCKED: Command flagged as dangerous (recursive delete) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      }
+    ]
+  },
+  {
+    "task": "data-v1",
+    "family": "hermes",
+    "unique_tool_results": 35,
+    "policy_blocks": [
+      {
+        "tool_call_id": "call_00_J6Zr18BnAJt6ounm8e4O8589",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via heredoc) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_ET_GMnLUYg3xhWrjCTwetQx7202",
+        "error": "BLOCKED: Command flagged as dangerous (recursive delete) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      }
+    ]
+  },
+  {
+    "task": "data-v2",
+    "family": "hermes",
+    "unique_tool_results": 31,
+    "policy_blocks": [
+      {
+        "tool_call_id": "call_00_6w6PWOy2W9107qw01GYN5946",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via heredoc) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_KurmFTqzpOn4X6VOcO8o1786",
+        "error": "BLOCKED: execute_code runs arbitrary local Python (including subprocess calls that bypass shell-string approval checks). Single-query mode (-q) runs without a user present to approve it. Use normal tools instead, or set approvals.single_query_mode: approve only if this single-query run is intentionally trusted.",
+        "status": "error"
+      },
+      {
+        "tool_call_id": "call_00_RNkR9b8EKwfLoPOQ0BaB0067",
+        "error": "BLOCKED: Command flagged as dangerous (delete in root path) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_D86doFRLnMIJLHDSC7x75192",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via -e/-c flag) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      }
+    ]
+  },
+  {
+    "task": "data-v3",
+    "family": "hermes",
+    "unique_tool_results": 58,
+    "policy_blocks": [
+      {
+        "tool_call_id": "call_01_p5L4PWRUGctQbKznjJm39894",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via heredoc) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_ho3qhnaxSJNsTIqfz5eZ9333",
+        "error": "BLOCKED: Command flagged as dangerous (script execution via -e/-c flag) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_ET_L1m6qIYnEP2r20wLdBfY1079",
+        "error": "BLOCKED: Command flagged as dangerous (recursive delete) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      },
+      {
+        "tool_call_id": "call_00_6cPOi96cz653hEERPx7Q7076",
+        "error": "BLOCKED: Command flagged as dangerous (recursive delete) but single-query mode (-q) runs without a user present to approve it. Find an alternative approach that avoids this command. To allow dangerous commands in single-query mode, set approvals.single_query_mode: approve in config.yaml.",
+        "status": "blocked"
+      }
+    ]
+  }
+]

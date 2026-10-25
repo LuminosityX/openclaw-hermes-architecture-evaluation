@@ -1,0 +1,31 @@
+重要校准说明：原真实模型试跑两家审批合同未完全对齐；Hermes有20次工具拦截。原费用与时延数值是这些配置下的观察，不能直接作公平架构效率或正式等级。现已同权正控通过4/4，完整新批次按统一要求配置。
+
+试跑复核与修复状态，2026-10-24
+本轮是校准，不是11维正式评分。下列是实际观察。
+
+openclaw: 6/6任务通过；总耗时1228.201秒；模型请求154次；费用估算0.98392808元。
+hermes: 6/6任务通过；总耗时1271.204秒；模型请求247次；费用估算1.17475132元。
+hermes 完整Gateway HTTP:[{'concurrency': 1, 'median_seconds': 0.41105771623551846, 'median_throughput': 2.4327483964004775, 'correct_requests': 5, 'total_requests': 5}, {'concurrency': 2, 'median_seconds': 0.5063659334555268, 'median_throughput': 3.9497127825161176, 'correct_requests': 10, 'total_requests': 10}, {'concurrency': 4, 'median_seconds': 0.6736596785485744, 'median_throughput': 5.937716219884427, 'correct_requests': 20, 'total_requests': 20}, {'concurrency': 8, 'median_seconds': 1.017111400142312, 'median_throughput': 7.8654117915507165, 'correct_requests': 40, 'total_requests': 40}]
+openclaw 完整Gateway HTTP:[{'concurrency': 1, 'median_seconds': 0.6739357840269804, 'median_throughput': 1.4838208976301603, 'correct_requests': 5, 'total_requests': 5}, {'concurrency': 2, 'median_seconds': 0.972060376778245, 'median_throughput': 2.057485365907737, 'correct_requests': 10, 'total_requests': 10}, {'concurrency': 4, 'median_seconds': 1.6078720279037952, 'median_throughput': 2.4877601765451787, 'correct_requests': 20, 'total_requests': 20}, {'concurrency': 8, 'median_seconds': 3.4138319604098797, 'median_throughput': 2.3434076699661235, 'correct_requests': 40, 'total_requests': 40}]
+hermes MCP:[{'tool_count': 1, 'median_ms': 200.286015, 'median_overlap': 1, 'n': 5}, {'tool_count': 4, 'median_ms': 806.447531, 'median_overlap': 1, 'n': 5}, {'tool_count': 8, 'median_ms': 1615.993199, 'median_overlap': 1, 'n': 5}]
+openclaw MCP:[{'tool_count': 1, 'median_ms': 200.285166, 'median_overlap': 1, 'n': 5}, {'tool_count': 4, 'median_ms': 200.906831, 'median_overlap': 4, 'n': 5}, {'tool_count': 8, 'median_ms': 201.671654, 'median_overlap': 8, 'n': 5}]
+hermes plugin-host:{'valid_comparison': True, 'plugin_loaded_and_called': True, 'crash_entered': True, 'main_loop_survived': True}
+openclaw plugin-host:{'valid_comparison': True, 'plugin_loaded_and_called': True, 'crash_entered': True, 'main_loop_survived': False}
+hermes plugin-in-process:{'valid_comparison': True, 'plugin_loaded_and_called': True, 'crash_entered': True, 'main_loop_survived': False}
+
+已处理的实验设置与计量问题：
+1. 固定协议提供方日志的并发临时文件竞争：加锁后重跑，原尝试保留。
+2. OpenClaw规范权限模式：tools.exec.mode=deny已实际阻止动作。旧security/ask路径3次独立复现校验合法却未拒绝；原生加载/合成诊断发现默认mode=full与旧deny并存，合成副本被原生校验器拒绝。保留配置语义回归，不泛化为所有权限失效。
+3. 原生插件：官方安装、能力同意和工具合同已补齐；两家身份探针及崩溃入口均实际触发。OpenClaw当前CLI任务中断是有效观测；不能说整个Gateway崩溃。Hermes host模式继续、in_process对照中断。
+4. Hermes后续探针：去掉会触发正确审批的inline-eval，改为受控文件脚本后通过；原审批阻断保留。
+5. HTTP夹具工作区入口缺失：修正后实际预热与结果校验通过。
+6. HTTP层级：原轻量API组件模式归档；已补两家官方完整Gateway路径。Hermes76条session_admissions与OpenClaw76个独立session_key已独立查询，76含预热1。
+7. 外层time的CPU/RSS数据无效并撤销；只保留完整配对的进程树采样PSS，3对约为3.23/3.37/3.31倍。总CPU尚不能从这些数据推出，正式采集必须过自检。
+8. 503：两家均恢复成功；Hermes三次受控样本在约0.03秒重试、没有遵守2秒Retry-After，OpenClaw约2.3秒。这个有效差异不是记录器问题，恢复成功和退避遵守分别报告。
+
+统计限制：MCP每规模5个测量批次属于同一连接；HTTP每档5批属于同一服务启动；不是5个独立部署样本。正式方案改为6个独立连接/服务实例。
+版本限制：OpenClaw为v2026.10.6；Hermes试跑为2026-10-24主干5894，banner日期不是源码日期。正式设计主线固定稳定版v0.22.5，不将这12例混入正式样本。
+收费：12例合计模型费用估算2.15867940元；其后本地固定协议测试没有真实模型调用。
+当前试跑及修复已结束，完整新正式批次尚未启动。
+
+补充：记录器实际HTTP处理器已通过4并发、80次请求的持久记录自检，记录数80且内容一致。旧字段语义问题不能再简单归为“操作者配置错”，详见pilot_evidence/legacy-config-native-assembly-validation.json。

@@ -1,0 +1,14 @@
+import fs from 'node:fs';import path from 'node:path';import{pathToFileURL}from'node:url';
+const R=path.resolve(import.meta.dirname,'..'),S='/root/output/openclaw-hermes-benchmark-20261022/sources/openclaw',state=R+'/runtime/openclaw',work=R+'/workspaces/openclaw';fs.mkdirSync(state,{recursive:true});fs.mkdirSync(work,{recursive:true});
+process.env.OPENCLAW_STATE_DIR=state;process.env.OPENCLAW_CONFIG_PATH=state+'/config.json';process.env.OPENCLAW_SKIP_CHANNELS='1';process.env.OPENCLAW_SKIP_PROVIDERS='1';
+const config=JSON.parse(fs.readFileSync('/root/output/openclaw-hermes-benchmark-20261022/configs/openclaw-deepseek-config.json'));
+config.models.providers['deepseek-bench'].baseUrl='http://127.0.0.1:40490/openclaw/v1';config.models.providers['deepseek-bench'].apiKey='local-benchmark-proxy';config.models.providers['deepseek-bench'].models[0].maxTokens=512;
+config.agents.defaults.workspace=work;config.agents.defaults.models['deepseek-bench/deepseek-flash'].params.maxTokens=512;config.agents.defaults.maxConcurrent=4;
+config.tools={allow:['exec'],codeMode:false,toolSearch:false,exec:{host:'gateway',security:'full',ask:'off'}};
+config.gateway={mode:'local',bind:'loopback',port:40491,auth:{mode:'token',token:'local-nonfunctional-benchmark'},controlUi:{enabled:false},http:{endpoints:{chatCompletions:{enabled:true}}}};
+fs.writeFileSync(state+'/config.json',JSON.stringify(config));
+const{registerSealedRuntimeProcessEntrypoint}=await import(pathToFileURL(S+'/src/infra/runtime-process-url.ts'));registerSealedRuntimeProcessEntrypoint('serviceChildGroupAnchor',pathToFileURL(S+'/dist/process/supervisor/service-child-group-anchor.js'));
+const{startGatewayServer}=await import(pathToFileURL(S+'/src/gateway/server.ts'));
+const server=await startGatewayServer(40491,{host:'127.0.0.1',controlUiEnabled:false,openAiChatCompletionsEnabled:true,sidecarStartup:'defer'});
+fs.writeFileSync(R+'/runtime/openclaw-ready.json',JSON.stringify({ready:true,pid:process.pid}));console.log('NONFUNCTIONAL_GATEWAY_READY');
+for(const signal of ['SIGTERM','SIGINT'])process.on(signal,async()=>{await server.close({reason:'benchmark complete',drainTimeoutMs:5000});process.exit(0)});

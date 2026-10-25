@@ -1,0 +1,331 @@
+[
+  {
+    "claim_id": "H-MCP-lock",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/mcp_tool_transport.py",
+    "archive_path": "references/pinned-source-files/hermes/5fa6c656a9f3-mcp_tool_transport.py",
+    "sha256": "5fa6c656a9f3a65d9231e0b8d79011a60b5b58a7a33873200effed79b2521908",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-MCP-safe-env",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/mcp_tool_config.py",
+    "archive_path": "references/pinned-source-files/hermes/8b0c1885099a-mcp_tool_config.py",
+    "sha256": "8b0c1885099a12f055abc308cd3edb065917e9f85adc3fadbb596ed2e303084e",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-unknown-recovery",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/platforms/api_server_authority_runs.py",
+    "archive_path": "references/pinned-source-files/hermes/6917612fbca6-api_server_authority_runs.py",
+    "sha256": "6917612fbca612f40fae15dc77a9abb13cc9f6dce17d148e67dcf360a826c884",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-separate-context-selection",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/plugins/context_engine/__init__.py",
+    "archive_path": "references/pinned-source-files/hermes/8e2d75255b9c-__init__.py",
+    "sha256": "8e2d75255b9c271f692daf9bf256d98ca6102fddda096c9f3fcc63ad5da143eb",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-delegation-is-routing",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/hermes_cli/plugins_registrars.py",
+    "archive_path": "references/pinned-source-files/hermes/b15ac6b0fa68-plugins_registrars.py",
+    "sha256": "b15ac6b0fa68c29d52190e8014485ec0ca5e4dbb117bdaa4258ab737fa705258",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-executor-plugin",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/plugins/sdk-agent-harness/registration.md",
+    "archive_path": "references/pinned-source-files/openclaw/6f0a26e6a286-registration.md",
+    "sha256": "6f0a26e6a286e14c94f94a9b89e01777131a5428b6d7df66ef9da996d5eccda8",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-native-recovery",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/gateway/restart-recovery.md",
+    "archive_path": "references/pinned-source-files/openclaw/5f0f24101b51-restart-recovery.md",
+    "sha256": "5f0f24101b51a1a066d6bce7f4a030679b4bb96e8392d46c330482001be9df36",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-backup-activation",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/cli/backup.md",
+    "archive_path": "references/pinned-source-files/openclaw/25ac35ad7371-backup.md",
+    "sha256": "25ac35ad73713d20d062f553b85af968e4e33af8a0678ee1f6a1d5069df1a5f7",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-backup-contract",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/reference/cli-commands.md",
+    "archive_path": "references/pinned-source-files/hermes/d9b643664395-cli-commands.md",
+    "sha256": "d9b643664395cfc1f1059a3dfe2a0081b62b62d0d0f23e9600ad2d1ac0dbfcef",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-observation-planes",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/developer-guide/gateway-monitoring.md",
+    "archive_path": "references/pinned-source-files/hermes/352d53d10b00-gateway-monitoring.md",
+    "sha256": "352d53d10b00874387ce516c3ea04b643c356a9a4a940c4d8c09441d312daa80",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-observation-relay",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/developer-guide/relay-shared-metrics.md",
+    "archive_path": "references/pinned-source-files/hermes/9c13feb9ef7e-relay-shared-metrics.md",
+    "sha256": "9c13feb9ef7e75639ebfb67a3ab03629bb0153ed45321a8d5bd5233d7607157f",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-grant-scope",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/cli/approvals.md",
+    "archive_path": "references/pinned-source-files/openclaw/200a7e708dc1-approvals.md",
+    "sha256": "200a7e708dc1efc2a2121b045edda5cf0a2f7de3b0ea920b820fb4d0c8a26b95",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-MCP-transports",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/tools/mcp.md",
+    "archive_path": "references/pinned-source-files/openclaw/3fb768e769c6-mcp.md",
+    "sha256": "3fb768e769c6d32444039645d44089f4acc15c335039d4b88b900d80ad2d9c88",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-context-official",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/developer-guide/context-engine-plugin.md",
+    "archive_path": "references/pinned-source-files/hermes/d446a1ddd5af-context-engine-plugin.md",
+    "sha256": "d446a1ddd5af61ba605e18c17ad17eab7216b64d1ec09841c47428bb17e6062f",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-public-external-executor",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/developer-guide/model-provider-plugin.md",
+    "archive_path": "references/pinned-source-files/hermes/9429d0d2d004-model-provider-plugin.md",
+    "sha256": "9429d0d2d00415b8c7a6d108f34f30fd16556799bc568b104388bfc5de290df6",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-MCP-call-lock-and-callback",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/mcp_tool_handlers.py",
+    "archive_path": "references/pinned-source-files/hermes/749d4c7ec573-mcp_tool_handlers.py",
+    "sha256": "749d4c7ec5739a18a063b6499f42db18bf7261e72ecfc4ff69cc36ae20737509",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-MCP-lock-design-reason",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/mcp_tool.py",
+    "archive_path": "references/pinned-source-files/hermes/0d4f2a29e4fe-mcp_tool.py",
+    "sha256": "0d4f2a29e4fea798df27a0c7aaf92befaf5ef6e49b17a5ff8cedd9ae067189fa",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-plugin-host-fault-contract",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/user-guide/features/plugins.md",
+    "archive_path": "references/pinned-source-files/hermes/18feb51efd18-plugins.md",
+    "sha256": "18feb51efd18ace98f7b690b0462e3506a03e2f0ad0fc98dcb5c8e46d075dfc3",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-chat-native-transcript-header",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/platforms/api_server_openai_routes.py",
+    "archive_path": "references/pinned-source-files/hermes/3da2a6483c0d-api_server_openai_routes.py",
+    "sha256": "3da2a6483c0d9fd85422ce229859e6a43532d9360758db48f54876e95c0da9f3",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-native-gateway-backpressure",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/platforms/api_server.py",
+    "archive_path": "references/pinned-source-files/hermes/71ac56c28683-api_server.py",
+    "sha256": "71ac56c28683aa6b935a432b58e5bfe3753492363ef2cf9f8853b121d0e8214f",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-native-plugin-trust-and-fault-domain",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/plugins/architecture.md",
+    "archive_path": "references/pinned-source-files/openclaw/440e981bc75b-architecture.md",
+    "sha256": "440e981bc75b11e143f164170e9243e1be632a6fabdbdf225fbd9c624598fe70",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-approval-inbox-route",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/server-request-context-DWxUA9aG.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/c374f5467984-server-request-context-DWxUA9aG.mjs",
+    "sha256": "c374f546798477f6b2050a5f3d3dd511574c67e47ce4435dc7b6e0e4a4d4fb76",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-approval-one-shot-contract",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/exec-approvals-policy-BUCGxklR.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/779b654f2d37-exec-approvals-policy-BUCGxklR.mjs",
+    "sha256": "779b654f2d37016cd6d1347dee4845a45d0bbdcc18ac78d01a3a4a69c80da9df",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-mutable-inline-approval",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/bash-tools-Cig8cES0.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/fe1b110c969e-bash-tools-Cig8cES0.mjs",
+    "sha256": "fe1b110c969e97d7d690ed75628b67bc51a449fe0ae7cdebd20dabf02a7331ed",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-approval-class-session-scope",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/approval.py",
+    "archive_path": "references/pinned-source-files/hermes/6f19d962993e-approval.py",
+    "sha256": "6f19d962993e563e527a6310f481c38d131ad34ab422e540db5c3f949ffa742d",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-kanban-hard-worker-deadline",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/hermes_cli/kanban_db_dispatch.py",
+    "archive_path": "references/pinned-source-files/hermes/849f7c62efa2-kanban_db_dispatch.py",
+    "sha256": "849f7c62efa225cc3b22ef39c2f905d3d207b4ccfbd5b5e32671fca67f64cad4",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-managed-policy-parse-fail-open",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/hermes_cli/managed_scope.py",
+    "archive_path": "references/pinned-source-files/hermes/d048bb14fae4-managed_scope.py",
+    "sha256": "d048bb14fae4517d9c0dc90255c9b495fdba3bbf5311a50aa5108b43c724874d",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-api-restored-profile-binding",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/session_api.py",
+    "archive_path": "references/pinned-source-files/hermes/fecef01c3ec9-session_api.py",
+    "sha256": "fecef01c3ec90953897ed55be93b93fbd43c14aee8c0153343683a5922590ff9",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-profile-identity-absolute-home",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/run_runtime.py",
+    "archive_path": "references/pinned-source-files/hermes/2085e75e7dd8-run_runtime.py",
+    "sha256": "2085e75e7dd822917049e8945a1b43a47c298adfaac2ea41f7fa1c5c8503fa98",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-context-durable-admission-contract",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/concepts/context-engine.md",
+    "archive_path": "references/pinned-source-files/openclaw/7bfbcd827199-context-engine.md",
+    "sha256": "7bfbcd827199f0b29c4af6b0e619d694532843cb945fcbbcbd79696a7a3b0ec6",
+    "scope": ""
+  },
+  {
+    "claim_id": "OC-native-host-only-executor-contract",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/plugins/sdk-agent-harness/core-ownership.md",
+    "archive_path": "references/pinned-source-files/openclaw/3b75610a4d84-core-ownership.md",
+    "sha256": "3b75610a4d84fac548036ac0f6ae2fdf9b5f55efec7392e0040e34d936fa8157",
+    "scope": ""
+  },
+  {
+    "claim_id": "H-MCP-call-tool-exact-lock-and-callback-context",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/mcp_tool_handlers.py",
+    "archive_path": "references/pinned-source-files/hermes/749d4c7ec573-mcp_tool_handlers.py",
+    "sha256": "749d4c7ec5739a18a063b6499f42db18bf7261e72ecfc4ff69cc36ae20737509",
+    "scope": "Baseline result is unchanged. Isolated single-lock removal supports this read-only workload bottleneck; no general concurrency/callback correctness claim."
+  },
+  {
+    "claim_id": "OC-live-tool-result-caps",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/tool-result-limits-DNBSu_jg.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/2f073e5df0dc-tool-result-limits-DNBSu_jg.mjs",
+    "sha256": "2f073e5df0dce2eaf221bd7e2cfe04f98e275dab28a77a550f3e9d09ba6e468b",
+    "scope": "Automatic bounded ordinary tool-result projection; does not prove every alternate code-mode route loses full data."
+  },
+  {
+    "claim_id": "H-full-tool-result-spill",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/tool_result_storage.py",
+    "archive_path": "references/pinned-source-files/hermes/855a0dac6733-tool_result_storage.py",
+    "sha256": "855a0dac6733ec78c0c43a3fb2d539b48a7595674dcdfeda2a5a86cdc6836ea5",
+    "scope": "Full local result archive is distinct from inline prompt size; all six native files were exact-byte validated."
+  },
+  {
+    "claim_id": "H-default-dependency-closure",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/pyproject.toml",
+    "archive_path": "references/pinned-source-files/hermes/68325d6717bd-pyproject.toml",
+    "sha256": "68325d6717bd4ebc3a7b015c5150bea4d5600c612259b9b7393e964caa828761",
+    "scope": "Default all is intentionally narrowed to dependencies that cannot be prepared on demand; not a causal allocation of RAM cost to individual modules."
+  },
+  {
+    "claim_id": "OC-native-backup-parent-dedup",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/backup-shared-B-OJB-yU.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/b9c2af752e3d-backup-shared-B-OJB-yU.mjs",
+    "sha256": "b9c2af752e3da3dd39035a54f46a520408195b75fa1bf003782ac7e208f40ad1",
+    "scope": "External benchmark config adds an activation asset; canonical-layout control must validate before making operation-count claims."
+  },
+  {
+    "claim_id": "OC-durable-approval-choice-and-origin",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/openclaw-state-schema-Cr2v_hbj.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/bb7c221b3b66-openclaw-state-schema-Cr2v_hbj.mjs",
+    "sha256": "bb7c221b3b6635bc2c3f6ae69171a184b5878e0b09e4dc64590bb82aa6f5a68d",
+    "scope": "Approval metadata is a first-class durable native store, with source/tool/run and resolver links. The experiment verifies actual matching rows, not just schema existence."
+  },
+  {
+    "claim_id": "H-approval-queue-lifecycle",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/approval_gateway_wait.py",
+    "archive_path": "references/pinned-source-files/hermes/2d4cf33858fb-approval_gateway_wait.py",
+    "sha256": "2d4cf33858fb520a6b9329ab0c6dedfc63986a0d0a58a1c53f501236de481d4b",
+    "scope": "Transient approval wait is separate from native tool-result/telemetry recording. Public hooks can carry exact choice; source alone does not establish durable official retention."
+  },
+  {
+    "claim_id": "H-public-human-observer-hooks",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/tools/human_input_hooks.py",
+    "archive_path": "references/pinned-source-files/hermes/cb683ab73dc6-human_input_hooks.py",
+    "sha256": "cb683ab73dc60f03d4ae98894287fa34c9769fda528d8fa05fbe8f2f111d58a5",
+    "scope": "Exact human-wait outcome is exposed to custom public observers. It must not be mistaken for an already installed official durable decision ledger."
+  },
+  {
+    "claim_id": "OC-native-Windows-declaration",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/platforms/windows.md",
+    "archive_path": "references/pinned-source-files/openclaw/b8d459b6d890-windows.md",
+    "sha256": "b8d459b6d8900744e326bf2335fc7ef51200e082901c762ad49a6179b48b3dbe",
+    "scope": "Pinned native CLI/Gateway route exists; an actual Windows matrix is still required."
+  },
+  {
+    "claim_id": "H-native-Windows-declaration",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/website/docs/user-guide/windows-native.md",
+    "archive_path": "references/pinned-source-files/hermes/f070c1ff17e6-windows-native.md",
+    "sha256": "f070c1ff17e626810038176f32ea75ffbf71481ac136b3c47bb123b0aebfb957",
+    "scope": "Pinned source documents native Windows operation; no pass is inferred from documentation."
+  },
+  {
+    "claim_id": "H-official-native-session-segment-lifecycle",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/agent/relay_runtime.py",
+    "archive_path": "references/pinned-source-files/hermes/d784442a6184-relay_runtime.py",
+    "sha256": "d784442a61844306ce5769e9065243b8670a67b18d6d929446bfbef021c77725",
+    "scope": "Official max_turns segment rotation closes the previous Relay root before opening the next turn; actual ATIF generation/retention is separately proven in six native same-session guards."
+  },
+  {
+    "claim_id": "OC-cooperative-session-and-main-lanes",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/docs/concepts/queue.md",
+    "archive_path": "references/pinned-source-files/openclaw/e057d80c5372-queue.md",
+    "sha256": "e057d80c537216a5678bf7af7b7984eb2d81fec83d20eccc4705eb7348b64c81",
+    "scope": "Source-confirmed shared event loop and cooperative, non-preemptive synchronous preparation. This can explain blocking propagation; the measured throughput gap is not causally allocated to this mechanism alone."
+  },
+  {
+    "claim_id": "H-canonical-turn-worker-offloop",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/session_runtime_workers.py",
+    "archive_path": "references/pinned-source-files/hermes/dd10aadcce77-session_runtime_workers.py",
+    "sha256": "dd10aadcce77376a04ddb03ff1587b61c9cc0910ccb04cd0e25bbaa89f32e1b4",
+    "scope": "The canonical session path runs synchronous turns in an executor and tracks physical worker lifetime. This is not just the API fallback path."
+  },
+  {
+    "claim_id": "H-agent-reuse-by-route-and-signature",
+    "original_path": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable/gateway/session_execution.py",
+    "archive_path": "references/pinned-source-files/hermes/7c1e29479500-session_execution.py",
+    "sha256": "7c1e294795003b329cc9639fe27e9b8b8fdfbd9b1e3106fcfbd6c8e06f670a60",
+    "scope": "Agent reuse is guarded by routing key, configuration signature and persisted state checks. The existence of this cache alone does not prove the measured RAM advantage or prove OC lacks equivalent reuse."
+  },
+  {
+    "claim_id": "OC-isolated-sqlite-worker-runtime-cost",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/sqlite-worker-store-DjUYjRAp.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/fd7c26dde86c-sqlite-worker-store-DjUYjRAp.mjs",
+    "sha256": "fd7c26dde86c4336f1d66681f9d81df298e4b16e718d19c0de33adf938188045",
+    "scope": "Source confirms independent Node Worker execution, pooled reuse, lifecycle and heap limits. Limits are not allocated memory. Structural runtime/message costs are credible mechanisms, not a quantified decomposition of the measured RAM gap."
+  },
+  {
+    "claim_id": "OC-canonical-validation-worker-pool",
+    "original_path": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/session-accessor.sqlite-canonical-worker-pool-Dv1dw6OS.mjs",
+    "archive_path": "references/pinned-source-files/openclaw/e369827a4022-session-accessor.sqlite-canonical-worker-pool-Dv1dw6OS.mjs",
+    "sha256": "e369827a4022cc85f6b3ac2a3d533a66be5fc9bffc6f7caea1a8657b7885ceb4",
+    "scope": "Source confirms independent Node Worker execution, pooled reuse, lifecycle and heap limits. Limits are not allocated memory. Structural runtime/message costs are credible mechanisms, not a quantified decomposition of the measured RAM gap."
+  }
+]

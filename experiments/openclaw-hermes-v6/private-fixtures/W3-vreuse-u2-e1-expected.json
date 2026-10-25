@@ -1,0 +1,87 @@
+{
+  "summary": [
+    {
+      "region": "华东",
+      "currency": "CNY",
+      "record_count": "3029",
+      "units": "12269",
+      "gross": "755734.06",
+      "refund": "1488.47",
+      "net": "754245.59"
+    },
+    {
+      "region": "华东",
+      "currency": "USD",
+      "record_count": "3030",
+      "units": "12206",
+      "gross": "762145.68",
+      "refund": "1476.10",
+      "net": "760669.58"
+    },
+    {
+      "region": "华北",
+      "currency": "CNY",
+      "record_count": "3027",
+      "units": "12075",
+      "gross": "761966.68",
+      "refund": "1464.54",
+      "net": "760502.14"
+    },
+    {
+      "region": "华北",
+      "currency": "USD",
+      "record_count": "3027",
+      "units": "12253",
+      "gross": "759864.62",
+      "refund": "1472.68",
+      "net": "758391.94"
+    },
+    {
+      "region": "华南",
+      "currency": "CNY",
+      "record_count": "3030",
+      "units": "11874",
+      "gross": "753696.07",
+      "refund": "1480.62",
+      "net": "752215.45"
+    },
+    {
+      "region": "华南",
+      "currency": "USD",
+      "record_count": "3025",
+      "units": "12406",
+      "gross": "767223.15",
+      "refund": "1494.62",
+      "net": "765728.53"
+    }
+  ],
+  "audit": {
+    "policy_id": "ACTIVE-2026",
+    "raw_rows": 26222,
+    "unique_records": 20006,
+    "duplicate_or_superseded_rows": 6216,
+    "void_records": 1819,
+    "invalid_records": [
+      "EDGE3",
+      "EDGE4",
+      "EDGE5",
+      "R01858",
+      "R02347",
+      "R04182",
+      "R05309",
+      "R05785",
+      "R05904",
+      "R07835",
+      "R08359",
+      "R08849",
+      "R09077",
+      "R10290",
+      "R11182",
+      "R12834",
+      "R14104",
+      "R19829",
+      "R19873"
+    ],
+    "included_records": 18168
+  }
+}

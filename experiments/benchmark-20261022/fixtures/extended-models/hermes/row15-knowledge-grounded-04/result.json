@@ -1,0 +1,17 @@
+{
+  "procedures": [
+    {
+      "id": 8,
+      "code": "P-15832",
+      "quota": 626,
+      "source": "docs/policy-08.md"
+    },
+    {
+      "id": 9,
+      "code": "P-19793",
+      "quota": 820,
+      "source": "docs/policy-09.md"
+    }
+  ],
+  "quota_sum": 1446
+}

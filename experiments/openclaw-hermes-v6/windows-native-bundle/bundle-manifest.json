@@ -1,0 +1,12 @@
+{
+  "files": {
+    "windows-native.mjs": "039d66b5fbcf438e8115e4e57ad7f2c9ca94b0b0e0ed182c60e97dd37ff61833",
+    "Run-Windows.ps1": "e9a5f3fc94fe7106a1e5b2112bddfb4cf0cc53944d17e4da63315b0cca252a01",
+    "README.txt": "29ea3a7ce85ee03b7a5524b33364287720023d305a7290180c226c100ef0cbb2",
+    "pins.json": "8cd85beaef906469b8070997f4b3fe788be442f47a5934c378aeebdcec1f521b"
+  },
+  "prepared_at": 1792885033.279842,
+  "execution_status": "Native Windows and PowerShell execution pending; actual Linux OC controller protocol positive control passed.",
+  "source_pins": "pins.json",
+  "scope": "Six native Windows CLI profile cases; no public IP or real inference credentials required."
+}

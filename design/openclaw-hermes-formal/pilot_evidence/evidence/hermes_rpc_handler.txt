@@ -1,0 +1,21 @@
+718:         report = current_tool_progress()
+719: 
+720:         async def _on_progress(progress, total, message):
+721:             if report is not None:
+722:                 report(progress, total, message)
+723: 
+724:         async def _call():
+725:             async with server._rpc_lock, _track_inflight_rpc(server, server_name, op, retry_safe=read_only):
+726:                 server._pending_call_context = contextvars.copy_context()  # for the elicitation callback
+727:                 try:
+728:                     result = await _call_tool_racing_stdio_death(
+729:                         server, server_name, tool_name, args, _on_progress if report is not None else None)
+730:                 finally:
+731:                     server._pending_call_context = None
+732:             if getattr(server, "_mark_session_proven", None) is not None:  # round-trip done: transport healthy
+733:                 server._mark_session_proven()
+734:             image_paths.clear()
+735:             return _render_call_tool_result(result, server_name, image_paths)
+736: 
+737:         def _on_failure(exc):
+738:             _core._bump_server_error(server_name)

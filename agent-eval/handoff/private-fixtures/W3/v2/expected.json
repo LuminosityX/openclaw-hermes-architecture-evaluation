@@ -1,0 +1,881 @@
+{
+  "columns": [
+    "id",
+    "region",
+    "quantity",
+    "unit_price"
+  ],
+  "clean": [
+    {
+      "id": "V2-0001",
+      "region": "east",
+      "quantity": "4",
+      "unit_price": "34.62"
+    },
+    {
+      "id": "V2-0002",
+      "region": "north",
+      "quantity": "9",
+      "unit_price": "22.01"
+    },
+    {
+      "id": "V2-0003",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "84.43"
+    },
+    {
+      "id": "V2-0004",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "127.43"
+    },
+    {
+      "id": "V2-0005",
+      "region": "west",
+      "quantity": "6",
+      "unit_price": "13.27"
+    },
+    {
+      "id": "V2-0006",
+      "region": "north",
+      "quantity": "8",
+      "unit_price": "52.63"
+    },
+    {
+      "id": "V2-0007",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "104.98"
+    },
+    {
+      "id": "V2-0008",
+      "region": "north",
+      "quantity": "4",
+      "unit_price": "134.50"
+    },
+    {
+      "id": "V2-0009",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "72.08"
+    },
+    {
+      "id": "V2-0010",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "37.54"
+    },
+    {
+      "id": "V2-0011",
+      "region": "north",
+      "quantity": "5",
+      "unit_price": "149.91"
+    },
+    {
+      "id": "V2-0012",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "119.43"
+    },
+    {
+      "id": "V2-0014",
+      "region": "east",
+      "quantity": "3",
+      "unit_price": "57.60"
+    },
+    {
+      "id": "V2-0015",
+      "region": "west",
+      "quantity": "4",
+      "unit_price": "15.54"
+    },
+    {
+      "id": "V2-0016",
+      "region": "west",
+      "quantity": "7",
+      "unit_price": "28.50"
+    },
+    {
+      "id": "V2-0018",
+      "region": "west",
+      "quantity": "4",
+      "unit_price": "17.57"
+    },
+    {
+      "id": "V2-0020",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "70.77"
+    },
+    {
+      "id": "V2-0021",
+      "region": "west",
+      "quantity": "2",
+      "unit_price": "91.92"
+    },
+    {
+      "id": "V2-0022",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "75.91"
+    },
+    {
+      "id": "V2-0024",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "2.38"
+    },
+    {
+      "id": "V2-0025",
+      "region": "west",
+      "quantity": "6",
+      "unit_price": "20.72"
+    },
+    {
+      "id": "V2-0027",
+      "region": "east",
+      "quantity": "2",
+      "unit_price": "90.98"
+    },
+    {
+      "id": "V2-0028",
+      "region": "west",
+      "quantity": "3",
+      "unit_price": "114.45"
+    },
+    {
+      "id": "V2-0029",
+      "region": "north",
+      "quantity": "8",
+      "unit_price": "9.27"
+    },
+    {
+      "id": "V2-0030",
+      "region": "east",
+      "quantity": "8",
+      "unit_price": "73.70"
+    },
+    {
+      "id": "V2-0031",
+      "region": "north",
+      "quantity": "8",
+      "unit_price": "111.22"
+    },
+    {
+      "id": "V2-0032",
+      "region": "north",
+      "quantity": "5",
+      "unit_price": "97.57"
+    },
+    {
+      "id": "V2-0033",
+      "region": "north",
+      "quantity": "7",
+      "unit_price": "132.57"
+    },
+    {
+      "id": "V2-0035",
+      "region": "east",
+      "quantity": "1",
+      "unit_price": "122.98"
+    },
+    {
+      "id": "V2-0036",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "49.39"
+    },
+    {
+      "id": "V2-0037",
+      "region": "north",
+      "quantity": "9",
+      "unit_price": "67.66"
+    },
+    {
+      "id": "V2-0040",
+      "region": "north",
+      "quantity": "4",
+      "unit_price": "132.46"
+    },
+    {
+      "id": "V2-0041",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "37.85"
+    },
+    {
+      "id": "V2-0042",
+      "region": "west",
+      "quantity": "5",
+      "unit_price": "117.10"
+    },
+    {
+      "id": "V2-0043",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "88.68"
+    },
+    {
+      "id": "V2-0044",
+      "region": "north",
+      "quantity": "3",
+      "unit_price": "116.32"
+    },
+    {
+      "id": "V2-0045",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "93.24"
+    },
+    {
+      "id": "V2-0047",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "91.16"
+    },
+    {
+      "id": "V2-0048",
+      "region": "west",
+      "quantity": "3",
+      "unit_price": "86.52"
+    },
+    {
+      "id": "V2-0049",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "135.72"
+    },
+    {
+      "id": "V2-0050",
+      "region": "north",
+      "quantity": "7",
+      "unit_price": "25.75"
+    },
+    {
+      "id": "V2-0053",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "139.17"
+    },
+    {
+      "id": "V2-0054",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "4.86"
+    },
+    {
+      "id": "V2-0055",
+      "region": "east",
+      "quantity": "1",
+      "unit_price": "37.59"
+    },
+    {
+      "id": "V2-0056",
+      "region": "east",
+      "quantity": "6",
+      "unit_price": "0.99"
+    },
+    {
+      "id": "V2-0058",
+      "region": "east",
+      "quantity": "1",
+      "unit_price": "142.07"
+    },
+    {
+      "id": "V2-0059",
+      "region": "west",
+      "quantity": "4",
+      "unit_price": "146.27"
+    },
+    {
+      "id": "V2-0060",
+      "region": "east",
+      "quantity": "2",
+      "unit_price": "84.98"
+    },
+    {
+      "id": "V2-0061",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "39.09"
+    },
+    {
+      "id": "V2-0062",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "107.44"
+    },
+    {
+      "id": "V2-0063",
+      "region": "north",
+      "quantity": "7",
+      "unit_price": "18.96"
+    },
+    {
+      "id": "V2-0064",
+      "region": "north",
+      "quantity": "8",
+      "unit_price": "63.62"
+    },
+    {
+      "id": "V2-0066",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "20.73"
+    },
+    {
+      "id": "V2-0067",
+      "region": "west",
+      "quantity": "3",
+      "unit_price": "0.27"
+    },
+    {
+      "id": "V2-0070",
+      "region": "west",
+      "quantity": "1",
+      "unit_price": "37.74"
+    },
+    {
+      "id": "V2-0071",
+      "region": "north",
+      "quantity": "4",
+      "unit_price": "100.75"
+    },
+    {
+      "id": "V2-0072",
+      "region": "east",
+      "quantity": "3",
+      "unit_price": "88.69"
+    },
+    {
+      "id": "V2-0073",
+      "region": "north",
+      "quantity": "9",
+      "unit_price": "120.13"
+    },
+    {
+      "id": "V2-0074",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "61.56"
+    },
+    {
+      "id": "V2-0075",
+      "region": "north",
+      "quantity": "2",
+      "unit_price": "63.89"
+    },
+    {
+      "id": "V2-0077",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "40.49"
+    },
+    {
+      "id": "V2-0079",
+      "region": "east",
+      "quantity": "9",
+      "unit_price": "16.24"
+    },
+    {
+      "id": "V2-0080",
+      "region": "north",
+      "quantity": "4",
+      "unit_price": "49.33"
+    },
+    {
+      "id": "V2-0081",
+      "region": "east",
+      "quantity": "6",
+      "unit_price": "109.79"
+    },
+    {
+      "id": "V2-0082",
+      "region": "north",
+      "quantity": "5",
+      "unit_price": "54.18"
+    },
+    {
+      "id": "V2-0083",
+      "region": "west",
+      "quantity": "5",
+      "unit_price": "129.22"
+    },
+    {
+      "id": "V2-0084",
+      "region": "west",
+      "quantity": "1",
+      "unit_price": "9.83"
+    },
+    {
+      "id": "V2-0086",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "105.19"
+    },
+    {
+      "id": "V2-0087",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "45.25"
+    },
+    {
+      "id": "V2-0088",
+      "region": "west",
+      "quantity": "9",
+      "unit_price": "146.95"
+    },
+    {
+      "id": "V2-0089",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "105.65"
+    },
+    {
+      "id": "V2-0090",
+      "region": "east",
+      "quantity": "8",
+      "unit_price": "9.44"
+    },
+    {
+      "id": "V2-0093",
+      "region": "north",
+      "quantity": "3",
+      "unit_price": "12.96"
+    },
+    {
+      "id": "V2-0094",
+      "region": "east",
+      "quantity": "1",
+      "unit_price": "110.47"
+    },
+    {
+      "id": "V2-0096",
+      "region": "east",
+      "quantity": "8",
+      "unit_price": "101.88"
+    },
+    {
+      "id": "V2-0097",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "51.75"
+    },
+    {
+      "id": "V2-0098",
+      "region": "north",
+      "quantity": "9",
+      "unit_price": "18.71"
+    },
+    {
+      "id": "V2-0099",
+      "region": "west",
+      "quantity": "5",
+      "unit_price": "80.74"
+    },
+    {
+      "id": "V2-0100",
+      "region": "north",
+      "quantity": "1",
+      "unit_price": "74.63"
+    },
+    {
+      "id": "V2-0101",
+      "region": "west",
+      "quantity": "3",
+      "unit_price": "143.79"
+    },
+    {
+      "id": "V2-0103",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "32.35"
+    },
+    {
+      "id": "V2-0105",
+      "region": "east",
+      "quantity": "1",
+      "unit_price": "49.34"
+    },
+    {
+      "id": "V2-0106",
+      "region": "east",
+      "quantity": "3",
+      "unit_price": "115.29"
+    },
+    {
+      "id": "V2-0107",
+      "region": "north",
+      "quantity": "1",
+      "unit_price": "29.54"
+    },
+    {
+      "id": "V2-0108",
+      "region": "north",
+      "quantity": "2",
+      "unit_price": "88.85"
+    },
+    {
+      "id": "V2-0109",
+      "region": "east",
+      "quantity": "8",
+      "unit_price": "47.34"
+    },
+    {
+      "id": "V2-0110",
+      "region": "west",
+      "quantity": "2",
+      "unit_price": "126.37"
+    },
+    {
+      "id": "V2-0111",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "112.73"
+    },
+    {
+      "id": "V2-0112",
+      "region": "north",
+      "quantity": "4",
+      "unit_price": "71.68"
+    },
+    {
+      "id": "V2-0113",
+      "region": "north",
+      "quantity": "3",
+      "unit_price": "25.60"
+    },
+    {
+      "id": "V2-0116",
+      "region": "east",
+      "quantity": "6",
+      "unit_price": "78.42"
+    },
+    {
+      "id": "V2-0118",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "45.50"
+    },
+    {
+      "id": "V2-0120",
+      "region": "east",
+      "quantity": "3",
+      "unit_price": "149.51"
+    },
+    {
+      "id": "V2-0121",
+      "region": "east",
+      "quantity": "8",
+      "unit_price": "70.05"
+    },
+    {
+      "id": "V2-0122",
+      "region": "west",
+      "quantity": "4",
+      "unit_price": "2.60"
+    },
+    {
+      "id": "V2-0123",
+      "region": "west",
+      "quantity": "4",
+      "unit_price": "105.92"
+    },
+    {
+      "id": "V2-0124",
+      "region": "east",
+      "quantity": "6",
+      "unit_price": "90.55"
+    },
+    {
+      "id": "V2-0125",
+      "region": "north",
+      "quantity": "4",
+      "unit_price": "143.94"
+    },
+    {
+      "id": "V2-0126",
+      "region": "west",
+      "quantity": "1",
+      "unit_price": "136.86"
+    },
+    {
+      "id": "V2-0127",
+      "region": "east",
+      "quantity": "1",
+      "unit_price": "137.44"
+    },
+    {
+      "id": "V2-0128",
+      "region": "north",
+      "quantity": "9",
+      "unit_price": "108.49"
+    },
+    {
+      "id": "V2-0129",
+      "region": "east",
+      "quantity": "2",
+      "unit_price": "88.90"
+    },
+    {
+      "id": "V2-0131",
+      "region": "east",
+      "quantity": "4",
+      "unit_price": "61.46"
+    },
+    {
+      "id": "V2-0132",
+      "region": "north",
+      "quantity": "2",
+      "unit_price": "81.90"
+    },
+    {
+      "id": "V2-0134",
+      "region": "east",
+      "quantity": "2",
+      "unit_price": "130.41"
+    },
+    {
+      "id": "V2-0135",
+      "region": "north",
+      "quantity": "7",
+      "unit_price": "40.11"
+    },
+    {
+      "id": "V2-0137",
+      "region": "west",
+      "quantity": "1",
+      "unit_price": "11.43"
+    },
+    {
+      "id": "V2-0139",
+      "region": "north",
+      "quantity": "8",
+      "unit_price": "30.97"
+    },
+    {
+      "id": "V2-0140",
+      "region": "east",
+      "quantity": "6",
+      "unit_price": "106.72"
+    },
+    {
+      "id": "V2-0141",
+      "region": "east",
+      "quantity": "6",
+      "unit_price": "15.40"
+    },
+    {
+      "id": "V2-0142",
+      "region": "east",
+      "quantity": "8",
+      "unit_price": "78.28"
+    },
+    {
+      "id": "V2-0144",
+      "region": "west",
+      "quantity": "3",
+      "unit_price": "12.83"
+    },
+    {
+      "id": "V2-0145",
+      "region": "north",
+      "quantity": "8",
+      "unit_price": "24.12"
+    },
+    {
+      "id": "V2-0146",
+      "region": "north",
+      "quantity": "5",
+      "unit_price": "39.02"
+    },
+    {
+      "id": "V2-0147",
+      "region": "north",
+      "quantity": "2",
+      "unit_price": "87.98"
+    },
+    {
+      "id": "V2-0148",
+      "region": "north",
+      "quantity": "7",
+      "unit_price": "143.23"
+    },
+    {
+      "id": "V2-0149",
+      "region": "north",
+      "quantity": "6",
+      "unit_price": "67.22"
+    },
+    {
+      "id": "V2-0150",
+      "region": "west",
+      "quantity": "6",
+      "unit_price": "116.54"
+    },
+    {
+      "id": "V2-0151",
+      "region": "west",
+      "quantity": "2",
+      "unit_price": "67.74"
+    },
+    {
+      "id": "V2-0154",
+      "region": "west",
+      "quantity": "6",
+      "unit_price": "84.55"
+    },
+    {
+      "id": "V2-0155",
+      "region": "west",
+      "quantity": "6",
+      "unit_price": "135.25"
+    },
+    {
+      "id": "V2-0157",
+      "region": "east",
+      "quantity": "9",
+      "unit_price": "75.72"
+    },
+    {
+      "id": "V2-0158",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "45.04"
+    },
+    {
+      "id": "V2-0159",
+      "region": "east",
+      "quantity": "3",
+      "unit_price": "22.08"
+    },
+    {
+      "id": "V2-0160",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "99.02"
+    },
+    {
+      "id": "V2-0162",
+      "region": "north",
+      "quantity": "7",
+      "unit_price": "53.03"
+    },
+    {
+      "id": "V2-0163",
+      "region": "west",
+      "quantity": "4",
+      "unit_price": "36.15"
+    },
+    {
+      "id": "V2-0164",
+      "region": "north",
+      "quantity": "9",
+      "unit_price": "113.28"
+    },
+    {
+      "id": "V2-0165",
+      "region": "east",
+      "quantity": "9",
+      "unit_price": "27.81"
+    },
+    {
+      "id": "V2-0166",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "131.23"
+    },
+    {
+      "id": "V2-0167",
+      "region": "east",
+      "quantity": "3",
+      "unit_price": "90.72"
+    },
+    {
+      "id": "V2-0168",
+      "region": "west",
+      "quantity": "7",
+      "unit_price": "51.55"
+    },
+    {
+      "id": "V2-0172",
+      "region": "east",
+      "quantity": "5",
+      "unit_price": "103.10"
+    },
+    {
+      "id": "V2-0173",
+      "region": "north",
+      "quantity": "5",
+      "unit_price": "71.82"
+    },
+    {
+      "id": "V2-0174",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "89.26"
+    },
+    {
+      "id": "V2-0175",
+      "region": "west",
+      "quantity": "8",
+      "unit_price": "66.99"
+    },
+    {
+      "id": "V2-0176",
+      "region": "west",
+      "quantity": "2",
+      "unit_price": "133.47"
+    },
+    {
+      "id": "V2-0177",
+      "region": "north",
+      "quantity": "5",
+      "unit_price": "39.89"
+    },
+    {
+      "id": "V2-0178",
+      "region": "east",
+      "quantity": "7",
+      "unit_price": "101.18"
+    },
+    {
+      "id": "V2-0179",
+      "region": "west",
+      "quantity": "7",
+      "unit_price": "1.92"
+    },
+    {
+      "id": "V2-0180",
+      "region": "west",
+      "quantity": "6",
+      "unit_price": "113.27"
+    }
+  ],
+  "summary": {
+    "input_rows": 186,
+    "kept_rows": 141,
+    "invalid_rows": 39,
+    "duplicate_rows": 6,
+    "total_quantity": 748,
+    "total_amount_cents": 5368434,
+    "by_region": {
+      "east": {
+        "rows": 49,
+        "quantity": 249,
+        "amount_cents": 1765029
+      },
+      "north": {
+        "rows": 48,
+        "quantity": 271,
+        "amount_cents": 1914273
+      },
+      "west": {
+        "rows": 44,
+        "quantity": 228,
+        "amount_cents": 1689132
+      }
+    }
+  }
+}

@@ -1,0 +1,15 @@
+请接手四家Agent产品家族评估。先读取：
+/root/Downloads/1023magnitude/agent_eval_handoff/START_HERE.md
+然后按RUNBOOK.md、SCORING.md、experiment.json和state/status.json继续，不重新规划全部实验。
+
+最新约束：Claude完全排除；OpenClaw/Hermes/DSH只用deepseek-flash；Codex只用gpt-6.1-sol。取消所有模型切换、Luna/Astra、Codex Flash和模型响应桩补充组。不要使用document-workflow技能，不要继承已撤回V1的评级。
+
+你是实验协调者。你能看到evaluator_private，但被测Agent必须另开新会话、只获得prepare_run生成的公开工作区，不能把黄金答案或本包整个目录交给它。不要把协调者自己解题算作被测产品结果。
+
+包内已经生成18个公开任务变体、独立验收材料、准备/验收/成对评分脚本及本地副作用模拟服务。离线自检已经通过，但四家真实运行、模型有效配置、账号/设备和预算尚未验证。
+
+先核验包完整性、运行纯本地自检和只读preflight，完成四家的adapter和availability记录。不要读出或展示密钥，不覆盖用户默认配置。费用上限、订阅/云授权和设备未落实时先完成免费的准备工作，并集中列出缺口；条件已明确授权时继续首轮24次试跑，不直接启动216次正式批次。
+
+每次运行保存输入、原始记录、实际模型、用量/费用、失败、人工介入和产物。W4语义及W5/W6必须人工核验，不能只凭结构检查或文件存在判成功。实际效果无证据不补强中弱，成对结果未知时等级保持空白。
+
+请每完成一个阶段更新state/status.json和相应records，先交环境就绪表和适配验证结果，再交试跑数据。保持进度更新，不长时间无反馈。

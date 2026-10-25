@@ -1,0 +1,13 @@
+{
+  "archived_at": "2026-10-25T16:13:53.738431+08:00",
+  "roots": {
+    "/root/output/oc-hermes-execution-20261024-v6": "experiments/openclaw-hermes-v6",
+    "/root/output/oc-hermes-comparison-20261024-v5": "experiments/openclaw-hermes-v5",
+    "/root/output/openclaw-hermes-benchmark-20261022": "experiments/benchmark-20261022",
+    "/root/output/openclaw-hermes-nonfunctional-20261022": "experiments/nonfunctional-20261022",
+    "/root/output/oc-hermes-formal-design-20261024": "design/openclaw-hermes-formal",
+    "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work": "agent-eval/work",
+    "/root/Downloads/1023magnitude/agent_eval_handoff": "agent-eval/handoff"
+  },
+  "note": "Upstream applications and package environments must be reconstructed from pinned versions; original results are kept locally, not replaced by re-runs."
+}

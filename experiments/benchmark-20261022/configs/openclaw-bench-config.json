@@ -1,0 +1,17 @@
+{
+  "models": {
+    "providers": {
+      "bench": {
+        "baseUrl": "http://127.0.0.1:38691/v1",
+        "apiKey": "synthetic-benchmark-key",
+        "api": "openai-completions",
+        "models": [{"id":"bench-scripted","name":"Scripted benchmark fixture","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":128000,"maxTokens":8192}]
+      }
+    }
+  },
+  "agents": {"defaults":{"model":{"primary":"bench/bench-scripted"},"workspace":"/root/output/openclaw-hermes-benchmark-20261022/fixtures/agent-workspace"}},
+  "memory": {"search":{"enabled":false}},
+  "plugins": {"enabled":false},
+  "tools": {"codeMode":false,"exec":{"host":"gateway","security":"full","ask":"off"}},
+  "gateway": {"mode":"local"}
+}

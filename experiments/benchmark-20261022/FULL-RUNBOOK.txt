@@ -1,0 +1,74 @@
+OpenClaw / Hermes: full26-row baseline suite,2026-10-22
+
+Deliverable
+  report.html:26-row table, one scoped comparison image per row, raw links.
+  results/technical-map-26.csv:one row per original technical-map item.
+  results/all-26-summary.csv:per-condition numeric chart values and sample counts.
+  results/extended-row-XX.json:scope, limitations, native entrypoints and raw evidence.
+  charts/:26 PNG,26 SVG,26 PDF exports.
+  full-results.zip:public evidence, scripts, synthetic fixtures and configuration.
+
+What was measured
+  01native session key relations;02actual native SSH execution endpoints;
+  03sender allowlist;04native path/workspace ownership;05long tool output
+  projection/persistence;06sandbox readiness;07real-model data task artifacts;
+  08one-connection MCP scheduling;09native child Agent delegation;
+  10persistent scheduler CRUD;11real-model skill intent selection;
+  12native skill lifecycle;13MCP schema/content round trips;
+  14persistent memory CRUD;15real-model grounded document answers;
+  16native image input + real DeepSeek field extraction;
+  17Retry-After positive wait decision;18dualSSH resource reads;
+  19explicit deny policy;20warmed complete minimal-turn CPU;
+  21native HTTP->tool->reply;22native browser fixed-plan DOM actions;
+  23skill catalog cold/warm;24captured-file restoration;
+  25native provider protocol interoperability;26kernel sandbox quotas.
+
+Each item is a defined baseline subquestion, not exhaustive domain coverage.
+Basic pass rates frequently tie. No combined score or overall framework ranking.
+Read each row's scope and limitations before reusing a chart.
+
+Actual-model suites
+  scripts/extended_model_fixtures.py generates deterministic paired tasks.
+  scripts/extended_model_launch.py hermes / openclaw runs native frameworks.
+  scripts/extended_model_summarize.py independently validates result.json.
+  scripts/extended_vision_fixtures.py generates the10identical-image fixtures.
+  scripts/extended_vision_launch.py hermes / openclaw runs native image routes.
+  Model deepseek-flash, thinking disabled, temperature0,1536output tokens for
+  data/skill/document tasks and256for image extraction. Each framework sees
+  the same case inputs, although native prompt/tool preparation differs.
+  Repeat only when desired: these commands use the configured account credits.
+  No key is stored in this artifact tree or its archive.
+
+Component/integration suites
+  scripts/controls_*.mjs/.py:01/03/04/05/10/17/19.
+  scripts/resources_*.mjs/.py:12/14/20/24/25; raw source-mode memory diagnostics
+  are secondary. Negative RSS deltas were never clamped or ranked.
+  scripts/integration_README.txt:02/09/13/18/21/22startup, execution and cleanup.
+  scripts/integration_audit.py:independent native child completion checks.
+  RUNBOOK.txt:original four-row suite and private DeepSeek configuration.
+
+Environment
+  Pinned commits and toolchain remain in results/environment-final.json.
+  Source-mode API execution is used. First source import/compilation overhead
+  and whole cold process RSS are not production package performance results.
+  Local SSH endpoints share a host; no WAN/cloud-scale conclusion.
+  Browser tasks use fixed actions; no claim of autonomous visual planning.
+  Provider25uses a deterministic protocol fixture, not a neural inference engine.
+  CPU20uses a fixed local model response, so native CPU excludes external
+  model inference work; imported source/native-worker overhead is scoped.
+
+Aggregation and rendering
+  In the prepared task directory:
+    python3 scripts/extended_model_summarize.py
+    envs/report/bin/python scripts/render_full_report.py
+    python3 scripts/package_results.py --archive-name full-results.zip
+  Full renderer refuses missing/nonfinite observations or incorrect pass-rate
+  denominators. Native real-model failures would remain failures, while verified
+  harness setup attempts are preserved separately in raw/setup-invalid-models/.
+
+Security and cleanup
+  runtime/,envs/,sources/and container layers are never bundled.
+  SSH private keys are only in taskruntime and excluded from packages.
+  DeepSeek private key is outside taskoutputs and never included.
+  The final archive is scanned against the configured credential without
+  printing credential values or fingerprints.

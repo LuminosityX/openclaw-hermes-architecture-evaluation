@@ -1,0 +1,17 @@
+runtime/
+runs*/
+logs/
+*.sqlite*
+*.db*
+*.jsonl
+*.log
+node_modules/
+.venv/
+venv/
+__pycache__/
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+runtime-secrets/

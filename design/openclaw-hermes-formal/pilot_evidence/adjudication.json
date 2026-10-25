@@ -1,0 +1,13 @@
+{
+  "model_tasks": "12 pilot tasks accepted, but approval-contract confound prevents using their wall/cost gap as fair architectural ranking",
+  "policy_blocks_in_original_hermes_tasks": 20,
+  "authorization_parity_positive_controls": {
+    "openclaw": "4/4",
+    "hermes": "4/4"
+  },
+  "native_plugin_fault": "Valid observed current-task interruption, not an evaluator failure and not a claim that the entire Gateway died",
+  "hermes_in_process_plugin": "Intentional negative control, not its best available fault-isolation configuration",
+  "retry503": "Both native runs completed; backoff compliance is a separate failing assertion for Hermes",
+  "legacy_policy": "Original file valid/no warnings, three independent effects occurred despite old deny fields; canonical mode deny works; native assembly introduced conflicting mode=full, and validating that assembled copy fails",
+  "resource": "Outer launcher CPU/RSS invalid, discarded. Three complete paired PSS sampling traces remain; total CPU still requires formal validated instrumentation."
+}

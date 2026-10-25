@@ -1,0 +1,20 @@
+{
+  "attribution": "coordinator test setup",
+  "corrections": [
+    {
+      "case": "OpenClaw deny",
+      "problem": "Legacy security/ask settings conflicted with canonical one-shot exec mode defaults",
+      "fix": "Use documented canonical tools.exec.mode=deny and check effective behavior before comparison"
+    },
+    {
+      "case": "OpenClaw native plugin crash",
+      "problem": "Config load path did not create installed-plugin provenance; probe tools were absent",
+      "fix": "Use official plugins install --force --link; require identity probe and crash-entry marker before scoring"
+    },
+    {
+      "case": "Hermes plugin followup",
+      "problem": "Inline python -c followup correctly triggered single-query approval gate, although the main loop had already survived",
+      "fix": "Use a benign file-based followup like other positive controls; preserve existing observation as valid survival evidence, not a product crash"
+    }
+  ]
+}

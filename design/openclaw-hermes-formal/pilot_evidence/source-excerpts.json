@@ -1,0 +1,42 @@
+[
+  {
+    "name": "hermes_rpc_serialization",
+    "source": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/hermes-source/tools/mcp_tool.py",
+    "source_sha256": "0d4f2a29e4fea798df27a0c7aaf92befaf5ef6e49b17a5ff8cedd9ae067189fa",
+    "lines": [
+      423,
+      438
+    ],
+    "excerpt": "evidence/hermes_rpc_serialization.txt"
+  },
+  {
+    "name": "hermes_rpc_handler",
+    "source": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/hermes-source/tools/mcp_tool_handlers.py",
+    "source_sha256": "f29475bde493fb93f55ca16ca53a845b703f87b851ba85770a90f3b5369c58b7",
+    "lines": [
+      718,
+      738
+    ],
+    "excerpt": "evidence/hermes_rpc_handler.txt"
+  },
+  {
+    "name": "openclaw_rpc_handler",
+    "source": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/openclaw/node_modules/openclaw/dist/agents/agent-bundle-mcp-runtime.js",
+    "source_sha256": "1abddd912cab692e7e64105643f86f43d14b4fb0756bd1d3f32fe28b70dfc83d",
+    "lines": [
+      705,
+      729
+    ],
+    "excerpt": "evidence/openclaw_rpc_handler.txt"
+  },
+  {
+    "name": "hermes_managed_parse",
+    "source": "/root/Documents/Codex/2026-10-24/agent-root-downloads-1023magnitude-agent-eval/work/subject-runtime/hermes-source/hermes_cli/managed_scope.py",
+    "source_sha256": "d048bb14fae4517d9c0dc90255c9b495fdba3bbf5311a50aa5108b43c724874d",
+    "lines": [
+      63,
+      98
+    ],
+    "excerpt": "evidence/hermes_managed_parse.txt"
+  }
+]

@@ -1,0 +1,8 @@
+{
+  "project": "pluggy",
+  "version": "1.5.0",
+  "validation_error_raised": true,
+  "failed_plugin_still_registered": true,
+  "desired_fix": "Failed registration must leave plugin name and hook registry unchanged",
+  "model_calls": 0
+}

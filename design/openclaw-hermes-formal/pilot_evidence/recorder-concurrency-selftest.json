@@ -1,0 +1,8 @@
+{
+  "passed": true,
+  "parallel_clients": 4,
+  "requests": 80,
+  "records": 80,
+  "real_model_calls": 0,
+  "validates": "Actual fixed-protocol HTTP handler concurrent log append and persistence after locking repair"
+}

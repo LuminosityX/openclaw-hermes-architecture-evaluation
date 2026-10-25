@@ -1,0 +1,25 @@
+{
+  "observations": [
+    {
+      "kind": "deny-legacy-r1",
+      "valid_config_exit": 0,
+      "side_effect_created": true,
+      "native_exit": 0
+    },
+    {
+      "kind": "deny-legacy-r2",
+      "valid_config_exit": 0,
+      "side_effect_created": true,
+      "native_exit": 0
+    },
+    {
+      "kind": "deny-legacy-r3",
+      "valid_config_exit": 0,
+      "side_effect_created": true,
+      "native_exit": 0
+    }
+  ],
+  "canonical_mode_deny_passed": true,
+  "classification": "Valid legacy configuration semantic regression candidate at one-shot entry; preserve, verify version contract, do not dismiss as evaluator typo or generalize to every permission path.",
+  "paid_calls": 0
+}

@@ -1,0 +1,32 @@
+"""Map semantic native reconstruction to frozen D09; incomplete contracts stay unknown."""
+import json
+from runtime import R,save
+
+def main():
+    source=R/'results/native-observability-reconstruction.json'
+    x=json.loads(source.read_text());a=x['approval'];b=x['fault_reconstruction']
+    if len(a)!=12 or len(b)!=18:raise RuntimeError('Native evidence units incomplete')
+    pa=[];pb=[]
+    for u in range(1,7):
+        for case in ['tool_events','approval_events','identity_links']:
+            fs={z['family']:z for z in a if z['unit']==u}
+            if set(fs)!={'openclaw','hermes'}:raise RuntimeError('Missing paired observation profile')
+            pa.append(dict(unit=f'{case}-u{u}',case=case,oc=fs['openclaw'][case],hermes=fs['hermes'][case]))
+    for case in ['side_effect_reconstruction','child_reconstruction','retry_reconstruction']:
+        units=[2,4,6] if case=='retry_reconstruction' else [1,2,3]
+        for u in units:
+            fs={z['family']:z for z in b if z['case']==case and z['unit']==u}
+            if set(fs)!={'openclaw','hermes'}:raise RuntimeError('Missing paired fault reconstruction')
+            pb.append(dict(unit=f'{case}-u{u}',case=case,oc=fs['openclaw']['passed'],hermes=fs['hermes']['passed']))
+    evidence=['results/native-observability-reconstruction.json','results/observability.json','results/session-closure-native-audit.json','results/observability-rubric-sensitivity.json','evidence/D09-common-contract-adjudication.json','evidence/source-architecture-index.json']
+    obs=json.loads((R/'results/observations.json').read_text())
+    obs['metrics']['D09a']=dict(pairs=pa,evidence=evidence,scope='Official configured collectors, six independent fresh profiles per product. Both native tool/task/verdict joins satisfy the frozen common contract. Exact authorization choice remains an additional observed OC advantage; it was not an explicitly frozen mandatory field and is therefore only evaluated in the disclosed exploratory strict-audit interpretation. Missing identical UUID/schema alone is never a failure; H public hooks can implement a custom precise-choice ledger.')
+    obs['metrics']['D09b']=dict(pairs=pb,evidence=evidence+['results/control-faults.json','results/child-standard-resume.json'],scope='Three independently retained native cases per failure type: exact error/retry cause and completion, durable parent/child completion vs interrupted delivery, failed ACK followed by a persisted receipt-query result. Identical trace topology is not required; external truth is not the native evidence.')
+    obs.setdefault('criterion_limits',{})['D09c']='Primary six paired outages and six supplementary Hermes closure guards completed. Official same-session segmentation exports complete native ATIF tool outputs even after outage; no inference of missing capability from an open root. In the fixed healthy observation window, OC primary remote exports include all tool IDs while H supplementary outage exports do not replay those IDs, but its local ATIF retains them. All retry/configuration and long-term-retention contracts are not certified, so weight20 remains unknown. Supplementary closure guards are not new independent primary approval units.'
+    obs.setdefault('gates',{})['D09']={'自身声明为权威的审批/操作结果记录不得与已知真值相反':dict(oc='pass',hermes='pass',evidence=evidence,scope='The two approved and one denied verdicts agree with actual effect truth in every configured profile; missing choice detail is incomplete metadata, not a fabricated approval or execution.')}
+    obs.setdefault('validity',{})['D09']={key:dict(status='pass',evidence=evidence) for key in ['外部真值账本不得冒充产品自身审计','不得将缺记录解释为未发生或将诊断入口宣称为合规归档']}
+    save(R/'results/observations.json',obs)
+    from assemble_observations import main as refresh
+    refresh()
+
+if __name__=='__main__':main()

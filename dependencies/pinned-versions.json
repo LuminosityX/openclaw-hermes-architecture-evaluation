@@ -1,0 +1,34 @@
+{
+  "node": {
+    "version": "24.22.1",
+    "x64": {
+      "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-x64.zip",
+      "sha256": "d2046d28c2c3dcd211ac5145c0bf30e2047ef9dfb306693c8c6e2eccd8b95fa5"
+    },
+    "arm64": {
+      "url": "https://nodejs.org/dist/v24.22.1/node-v24.22.1-win-arm64.zip",
+      "sha256": "a0c807319fede24c4a0d8f84564c82a619bd313b16b10c007c383c2609e99171"
+    }
+  },
+  "openclaw": {
+    "version": "2026.10.6",
+    "commit": "fe06181dc5ecc01cf8904abbfc26925925efefbc"
+  },
+  "hermes": {
+    "version": "0.22.5",
+    "commit": "bf0203a794a07aac3ff764972ab9087baa4e4f4e",
+    "url": "https://codeload.github.com/NousResearch/hermes-agent/tar.gz/bf0203a794a07aac3ff764972ab9087baa4e4f4e",
+    "sha256": "0dc2cca54657d162845a77f634e107c61c3fb0bd6c8505212aa2e200591b7cc9",
+    "installer_sha256": "82781c63bef90920ceb41a075b69ff5994d12ac1f11606d0b572573fdf515fc2"
+  },
+  "uv": {
+    "version": "0.13.5",
+    "x64": {
+      "sha256": "a38b8d1902b7cfbc76b423ba1bb456f623f42064cdc72628b6075b89afd1019a"
+    },
+    "arm64": {
+      "sha256": "09f47edf90726084a70f9426f6e3ca4f46e9bf7cbf23b1716ec64d60b055fae3"
+    }
+  },
+  "status": "Prepared in Linux; native Windows execution is pending. No Windows pass/fail is asserted from syntax inspection."
+}
