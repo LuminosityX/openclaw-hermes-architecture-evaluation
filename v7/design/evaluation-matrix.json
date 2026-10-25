@@ -1,0 +1,1701 @@
+{
+  "schema_version": 1,
+  "version": "V7-design-draft",
+  "status": "planned-not-executed",
+  "baseline": {
+    "branch": "main",
+    "commit": "a33644efc9490ff771d058ebf047f08550e4ccb3",
+    "archive": "v6/",
+    "change_policy": "Keep every V6 archived file unchanged."
+  },
+  "execution": {
+    "enabled": false,
+    "allow_dependency_downloads": false,
+    "allow_paid_model_calls": false,
+    "run_count": 0,
+    "disk_budget_bytes": null,
+    "required_before_execution": [
+      "Implement and validate matched adapters and independent outcome fixtures.",
+      "Declare a whole-run disk and inode budget, shared dependency budget, and cleanup ownership manifest.",
+      "Set per-case time, memory, process, and connection limits.",
+      "Pre-register independent-unit counts, workload sizes, failure boundaries, and stopping rules.",
+      "Any real-model confirmation requires a separately defined budget; historical authorization text is not inherited."
+    ]
+  },
+  "reporting": {
+    "outcome_axes": [
+      "correctness",
+      "automation",
+      "availability",
+      "authority",
+      "performance",
+      "resource cost",
+      "portability and integration effort"
+    ],
+    "states": [
+      "planned",
+      "fixture-validated",
+      "adapter-matched",
+      "executed",
+      "evidence-verified",
+      "reviewed"
+    ],
+    "causal_evidence_levels": [
+      "observed symptom",
+      "instrumented mechanism",
+      "matched intervention",
+      "independent reproduction"
+    ],
+    "rule": "No product scores or architectural causal claims are generated from design completeness or CI success."
+  },
+  "dimensions": [
+    {
+      "id": "D01",
+      "name": "Reliability and recoverability",
+      "v6_basis": [
+        "E02",
+        "E04",
+        "E10"
+      ],
+      "review_gap": "V6 already tests restart and side effects. Its own evidence review leaves the complete intervention-time contract unresolved; fixed trigger points also need systematic coverage of persistence and acknowledgment boundaries.",
+      "experiments": [
+        {
+          "id": "D01-01",
+          "title": "Admission and persistence boundaries",
+          "status": "planned",
+          "mechanism": "The task-admission acknowledgment and durable task record can be committed at different times.",
+          "intervention": "Inject termination at instrumented boundaries; distinguish a task acknowledged as durable from a merely received request.",
+          "scenarios": [
+            "before durable append",
+            "after durable append but before client acknowledgment",
+            "after acknowledgment but before worker dispatch"
+          ],
+          "oracle": "Compare acknowledged task IDs with durable records and completed work after restart; report the unacknowledged ambiguity window separately.",
+          "metrics": [
+            "lost acknowledged tasks",
+            "duplicate dispatches",
+            "recovery latency",
+            "durability window"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D01-02",
+          "title": "External effects and lost acknowledgments",
+          "status": "planned",
+          "mechanism": "A remote side effect and the agent checkpoint do not share a transaction.",
+          "intervention": "Use a local side-effect server with an independent ledger; drop the response after commit, with and without an idempotency key.",
+          "scenarios": [
+            "effect not committed",
+            "effect committed and response lost",
+            "process dies before recording the tool result"
+          ],
+          "oracle": "The ledger must show the exact effect count; separate correct reconciliation, safe uncertainty, incorrect replay, and falsely reported completion.",
+          "metrics": [
+            "duplicate effects",
+            "unresolved effects",
+            "automatic reconciliation rate",
+            "operator actions"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D01-03",
+          "title": "Delegated work and stale owners",
+          "status": "planned",
+          "mechanism": "Parent-child state, leases, and result publication may have different owners.",
+          "intervention": "Terminate or partition the parent and child independently; allow a stale worker to publish after reassignment.",
+          "scenarios": [
+            "parent restart while child runs",
+            "child restart after effect commit",
+            "lease expiry and delayed stale result"
+          ],
+          "oracle": "Track ownership epochs, child identities, accepted results, and effect IDs; a stale result must not silently overwrite the current result.",
+          "metrics": [
+            "orphaned work",
+            "stale commits",
+            "duplicate effects",
+            "time to converge"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D01-04",
+          "title": "Recovery automation and service availability",
+          "status": "planned",
+          "mechanism": "A plugin, worker, and request service can share or separate physical execution lifetimes.",
+          "intervention": "Terminate only the identified plugin host, execution worker, or gateway; keep an unrelated session active.",
+          "scenarios": [
+            "plugin exits",
+            "worker exits",
+            "gateway restarts",
+            "manual confirmation is required"
+          ],
+          "oracle": "Record which sessions stop and which resume automatically; availability, recovery correctness, and required human work remain separate outcomes.",
+          "metrics": [
+            "affected sessions",
+            "service downtime",
+            "automatic resume rate",
+            "manual steps and active operator time"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D02",
+      "name": "Security and isolation",
+      "v6_basis": [
+        "E03",
+        "E04"
+      ],
+      "review_gap": "V6 includes real boundary probes and permission controls. The next design must enumerate every execution surface and test combinations of capabilities, delegation, and concurrent tenants rather than extrapolating from one sandbox path.",
+      "experiments": [
+        {
+          "id": "D02-01",
+          "title": "Execution-surface authority",
+          "status": "planned",
+          "mechanism": "Shell tools, file tools, MCP servers, in-process plugins, and separate plugin processes can receive different host capabilities.",
+          "intervention": "Apply the same allowed and denied filesystem, network, process, and environment probes through each supported surface.",
+          "scenarios": [
+            "shell tool",
+            "native file tool",
+            "MCP server",
+            "in-process plugin",
+            "separate plugin process"
+          ],
+          "oracle": "Use OS-visible effects and local network receipts; a model refusal or separate process ID alone does not establish isolation.",
+          "metrics": [
+            "denied effects that succeeded",
+            "allowed positive controls",
+            "effective UID and capabilities",
+            "reachable host resources"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D02-02",
+          "title": "Credential propagation and revocation",
+          "status": "planned",
+          "mechanism": "Credentials can be copied into child environments or cached connections beyond their intended lifetime.",
+          "intervention": "Grant one synthetic capability, delegate work, revoke it, and retry through the original and delegated paths.",
+          "scenarios": [
+            "fresh process",
+            "reused connection",
+            "child task",
+            "plugin restart"
+          ],
+          "oracle": "Synthetic credential use is accepted only within the declared grant and revocation semantics; trace propagation without placing real secrets in the fixture.",
+          "metrics": [
+            "unexpected credential reach",
+            "revocation lag",
+            "post-revocation effects",
+            "unnecessary grant breadth"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D02-03",
+          "title": "Isolation setup and path races",
+          "status": "planned",
+          "mechanism": "Sandbox setup failures and filesystem aliases can bypass an intended resource boundary.",
+          "intervention": "Force a declared isolation backend to fail and race symlink or rename changes against file access.",
+          "scenarios": [
+            "backend unavailable",
+            "bind or permission setup fails",
+            "symlink target changes",
+            "allowed file accessed as a positive control"
+          ],
+          "oracle": "The action must either remain within the verified boundary or fail visibly; backend errors must not silently select an unrestricted path.",
+          "metrics": [
+            "fail-open dispatches",
+            "alias escapes",
+            "clear failures",
+            "cleanup residuals"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D02-04",
+          "title": "Cross-session authority separation",
+          "status": "planned",
+          "mechanism": "Shared caches, pooled workers, and reused plugin state can carry data between sessions.",
+          "intervention": "Run two synthetic tenants concurrently, restart pooled components, and attempt cross-session reads or credential reuse.",
+          "scenarios": [
+            "sequential worker reuse",
+            "concurrent requests",
+            "cached tool result",
+            "restarted plugin host"
+          ],
+          "oracle": "Each tenant can access only its own explicitly granted artifacts; shared public cache entries must be distinguished from tenant data.",
+          "metrics": [
+            "cross-session disclosures",
+            "state-key collisions",
+            "inherited environment data",
+            "authorized sharing success"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D03",
+      "name": "Architectural control",
+      "v6_basis": [
+        "E00",
+        "E04"
+      ],
+      "review_gap": "V6 tests policy loading, approval, cancellation, and delegation. More evidence is needed about policy changes between authorization and dispatch, concurrent budgets, and consistency across all execution entry points.",
+      "experiments": [
+        {
+          "id": "D03-01",
+          "title": "Policy resolution across entry points",
+          "status": "planned",
+          "mechanism": "Policy sources, precedence, and enforcement locations can differ between CLI, gateway, child tasks, and resumed work.",
+          "intervention": "Identify each product's actual mandatory and optional policy files, then vary one layer while sending the same operation through each supported entry point.",
+          "scenarios": [
+            "missing mandatory policy",
+            "malformed policy",
+            "conflicting project rule",
+            "restart with a changed rule"
+          ],
+          "oracle": "Compare effective policy provenance with the actual operation; do not call every missing configuration file an administrator-policy failure.",
+          "metrics": [
+            "enforcement disagreement",
+            "silent policy fallback",
+            "policy version in decisions",
+            "explicit diagnostic quality"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D03-02",
+          "title": "Revocation between approval and dispatch",
+          "status": "planned",
+          "mechanism": "Checking permission once does not necessarily bind authorization to the final operation.",
+          "intervention": "Pause after approval, change the policy or resource target, and then permit dispatch.",
+          "scenarios": [
+            "single-use approval",
+            "session approval",
+            "delegated approval",
+            "queued operation"
+          ],
+          "oracle": "The effect must follow the documented revocation and target-binding contract; record check time, dispatch time, actor, and policy version.",
+          "metrics": [
+            "stale authorizations",
+            "approval reuse",
+            "revocation lag",
+            "policy checks per dispatch"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D03-03",
+          "title": "Cancellation across descendants",
+          "status": "planned",
+          "mechanism": "Cancellation can stop the client while queued work or child processes continue.",
+          "intervention": "Cancel at each execution boundary and inspect all descendants and externally observable effects.",
+          "scenarios": [
+            "queued request",
+            "running synchronous tool",
+            "background child",
+            "checkpointed resumable work"
+          ],
+          "oracle": "Classify intentionally durable work separately; non-durable cancelled work must not continue producing forbidden effects.",
+          "metrics": [
+            "post-cancel effects",
+            "surviving descendants",
+            "queue removal latency",
+            "resource reclamation latency"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D03-04",
+          "title": "Concurrent budget enforcement",
+          "status": "planned",
+          "mechanism": "A budget maintained per worker can overshoot a task-wide limit when work is delegated or concurrent.",
+          "intervention": "Use a local metered fixture and issue concurrent requests that compete for the same task budget.",
+          "scenarios": [
+            "two sibling tasks",
+            "retry consumes remaining budget",
+            "tool and model limits interact",
+            "restart preserves consumed budget"
+          ],
+          "oracle": "An independent usage ledger determines the total; distinguish admission reservations from actual usage and explicit overshoot bounds.",
+          "metrics": [
+            "global budget overshoot",
+            "double reservations",
+            "unaccounted retries",
+            "incorrectly rejected allowed work"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D04",
+      "name": "Performance and responsiveness",
+      "v6_basis": [
+        "E01",
+        "E05",
+        "E06",
+        "E12"
+      ],
+      "review_gap": "V6 measures matched task latency, gateway latency, and MCP critical paths. Aggregate latency still cannot identify whether context construction, event-loop work, Python CPU work, connection locks, or queueing caused the difference.",
+      "experiments": [
+        {
+          "id": "D04-01",
+          "title": "Request preparation on the service path",
+          "status": "planned",
+          "mechanism": "Tool-schema construction and conversation preparation can execute on the request-serving thread or on an execution worker.",
+          "intervention": "Increase schema count and history size independently while issuing unrelated short requests.",
+          "scenarios": [
+            "small versus large tool catalogue",
+            "short versus long history",
+            "cold versus warm component cache"
+          ],
+          "oracle": "Attribute preparation spans to concrete process and thread identities; an unrelated request provides a direct responsiveness control.",
+          "metrics": [
+            "preparation CPU time",
+            "event-loop lag",
+            "queue wait",
+            "unrelated-request first-text p95"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D04-02",
+          "title": "CPU work versus asynchronous waiting",
+          "status": "planned",
+          "mechanism": "Node.js event-loop scheduling, Python interpreter execution, and worker placement affect different kinds of work differently.",
+          "intervention": "Use matched CPU-bound preparation and IO-wait fixtures; where supported, change worker placement without changing the fixture result.",
+          "scenarios": [
+            "CPU-bound preparation",
+            "IO-bound preparation",
+            "one session",
+            "multiple independent sessions"
+          ],
+          "oracle": "Record wall time, per-thread CPU, runnable time, and service progress; language choice alone is not a causal explanation.",
+          "metrics": [
+            "CPU attribution",
+            "runnable delay",
+            "throughput",
+            "short-request tail latency"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D04-03",
+          "title": "Tool scheduling and connection locks",
+          "status": "planned",
+          "mechanism": "Dependency ordering and transport-level serialization can constrain otherwise independent tools.",
+          "intervention": "Run the same dependency graph over one connection and multiple independent connections; include ordered mutating operations.",
+          "scenarios": [
+            "independent reads",
+            "dependency chain",
+            "single connection",
+            "separate connections"
+          ],
+          "oracle": "Compare tool start and finish events with the dependency graph; speedups that violate required ordering are failures.",
+          "metrics": [
+            "critical-path length",
+            "actual overlap",
+            "lock wait",
+            "ordering violations"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D04-04",
+          "title": "Fairness during a slow task",
+          "status": "planned",
+          "mechanism": "Worker execution can be separate while admission queues or shared state still delay new requests.",
+          "intervention": "Mix long and short requests under a fixed arrival schedule; vary only queue or worker configuration when officially configurable.",
+          "scenarios": [
+            "one slow tool",
+            "large preparation task",
+            "burst of short requests",
+            "cancellation of the slow task"
+          ],
+          "oracle": "Report acceptance, queueing, first text, and completion independently for each request class.",
+          "metrics": [
+            "short-request p95 and p99",
+            "starvation duration",
+            "admission latency",
+            "goodput"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D05",
+      "name": "Resource and cost efficiency",
+      "v6_basis": [
+        "E01",
+        "E05",
+        "E12",
+        "E13"
+      ],
+      "review_gap": "V6 retains full-process resource checks and actual API accounting, but its final resource/cost dimension remains ungraded. The architecture review must separate resident baseline, marginal concurrency cost, reuse amortization, and disk amplification.",
+      "experiments": [
+        {
+          "id": "D05-01",
+          "title": "Resident baseline and marginal session memory",
+          "status": "planned",
+          "mechanism": "Shared runtimes and separate execution processes trade baseline memory against per-session memory and isolation.",
+          "intervention": "Measure an idle service and increasing active sessions with identical tool and context payloads.",
+          "scenarios": [
+            "idle service",
+            "one session",
+            "four sessions",
+            "sixteen sessions",
+            "post-completion idle"
+          ],
+          "oracle": "Use complete process and container membership; report PSS and cgroup accounting separately instead of treating RSS sums as physical memory.",
+          "metrics": [
+            "resident baseline",
+            "memory slope per session",
+            "peak cgroup memory",
+            "retained memory after completion"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D05-02",
+          "title": "Initialization and component reuse",
+          "status": "planned",
+          "mechanism": "Repeated runtime initialization and component loading can dominate short tasks.",
+          "intervention": "Compare fresh execution with reuse of the same supported components, separating filesystem cache state from application reuse.",
+          "scenarios": [
+            "cold process and cold cache",
+            "cold process and warm cache",
+            "warm process",
+            "repeated plugin loading"
+          ],
+          "oracle": "The task and component versions remain identical; record exactly which initialization steps are avoided.",
+          "metrics": [
+            "startup CPU",
+            "initialization wall time",
+            "bytes loaded",
+            "memory retained for reuse"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D05-03",
+          "title": "Learning and context cost amortization",
+          "status": "planned",
+          "mechanism": "Learning, retrieval, context construction, retries, and stale assets change cost over a sequence of tasks.",
+          "intervention": "Use equal-quality task sequences with and without native reusable assets; introduce a rule change after several reuse horizons.",
+          "scenarios": [
+            "one later task",
+            "five later tasks",
+            "twenty later tasks",
+            "rule change with stale assets"
+          ],
+          "oracle": "Use real provider usage only in a separately budgeted phase, including learning, auxiliary calls, failures, and retries; synthetic usage is never a price measurement.",
+          "metrics": [
+            "cost per accepted delivery",
+            "reuse break-even point",
+            "context tokens",
+            "stale-rule failures"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "real-usage-required"
+        },
+        {
+          "id": "D05-04",
+          "title": "Disk and inode amplification",
+          "status": "planned",
+          "mechanism": "Copying whole dependency trees per case multiplies storage without adding independent experimental evidence.",
+          "intervention": "Compare a shared immutable installation with the documented writable-copy path required for installation or fault tests.",
+          "scenarios": [
+            "one run",
+            "many short runs",
+            "interrupted setup",
+            "cleanup after evidence retention"
+          ],
+          "oracle": "Count allocated blocks, apparent bytes, inodes, caches, and open-but-deleted files against an explicit run ownership manifest.",
+          "metrics": [
+            "allocated bytes per run",
+            "dependency duplication factor",
+            "inode growth",
+            "residual bytes after cleanup"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D06",
+      "name": "Scalability",
+      "v6_basis": [
+        "E06",
+        "E12"
+      ],
+      "review_gap": "V6 tests concurrency up to sixteen and two isolated nodes on one host. Those results do not establish behavior under overload, independent-host expansion, state contention, or long-duration resource growth.",
+      "experiments": [
+        {
+          "id": "D06-01",
+          "title": "Admission and overload behavior",
+          "status": "planned",
+          "mechanism": "Queue capacity and admission control determine whether load becomes bounded rejection or unbounded waiting.",
+          "intervention": "Use an open-loop arrival schedule below, near, and above measured sustainable capacity.",
+          "scenarios": [
+            "steady load",
+            "burst load",
+            "slow external service",
+            "overload recovery"
+          ],
+          "oracle": "Count every offered request, including rejected, cancelled, timed-out, and incorrect work; do not hide overload through client-side waiting.",
+          "metrics": [
+            "offered and admitted rate",
+            "correct goodput",
+            "queue depth",
+            "tail latency",
+            "recovery time"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D06-02",
+          "title": "State contention under parallel sessions",
+          "status": "planned",
+          "mechanism": "Shared session stores and connection locks can limit concurrency independently of available workers.",
+          "intervention": "Compare independent sessions with concurrent operations against the same declared shared state.",
+          "scenarios": [
+            "independent sessions",
+            "same-session updates",
+            "long state transaction",
+            "delayed result commit"
+          ],
+          "oracle": "Check for lost updates and transaction violations while tracing lock or commit waits.",
+          "metrics": [
+            "conflicts",
+            "lost updates",
+            "state-lock wait",
+            "throughput scaling"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D06-03",
+          "title": "Actual multi-host execution",
+          "status": "planned",
+          "mechanism": "A second HTTP entry point or remote shell does not prove that the complete agent execution unit can move to another host.",
+          "intervention": "Use independent hosts with controlled placement, then remove one host while work is active.",
+          "scenarios": [
+            "one host",
+            "two independent hosts",
+            "worker-host loss",
+            "network partition"
+          ],
+          "oracle": "Verify placement of the model loop, state owner, tools, and result commit; mark unavailable hosts as untested rather than simulating a claim.",
+          "metrics": [
+            "placement evidence",
+            "additional usable capacity",
+            "orphaned work",
+            "cross-host recovery"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D06-04",
+          "title": "Sustained load and recycling",
+          "status": "planned",
+          "mechanism": "Resident workers, state caches, queues, and connections may grow across many completed tasks.",
+          "intervention": "Run bounded-duration deterministic load with a fixed active concurrency, then drain and optionally recycle supported workers.",
+          "scenarios": [
+            "steady workload",
+            "repeated session creation",
+            "repeated connection errors",
+            "drain to idle"
+          ],
+          "oracle": "Predeclare duration, disk limits, and leak-slope criteria; report interrupted runs as censored rather than successful.",
+          "metrics": [
+            "memory growth slope",
+            "descriptor and connection growth",
+            "queue growth",
+            "post-drain baseline"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D07",
+      "name": "Modifiability and extensibility",
+      "v6_basis": [
+        "E07",
+        "E10",
+        "E12"
+      ],
+      "review_gap": "V6 exercises public extension routes and lifecycle operations. The next step must distinguish replacing a tool, context preparation, a provider adapter, and the full agent harness, and must test state obligations during replacement.",
+      "experiments": [
+        {
+          "id": "D07-01",
+          "title": "Extension replacement during active work",
+          "status": "planned",
+          "mechanism": "Registration and disable operations can affect new dispatches differently from already running calls.",
+          "intervention": "Install, update, disable, and uninstall the same extension while one invocation is paused.",
+          "scenarios": [
+            "new call after disable",
+            "in-flight call during update",
+            "restart after uninstall",
+            "failed replacement"
+          ],
+          "oracle": "Verify documented lifecycle semantics and state ownership; record how many core changes or private patches are required.",
+          "metrics": [
+            "stale registrations",
+            "residual effects",
+            "public-interface coverage",
+            "required core modification scope"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D07-02",
+          "title": "Full harness replacement versus provider routing",
+          "status": "planned",
+          "mechanism": "Delegating to a model provider or external tool may leave the original agent loop and state ownership intact.",
+          "intervention": "Integrate the same reference external harness through each documented route and trace ownership end to end.",
+          "scenarios": [
+            "tool delegation",
+            "provider plugin",
+            "public harness interface where present",
+            "resume after external harness failure"
+          ],
+          "oracle": "Identify the owner of planning, tool selection, checkpoints, cancellation, and result commits; do not label all routes equivalent harness support.",
+          "metrics": [
+            "ownership handoffs",
+            "missing lifecycle callbacks",
+            "recovery obligations",
+            "adapter and core change scope"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D07-03",
+          "title": "Extension API and version skew",
+          "status": "planned",
+          "mechanism": "An interface may work for one exact version while exposing private product objects or undocumented assumptions.",
+          "intervention": "Run the same extension against declared compatible versions, including additive schema changes and missing optional capabilities.",
+          "scenarios": [
+            "old extension on new supported version",
+            "optional field added",
+            "capability absent",
+            "extension startup fails"
+          ],
+          "oracle": "Judge against the actual compatibility promise and explicit rejection behavior, not arbitrary cross-version expectations.",
+          "metrics": [
+            "supported combinations",
+            "silent semantic drift",
+            "compatibility diagnostics",
+            "maintenance surface"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D07-04",
+          "title": "Context and persistence contracts",
+          "status": "planned",
+          "mechanism": "Replacing context preparation can change token allocation, memory retrieval, or persistent state behavior.",
+          "intervention": "Swap a reference context component while preserving task state and a fixed model-visible contract.",
+          "scenarios": [
+            "normal task",
+            "context limit reached",
+            "checkpoint and restart",
+            "component disabled"
+          ],
+          "oracle": "Assert which state the extension may write and which invariants remain core-owned; no hidden answer injection is permitted.",
+          "metrics": [
+            "semantic regressions",
+            "state coupling",
+            "public hooks required",
+            "rollback cleanliness"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D08",
+      "name": "Portability",
+      "v6_basis": [
+        "E08",
+        "E10",
+        "E11"
+      ],
+      "review_gap": "V6 validates changed Linux paths and dependency reconstruction, but its own evidence records native cross-OS execution as unavailable. File transfer, identity continuity, credential rebind, and actual execution must be separated.",
+      "experiments": [
+        {
+          "id": "D08-01",
+          "title": "State identity under relocation",
+          "status": "planned",
+          "mechanism": "Absolute directories and derived identifiers can bind otherwise portable state to one deployment.",
+          "intervention": "Change home, state directory, workspace path, and UID independently before a combined relocation.",
+          "scenarios": [
+            "state path only",
+            "workspace path only",
+            "UID only",
+            "combined relocation"
+          ],
+          "oracle": "Inventory content, session identity, scheduled work, extension state, and continuation behavior after native startup.",
+          "metrics": [
+            "identity continuity",
+            "missing or duplicated tasks",
+            "manual path repair",
+            "accepted continuation"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D08-02",
+          "title": "Dependency reconstruction without host leakage",
+          "status": "planned",
+          "mechanism": "A restored application can accidentally depend on binaries, caches, or configuration from the original host.",
+          "intervention": "Reconstruct exact pinned dependencies in a clean environment with the source host paths unavailable.",
+          "scenarios": [
+            "empty cache",
+            "preverified local package cache",
+            "missing dependency",
+            "dependency checksum mismatch"
+          ],
+          "oracle": "Record all runtime resolutions and reject undeclared host dependencies; package setup failure is an environment outcome until attributed.",
+          "metrics": [
+            "undeclared dependencies",
+            "reconstruction steps",
+            "downloaded and installed bytes",
+            "rebuild reproducibility"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D08-03",
+          "title": "Native cross-OS semantics",
+          "status": "planned",
+          "mechanism": "Filesystem naming, process control, paths, and native state formats can differ by operating system.",
+          "intervention": "Use real Linux and Windows executors, and any additional OS only when available, with the same semantic fixture.",
+          "scenarios": [
+            "Unicode and path behavior",
+            "process cancellation",
+            "state import",
+            "native session continuation"
+          ],
+          "oracle": "Require actual target execution and independent artifact checks; syntax checks and upstream CI are not migration results.",
+          "metrics": [
+            "semantic preservation",
+            "unsupported combinations",
+            "native execution evidence",
+            "repair steps"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D08-04",
+          "title": "Credential and endpoint rebind",
+          "status": "planned",
+          "mechanism": "Portable state must not require transplanting machine-bound credentials or using an obsolete service identity.",
+          "intervention": "Move synthetic state to a new endpoint and credential authority without copying the original secret material.",
+          "scenarios": [
+            "endpoint changes",
+            "credential rotates",
+            "old endpoint unavailable",
+            "revoked old credential"
+          ],
+          "oracle": "Resume only within the new deployment's grants; identify state that intentionally cannot migrate.",
+          "metrics": [
+            "stale endpoint use",
+            "credential coupling",
+            "rebind actions",
+            "task continuation"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D09",
+      "name": "Observability and auditability",
+      "v6_basis": [
+        "E02",
+        "E04",
+        "E09"
+      ],
+      "review_gap": "V6 already distinguishes native records from external truth and contains matched short collector-outage controls. Its own review leaves complete retention/export contracts unresolved; exact approval scope and crash persistence require explicit tests.",
+      "experiments": [
+        {
+          "id": "D09-01",
+          "title": "Authorization decision reconstruction",
+          "status": "planned",
+          "mechanism": "An allowed verdict can omit whether the approval was single-use, session-scoped, persistent, inherited, or policy-derived.",
+          "intervention": "Exercise each declared approval mode and reconstruct actor, target, policy version, and scope using product records alone.",
+          "scenarios": [
+            "single-use grant",
+            "session grant",
+            "persistent grant",
+            "revoked inherited grant"
+          ],
+          "oracle": "A reviewer must identify the actual authorization choice, not merely approved versus denied; truth is held separately.",
+          "metrics": [
+            "scope reconstruction accuracy",
+            "actor and task linkage",
+            "missing decision fields",
+            "ambiguous records"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D09-02",
+          "title": "Collector failure and publisher durability",
+          "status": "planned",
+          "mechanism": "A retry queue may be memory-only or durable, and a local transcript may survive when remote export does not.",
+          "intervention": "Fail the collector at a matched event boundary, then restart the publisher or exhaust its declared buffer.",
+          "scenarios": [
+            "brief outage",
+            "long outage",
+            "publisher restart",
+            "buffer capacity reached"
+          ],
+          "oracle": "Compare native local records and exported events independently against event IDs; distinguish duplicate delivery from missing events.",
+          "metrics": [
+            "lost events",
+            "duplicate deliveries",
+            "durable replay after restart",
+            "overflow signaling"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D09-03",
+          "title": "Blind diagnosis of known faults",
+          "status": "planned",
+          "mechanism": "Many log lines do not guarantee that an operator can reconstruct causal order or distinguish retries from duplicate effects.",
+          "intervention": "Give a reviewer only product records for predeclared injected faults; withhold the independent truth ledger until scoring.",
+          "scenarios": [
+            "retry after lost acknowledgment",
+            "parent-child failure",
+            "approval revocation race",
+            "external effect without result checkpoint"
+          ],
+          "oracle": "Score the reconstructed cause and timeline against the hidden truth; record unknown answers instead of guessing from absent logs.",
+          "metrics": [
+            "correct diagnosis",
+            "unsupported conclusions",
+            "time to reconstruct",
+            "evidence completeness"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D09-04",
+          "title": "Retention, export, and tamper boundaries",
+          "status": "planned",
+          "mechanism": "Retention policy and record ownership determine which later audit claims remain possible.",
+          "intervention": "Rotate, prune, export, restart, and modify records under declared administrator and unprivileged roles.",
+          "scenarios": [
+            "retention boundary",
+            "export and reimport",
+            "redaction of synthetic secrets",
+            "record modification attempt"
+          ],
+          "oracle": "Compare declared guarantees with retained event identity and content; plain diagnostics are not automatically tamper-evident audit storage.",
+          "metrics": [
+            "retained event coverage",
+            "export fidelity",
+            "redaction errors",
+            "tamper detection where promised"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D10",
+      "name": "Maintainability and operability",
+      "v6_basis": [
+        "E07",
+        "E09",
+        "E10"
+      ],
+      "review_gap": "V6 has real backup/restore, upgrade, and dependency tests. More depth requires recovery during concurrent writes, partial migrations, failed dependency publication, and operator diagnosis rather than command exit codes.",
+      "experiments": [
+        {
+          "id": "D10-01",
+          "title": "Consistent backup during active work",
+          "status": "planned",
+          "mechanism": "Configuration, databases, workspaces, and queued jobs may be captured at different logical moments.",
+          "intervention": "Take supported backups while synthetic work updates each state class, then restore into a clean target.",
+          "scenarios": [
+            "idle snapshot",
+            "concurrent writes",
+            "queued work",
+            "interrupted backup"
+          ],
+          "oracle": "Validate the declared snapshot consistency boundary and native service behavior; include externally stored workspaces only when explicitly in scope.",
+          "metrics": [
+            "inconsistent task states",
+            "missing promised artifacts",
+            "restore time",
+            "manual recovery actions"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D10-02",
+          "title": "Upgrade and rollback after partial migration",
+          "status": "planned",
+          "mechanism": "Application code and persisted schema may advance in separate steps, making binary rollback insufficient.",
+          "intervention": "Interrupt the documented upgrade at each observable migration boundary and follow the documented recovery or rollback path.",
+          "scenarios": [
+            "before schema change",
+            "during schema change",
+            "after schema change before service ready",
+            "extension incompatible with new version"
+          ],
+          "oracle": "Verify the supported rollback contract and data semantics; an unsupported downgrade must be explicit rather than silently corrupting state.",
+          "metrics": [
+            "unrecoverable states",
+            "data semantic changes",
+            "downtime",
+            "rollback steps"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D10-03",
+          "title": "Dependency publication and repair",
+          "status": "planned",
+          "mechanism": "A partial install, shared cache, or lock failure can affect later sessions even after the original setup process stops.",
+          "intervention": "Inject download, checksum, disk, and publication failures using local fixtures and one owned dependency installation.",
+          "scenarios": [
+            "partial download",
+            "checksum mismatch",
+            "cache unavailable",
+            "installer interrupted before publication"
+          ],
+          "oracle": "The previously usable generation must remain usable or fail visibly according to contract; no case may copy the whole shared environment by default.",
+          "metrics": [
+            "broken published generations",
+            "repair actions",
+            "residual bytes",
+            "independent-session availability"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D10-04",
+          "title": "Diagnosis and operational burden",
+          "status": "planned",
+          "mechanism": "A short command can conceal multiple manual decisions, privileged actions, or undocumented state repairs.",
+          "intervention": "Give an operator a frozen runbook and injected configuration, database, and extension failures.",
+          "scenarios": [
+            "invalid configuration",
+            "state corruption",
+            "extension startup failure",
+            "storage exhaustion"
+          ],
+          "oracle": "Record correct diagnosis, logical interventions, privilege requirements, and validated recovery; shell line count is not an effort metric.",
+          "metrics": [
+            "diagnostic accuracy",
+            "active operator time",
+            "logical interventions",
+            "validated service restoration"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    },
+    {
+      "id": "D11",
+      "name": "Compatibility",
+      "v6_basis": [
+        "E07",
+        "E10",
+        "E11"
+      ],
+      "review_gap": "V6 explicitly limits compatibility to a finite protocol and package list and notes untested legacy SSE, expired MCP sessions, cancellation edges, and opaque reasoning signatures. Each external contract needs its own advertised/tested/unsupported record.",
+      "experiments": [
+        {
+          "id": "D11-01",
+          "title": "MCP transport and content contracts",
+          "status": "planned",
+          "mechanism": "Transport support and tool-result semantics are distinct compatibility layers.",
+          "intervention": "Use a versioned local conformance fixture for each advertised transport and each content type.",
+          "scenarios": [
+            "stdio",
+            "Streamable HTTP",
+            "legacy HTTP/SSE when advertised",
+            "text, structured, resource, Unicode, and large results"
+          ],
+          "oracle": "Validate parameter and content fidelity, structured errors, and full-result access; record unsupported transports separately from failures of an advertised contract.",
+          "metrics": [
+            "advertised contracts passed",
+            "content fidelity",
+            "semantic errors",
+            "required adapters"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D11-02",
+          "title": "MCP session and cancellation lifecycle",
+          "status": "planned",
+          "mechanism": "Reconnect, request identity, expiry, and cancellation can behave differently from successful steady-state calls.",
+          "intervention": "Expire or disconnect an active synthetic MCP session and inject out-of-order or late responses.",
+          "scenarios": [
+            "expired session",
+            "reconnect during call",
+            "cancel in flight",
+            "late response after cancellation"
+          ],
+          "oracle": "Match each response and effect to its request and session generation; rejected calls must not silently produce forbidden effects.",
+          "metrics": [
+            "request identity errors",
+            "duplicate effects",
+            "stale session use",
+            "cancellation fidelity"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D11-03",
+          "title": "OAuth authorization lifecycle",
+          "status": "planned",
+          "mechanism": "Discovery, grants, token refresh, and scope handling may be delegated to different integration layers.",
+          "intervention": "Use a local synthetic authorization server and the exact OAuth profile advertised by the integration.",
+          "scenarios": [
+            "initial grant",
+            "token refresh",
+            "expired or revoked grant",
+            "insufficient scope"
+          ],
+          "oracle": "Check the declared authorization profile and actual tool effect without real identity-provider credentials; do not call generic HTTP support OAuth compatibility.",
+          "metrics": [
+            "advertised flows passed",
+            "scope enforcement",
+            "refresh behavior",
+            "adapter requirements"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D11-04",
+          "title": "AGENTS.md and external Skill inputs",
+          "status": "planned",
+          "mechanism": "Instruction-file discovery and external Skill packaging can preserve file format while changing precedence or execution meaning.",
+          "intervention": "Import the same versioned external guidance and Skill corpus, including declared path and precedence variants.",
+          "scenarios": [
+            "root and nested AGENTS.md",
+            "external Skill package",
+            "relative resource paths",
+            "conflicting or unsupported metadata"
+          ],
+          "oracle": "Check which instructions and assets actually reach the task under documented precedence; importing files is not behavioral equivalence.",
+          "metrics": [
+            "declared formats passed",
+            "guidance precedence fidelity",
+            "asset resolution",
+            "conversion steps"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D11-05",
+          "title": "External tools, plugins, and harnesses",
+          "status": "planned",
+          "mechanism": "MCP tools, product-specific plugin SDKs, and external agent harnesses expose different contracts and ownership boundaries.",
+          "intervention": "Use a declared external artifact corpus and identify the integration route required by each product.",
+          "scenarios": [
+            "MCP tool configuration",
+            "foreign plugin SDK package",
+            "external harness process",
+            "extension update and uninstall"
+          ],
+          "oracle": "Record direct compatibility, documented adapter, core modification, or unsupported status separately; a callable tool is not full harness replacement.",
+          "metrics": [
+            "directly reusable artifacts",
+            "adapter scope",
+            "core changes",
+            "lifecycle fidelity"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        },
+        {
+          "id": "D11-06",
+          "title": "Model streaming and reasoning payloads",
+          "status": "planned",
+          "mechanism": "Tool-call assembly, stream termination, and provider-specific reasoning fields can break otherwise accepted model protocols.",
+          "intervention": "Replay versioned local transcripts with split chunks, malformed events, errors, and opaque provider fields.",
+          "scenarios": [
+            "fragmented tool-call arguments",
+            "stream ends before usage",
+            "provider error and retry",
+            "opaque reasoning field round trip"
+          ],
+          "oracle": "Validate tool identity, arguments, visible completion, usage completeness, and declared provider semantics; deterministic replay says nothing about model reasoning quality.",
+          "metrics": [
+            "transcript contracts passed",
+            "argument corruption",
+            "premature completion",
+            "usage and opaque-field fidelity"
+          ],
+          "controls": [
+            "Use matched documented product entry points and equivalent effective permissions.",
+            "Keep model responses and external service work fixed for mechanism tests.",
+            "Retain baseline and intervention evidence separately; never score a modified runtime as the baseline."
+          ],
+          "evidence": [
+            "effective-config-and-version-manifest",
+            "monotonic-event-timeline",
+            "native-product-records",
+            "independent-outcome-ledger",
+            "process-thread-and-resource-attribution"
+          ],
+          "billing": "deterministic-local-fixture"
+        }
+      ]
+    }
+  ]
+}

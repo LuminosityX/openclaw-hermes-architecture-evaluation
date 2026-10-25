@@ -1,0 +1,30 @@
+{
+  "baseline_commit": "a33644efc9490ff771d058ebf047f08550e4ccb3",
+  "protocol_experiment_families": 14,
+  "criterion_count": 33,
+  "filled_metrics": 30,
+  "criterion_limits": {
+    "D08b": "M02 full state+fresh dependency integration is completed. M03 cross-OS executor remains unavailable; exact-commit official CI is architecture support, not our migration experiment. The frozen whole subcriterion stays uncertain without its required OS case.",
+    "D01c": "Mixed automatic/explicit confirmation/re-attachment and R09 followup timing are reported individually; whole frozen intervention-time contract is not established. Weight20 remains unknown.",
+    "D11": "Finite current protocol/content/package/setup list only. Legacy MCP SSE, MCP-specific expired-session/cancel edge cases, and vendor opaque reasoning signatures were not separately exercised; do not call this universal protocol certification.",
+    "D09c": "Original startup-timed outages were not a matched tool replay test and do not establish comparative retry superiority. Six supplemental same-original-unit controls arm at the first actual tool approval: both reject the same first tool span, OC3/3 replays the identical trace/span ID, H0/3 replays it in the declared >=20-second healthy window but H3/3 retains all three native tool results in closed official ATIF. Full long-term-retention and all public retry-configuration contracts are not certified; weight20 remains unknown. No primary independent-sample inflation."
+  },
+  "ungraded_dimensions": [
+    "D05",
+    "D08"
+  ],
+  "windows_execution_pending": true,
+  "colleague_review_complete": false,
+  "evidence_artifacts": [
+    {
+      "name": "observations.json",
+      "sha256": "415d63519336174ad9189d6f1c1a104a83deaf2eedddd6939a4e5f356647f27e",
+      "distribution": "retained locally; not copied into the public repository"
+    },
+    {
+      "name": "final-grades.json",
+      "sha256": "c1a6186dbe1d83cb9c6904685e2f245fbd4f5ffea57bad2fefc65123dba8ed1c",
+      "distribution": "retained locally; not copied into the public repository"
+    }
+  ]
+}

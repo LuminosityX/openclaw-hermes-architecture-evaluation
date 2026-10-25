@@ -1,5 +1,7 @@
 # OpenClaw and Hermes Architecture Evaluation
 
+**Branch status:** This research branch adds the [V7 evaluation design](v7/README.md). The `main` branch preserves the V6 experiment archive. V7 product experiments have not been executed.
+
 V6 experiment harnesses, task fixtures, scoring rules, and source references for evaluating the architecture of OpenClaw and Hermes.
 
 This repository is a **source archive**. Repository checks run offline with Python 3.11 or later. Repeating the product experiments requires reconstructing the pinned runtimes; cloning this repository does not install or start either product.
@@ -16,8 +18,8 @@ These are historical experiment pins, not recommendations for current deployment
 ## Quick start
 
 ```sh
-git clone https://github.com/zyw02/agent-architecture-evaluation-20261025.git
-cd agent-architecture-evaluation-20261025
+git clone https://github.com/zyw02/openclaw-hermes-architecture-evaluation.git
+cd openclaw-hermes-architecture-evaluation
 python3 tools/check_repository.py
 ```
 
