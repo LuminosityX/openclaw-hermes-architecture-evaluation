@@ -1,0 +1,21 @@
+[
+  {
+    "source_repository": "/root/output/openclaw-hermes-benchmark-20261022/sources/openclaw",
+    "head": "1b58cb9a1b4f4353e1add63c8506db4d890962e8",
+    "tracked_diff_bytes": 0,
+    "untracked_source_files": []
+  },
+  {
+    "source_repository": "/root/output/openclaw-hermes-benchmark-20261022/sources/hermes",
+    "head": "5b147ab036d6d19131bff8d20701b5001eab844a",
+    "tracked_diff_bytes": 0,
+    "untracked_source_files": []
+  },
+  {
+    "source_repository": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-mcp-lock-ablation",
+    "base": "/root/output/oc-hermes-execution-20261024-v6/runtime/hermes-stable",
+    "patch": "patches/hermes-mcp-lock-ablation.patch",
+    "tracked_diff_bytes": 564,
+    "scope": "Intentional isolated counterfactual, not baseline product behavior."
+  }
+]

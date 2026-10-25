@@ -1,0 +1,11 @@
+--- a/tools/mcp_tool_handlers.py
++++ b/tools/mcp_tool_handlers.py
+@@ -649,7 +649,7 @@
+                 report(progress, total, message)
+ 
+         async def _call():
+-            async with server._rpc_lock, _track_inflight_rpc(server, server_name, op, retry_safe=read_only):
++            async with _track_inflight_rpc(server, server_name, op, retry_safe=read_only):
+                 server._pending_call_context = contextvars.copy_context()  # for the elicitation callback
+                 try:
+                     result = await _call_tool_racing_stdio_death(
