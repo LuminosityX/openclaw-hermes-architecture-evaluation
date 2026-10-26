@@ -83,6 +83,34 @@ def log_event_ids(data):
     return result
 
 
+def read_http_body(stream,headers,limit=4*1024**2):
+    transfer=headers.get('Transfer-Encoding','').lower().strip()
+    if transfer:
+        if transfer!='chunked' or headers.get('Content-Length') is not None:raise ValueError('Unsupported or ambiguous HTTP body framing')
+        parts=[];total=0
+        while True:
+            line=stream.readline(129)
+            if len(line)>128 or not line.endswith(b'\r\n'):raise ValueError('Invalid bounded chunk header')
+            try:size=int(line.split(b';',1)[0].strip(),16)
+            except ValueError:raise ValueError('Invalid chunk size') from None
+            if size<0 or total+size>limit:raise ValueError('HTTP chunked body exceeds bound')
+            if size==0:
+                trailer_bytes=0
+                while True:
+                    trailer=stream.readline(513);trailer_bytes+=len(trailer)
+                    if not trailer or trailer_bytes>2048 or not trailer.endswith(b'\r\n'):raise ValueError('Invalid bounded HTTP trailers')
+                    if trailer==b'\r\n':return b''.join(parts)
+            data=stream.read(size)
+            if len(data)!=size or stream.read(2)!=b'\r\n':raise ValueError('Incomplete HTTP chunk')
+            parts.append(data);total+=size
+    try:size=int(headers.get('Content-Length','0'))
+    except ValueError:raise ValueError('Invalid Content-Length') from None
+    if not 0<size<=limit:raise ValueError('Missing or oversized HTTP body')
+    data=stream.read(size)
+    if len(data)!=size:raise ValueError('Incomplete HTTP body')
+    return data
+
+
 class Collector:
     def __init__(self):
         self.fail=False;self.attempts=[];self.deliveries=Counter();self.lock=threading.Lock()
@@ -94,14 +122,18 @@ class Collector:
         class Handler(BaseHTTPRequestHandler):
             def log_message(self,*args):pass
             def do_POST(self):
-                size=int(self.headers.get('Content-Length','0'))
-                if not 0<size<=4*1024**2:self.send_error(413);return
-                raw=self.rfile.read(size)
-                if self.headers.get('Content-Encoding')=='gzip':
-                    raw=zlib.decompressobj(16+zlib.MAX_WBITS).decompress(raw,4*1024**2+1)
-                try:ids=log_event_ids(raw)
-                except ValueError as error:
-                    with owner.lock:owner.attempts.append(dict(parser_error=str(error),bytes=len(raw)))
+                raw=b''
+                try:
+                    self.connection.settimeout(5)
+                    raw=read_http_body(self.rfile,self.headers)
+                    if self.headers.get('Content-Encoding')=='gzip':
+                        decoder=zlib.decompressobj(16+zlib.MAX_WBITS);raw=decoder.decompress(raw,4*1024**2+1)
+                        if not decoder.eof:raise ValueError('Compressed body is incomplete or exceeds expansion bound')
+                    ids=log_event_ids(raw)
+                except (ValueError,OSError,zlib.error) as error:
+                    with owner.lock:owner.attempts.append(dict(parser_error=str(error)[:500],bytes=len(raw),status=400,
+                        transfer_encoding=self.headers.get('Transfer-Encoding'),content_encoding=self.headers.get('Content-Encoding')))
+
                     self.send_error(400);return
                 with owner.lock:
                     status=503 if owner.fail else 200
@@ -224,6 +256,7 @@ def run_scenario(root,scenario,unit=1):
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2500],metadata=metadata)
     finally:
         collector.fail=False
+        if gateway:gateway.stop()
         row['collector_diagnostics']=dict(request_count=len(collector.attempts),successful_unique_event_ids=len(collector.deliveries),
             recent_attempts=[{**{k:v for k,v in a.items() if k!='ids'},'event_count':len(a.get('ids',[]))} for a in collector.attempts[-8:]])
         native_log=root/'gateway-native.log'

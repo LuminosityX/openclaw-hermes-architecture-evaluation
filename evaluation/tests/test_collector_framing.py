@@ -1,6 +1,7 @@
 """OTLP body event IDs are counted independently of unrelated protobuf fields."""
 from pathlib import Path
 import hashlib
+import io
 import json
 import sqlite3
 import tempfile
@@ -9,7 +10,7 @@ import unittest
 from unittest.mock import patch
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runner'))
-from collector_cases import fields,log_event_ids
+from collector_cases import fields,log_event_ids,read_http_body
 import collector_cases
 
 
@@ -34,6 +35,14 @@ class CollectorFramingTest(unittest.TestCase):
     def test_truncated_and_overlong_frames_do_not_become_successful_empty_logs(self):
         for bad in [b'\x0a\x08short',b'\x80'*12,b'\x00',b'\x0f']:
             with self.assertRaises(ValueError):fields(bad)
+
+    def test_chunked_otlp_http_body_is_decoded_and_bounded(self):
+        raw=b'actual-protobuf-body'
+        body=b'5;owned=1\r\n'+raw[:5]+b'\r\n'+format(len(raw)-5,'x').encode()+b'\r\n'+raw[5:]+b'\r\n0\r\n\r\n'
+        self.assertEqual(read_http_body(io.BytesIO(body),{'Transfer-Encoding':'chunked'}),raw)
+        with self.assertRaisesRegex(ValueError,'exceeds bound'):read_http_body(io.BytesIO(body),{'Transfer-Encoding':'chunked'},limit=8)
+        with self.assertRaisesRegex(ValueError,'ambiguous'):read_http_body(io.BytesIO(body),{'Transfer-Encoding':'chunked','Content-Length':'5'})
+        with self.assertRaisesRegex(ValueError,'Incomplete'):read_http_body(io.BytesIO(b'5\r\nx'),{'Transfer-Encoding':'chunked'})
 
     def test_native_metadata_restore_cannot_replace_the_logged_event_identity(self):
         with tempfile.TemporaryDirectory() as name:
