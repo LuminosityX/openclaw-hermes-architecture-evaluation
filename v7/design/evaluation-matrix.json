@@ -3,7 +3,7 @@
   "version": "V7-design-draft",
   "status": "planned-not-executed",
   "baseline": {
-    "branch": "main",
+    "branch": "archive/v6",
     "commit": "a33644efc9490ff771d058ebf047f08550e4ccb3",
     "archive": "v6/",
     "change_policy": "Keep every V6 archived file unchanged."

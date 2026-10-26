@@ -1,6 +1,6 @@
 # OpenClaw and Hermes Architecture Evaluation
 
-**Branch status:** This research branch adds the [V7 evaluation design](v7/README.md). The `main` branch preserves the V6 experiment archive. V7 product experiments have not been executed.
+**Branch status:** `research/v7-evaluation-design` is the default branch for ongoing maintenance and the [V7 evaluation design](v7/README.md). `archive/v6` is the frozen historical branch, preserved at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`; do not submit changes to it. V7 product experiments have not been executed.
 
 V6 experiment harnesses, task fixtures, scoring rules, and source references for evaluating the architecture of OpenClaw and Hermes.
 
