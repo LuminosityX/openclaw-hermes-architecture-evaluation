@@ -3,6 +3,9 @@ import json
 import os
 from pathlib import Path
 import subprocess
+import sqlite3
+import base64
+import hashlib
 import time
 
 spec=json.loads(Path('/input/spec.json').read_text())
@@ -13,13 +16,23 @@ env=dict(os.environ,OPENCLAW_STATE_DIR='/scratch/state',OPENCLAW_CONFIG_PATH='/s
 process=subprocess.Popen(['/toolchain/node','/runtime/node_modules/openclaw/openclaw.mjs','node','run','--host',spec['host'],'--port','443','--tls','--display-name','owned-multihost-worker','--session-host'],env=env,stdout=Path('/evidence/native-node.log').open('w'),stderr=subprocess.STDOUT)
 try:
     until=time.monotonic()+100
-    identity=Path('/scratch/state/identity/device.json')
-    while not identity.is_file() and time.monotonic()<until:
+    public=None
+    while public is None and time.monotonic()<until:
         if process.poll() is not None:raise RuntimeError('Actual native node exited before publishing its own device identity')
-        time.sleep(.2)
-    if not identity.is_file():raise RuntimeError('Actual native node identity did not appear')
-    data=json.loads(identity.read_text());public={k:data[k] for k in ['deviceId','publicKeyPem'] if k in data}
-    if not public.get('deviceId') or not public.get('publicKeyPem'):raise RuntimeError('Actual native node public identity fields are unavailable')
+        found=[]
+        for database in Path('/scratch/state').rglob('*.sqlite'):
+            connection=sqlite3.connect('file:'+str(database)+'?mode=ro',uri=True,timeout=2)
+            try:
+                if connection.execute("select 1 from sqlite_master where type='table' and name='device_identities'").fetchone():
+                    found.extend(connection.execute('select device_id,public_key_pem from device_identities limit 2').fetchall())
+            finally:connection.close()
+        if len(found)>1:raise RuntimeError('Fresh native node public identity is ambiguous')
+        if found:
+            device,pem=found[0];der=base64.b64decode(''.join(line for line in pem.splitlines() if not line.startswith('---')))
+            if hashlib.sha256(der[-32:]).hexdigest()!=device:raise RuntimeError('Native public key does not bind its actual device ID')
+            public=dict(deviceId=device,publicKeyPem=pem,source='read-only canonical SQLite public columns; private-key column never queried')
+        else:time.sleep(.2)
+    if public is None:raise RuntimeError('Actual canonical native node public identity did not appear')
     Path('/evidence/node-public.json').write_text(json.dumps(public)+'\n')
     process.wait(timeout=1100)
 finally:
