@@ -1,0 +1,15 @@
+{
+  "kind": "real-provider-request-ledger",
+  "provider": "deepseek",
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "campaign_spend_ceiling": null,
+  "requests": [],
+  "request_count": 0,
+  "unattributed_request_count": 0,
+  "raw_prompts_retained": false,
+  "raw_responses_retained": false,
+  "credentials_retained": false,
+  "actual_charges_known": false,
+  "limitation": "Usage metadata is not a provider invoice. Missing usage remains unknown."
+}

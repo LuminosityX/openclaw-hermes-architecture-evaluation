@@ -1,0 +1,526 @@
+{
+  "kind": "native-adapter-validation",
+  "product": "openclaw",
+  "studies": [],
+  "case_id": "REL-15",
+  "full_campaign_coverage": false,
+  "observations": [
+    {
+      "scenario_id": "REL-15-S01",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": false,
+      "state": "harness-error",
+      "request": {
+        "token": "PILOT_PROTOCOL_REL_15_S01_π",
+        "status": null,
+        "accepted": false,
+        "latency_ms": 0.117518,
+        "error": "UnicodeEncodeError"
+      },
+      "response_excerpt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-correct-effect",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "completion-visible",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "retry-after-respected",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [],
+      "native_records": {
+        "tokens": {
+          "PILOT_PROTOCOL_REL_15_S01_π": {
+            "token_seen": false,
+            "receipt_seen": false,
+            "tables": [],
+            "native_log_token_seen": false
+          }
+        },
+        "native_log_sha256": "4ab41222679b372238007119ebd34767cb5813a242da4e55a3917d51b758f30c",
+        "native_log_bytes": 32471
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 41,
+        "product_process_tree_cpu_user_seconds": 10.25,
+        "product_process_tree_cpu_system_seconds": 0.76,
+        "peak_sampled_pss_bytes": 1013472256,
+        "peak_sampled_rss_sum_bytes": 1131716608,
+        "peak_sampled_processes": 3,
+        "peak_sampled_threads": 38,
+        "peak_sampled_open_fds": 129,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "3644a28dda2b0d04548be8e7dd1c4578a7a2c19aea6113ec06941c2bc0db377f",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero.",
+      "reason": "Native provider entry point was not reached"
+    },
+    {
+      "scenario_id": "REL-15-S02",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": false,
+      "state": "harness-error",
+      "request": {
+        "token": "PILOT_PROTOCOL_REL_15_S02_π",
+        "status": null,
+        "accepted": false,
+        "latency_ms": 0.098093,
+        "error": "UnicodeEncodeError"
+      },
+      "response_excerpt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-correct-effect",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "completion-visible",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "both-faults-exercised",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [],
+      "native_records": {
+        "tokens": {
+          "PILOT_PROTOCOL_REL_15_S02_π": {
+            "token_seen": false,
+            "receipt_seen": false,
+            "tables": [],
+            "native_log_token_seen": false
+          }
+        },
+        "native_log_sha256": "03e40e0916c2eb8e9c95031482eb82b1f5ea274bfda8ff95b3e68efe76791fe6",
+        "native_log_bytes": 32473
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 40,
+        "product_process_tree_cpu_user_seconds": 10.06,
+        "product_process_tree_cpu_system_seconds": 0.75,
+        "peak_sampled_pss_bytes": 1009187840,
+        "peak_sampled_rss_sum_bytes": 1127620608,
+        "peak_sampled_processes": 3,
+        "peak_sampled_threads": 38,
+        "peak_sampled_open_fds": 129,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "6709e2571cdca00631fa89bf616c1616cfd63fd824f1aa87330fdca4e78e86ed",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero.",
+      "reason": "Native provider entry point was not reached"
+    },
+    {
+      "scenario_id": "REL-15-S03",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": false,
+      "state": "harness-error",
+      "request": {
+        "token": "PILOT_PROTOCOL_REL_15_S03_π",
+        "status": null,
+        "accepted": false,
+        "latency_ms": 0.103374,
+        "error": "UnicodeEncodeError"
+      },
+      "response_excerpt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "effect-before-deadline-error-observed",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-false-success-after-unreceived-result",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [],
+      "native_records": {
+        "tokens": {
+          "PILOT_PROTOCOL_REL_15_S03_π": {
+            "token_seen": false,
+            "receipt_seen": false,
+            "tables": [],
+            "native_log_token_seen": false
+          }
+        },
+        "native_log_sha256": "5be15d45953c866d01de7edbae95b77c48e5809ab6f3ccf316e4b4bf47c4005f",
+        "native_log_bytes": 31529
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 40,
+        "product_process_tree_cpu_user_seconds": 9.96,
+        "product_process_tree_cpu_system_seconds": 0.76,
+        "peak_sampled_pss_bytes": 1018095616,
+        "peak_sampled_rss_sum_bytes": 1135144960,
+        "peak_sampled_processes": 3,
+        "peak_sampled_threads": 38,
+        "peak_sampled_open_fds": 129,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "3214581f6de276efc57092a8aa1759ac3fa7f757d87937cc1c07902b89a8b43c",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero.",
+      "reason": "Native provider entry point was not reached"
+    },
+    {
+      "scenario_id": "REL-15-S04",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": false,
+      "state": "harness-error",
+      "request": {
+        "token": "PILOT_PROTOCOL_REL_15_S04_π",
+        "status": null,
+        "accepted": false,
+        "latency_ms": 0.110289,
+        "error": "UnicodeEncodeError"
+      },
+      "response_excerpt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-false-success",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [],
+      "native_records": {
+        "tokens": {
+          "PILOT_PROTOCOL_REL_15_S04_π": {
+            "token_seen": false,
+            "receipt_seen": false,
+            "tables": [],
+            "native_log_token_seen": false
+          }
+        },
+        "native_log_sha256": "148fdf919fce4dc9777e748038661bf3fb05c0d9ee43bd6083049e8669aee944",
+        "native_log_bytes": 32479
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 40,
+        "product_process_tree_cpu_user_seconds": 10.06,
+        "product_process_tree_cpu_system_seconds": 0.7699999999999999,
+        "peak_sampled_pss_bytes": 1012290560,
+        "peak_sampled_rss_sum_bytes": 1130758144,
+        "peak_sampled_processes": 3,
+        "peak_sampled_threads": 38,
+        "peak_sampled_open_fds": 129,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "b6d9ced0951af880c392eaea183f97603eb7cc8634fa0c322b624600aecd0244",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero.",
+      "reason": "Native provider entry point was not reached"
+    },
+    {
+      "scenario_id": "REL-15-S05",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": false,
+      "state": "harness-error",
+      "request": {
+        "token": "PILOT_PROTOCOL_REL_15_S05_π",
+        "status": null,
+        "accepted": false,
+        "latency_ms": 0.103716,
+        "error": "UnicodeEncodeError"
+      },
+      "response_excerpt_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-false-success",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [],
+      "native_records": {
+        "tokens": {
+          "PILOT_PROTOCOL_REL_15_S05_π": {
+            "token_seen": false,
+            "receipt_seen": false,
+            "tables": [],
+            "native_log_token_seen": false
+          }
+        },
+        "native_log_sha256": "1c8e6c9556ef64bf2bc18b9be1e4ccd8691f28e1cf019c3346ecd39aa1da1969",
+        "native_log_bytes": 25227
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 40,
+        "product_process_tree_cpu_user_seconds": 10.05,
+        "product_process_tree_cpu_system_seconds": 0.7599999999999999,
+        "peak_sampled_pss_bytes": 1012885504,
+        "peak_sampled_rss_sum_bytes": 1131286528,
+        "peak_sampled_processes": 3,
+        "peak_sampled_threads": 38,
+        "peak_sampled_open_fds": 129,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "c29fbe53a499f1700b9772ac10c0eb8e4833c21192e980124bceb5eeb380ec90",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero.",
+      "reason": "Native provider entry point was not reached"
+    }
+  ],
+  "paid_model_calls": 0,
+  "storage_guard_check": {
+    "kernel_enospc_observed": true,
+    "tmpfs_total_bytes": 67108864,
+    "bytes_written_before_rejection": 67108864,
+    "probe_files_retained": false,
+    "purpose": "One-time kernel capacity check before product startup; not product disk usage."
+  },
+  "fixture_selfcheck": {
+    "fragment_reassembly": true,
+    "unicode_preserved": true,
+    "scripted_faults_validated": true
+  },
+  "validation_complete": true,
+  "fixture_and_invocation_valid": false,
+  "harness_error": "Candidate adapters include incomplete/native-entry failures; no full coverage awarded",
+  "stderr_tail": "[pilot] starting Gateway rel-15-s01\n[pilot] ready Gateway rel-15-s01\n[pilot] starting Gateway rel-15-s02\n[pilot] ready Gateway rel-15-s02\n[pilot] starting Gateway rel-15-s03\n[pilot] ready Gateway rel-15-s03\n[pilot] starting Gateway rel-15-s04\n[pilot] ready Gateway rel-15-s04\n[pilot] starting Gateway rel-15-s05\n[pilot] ready Gateway rel-15-s05\n",
+  "whole_run_timeout": false,
+  "runtime_identity": {
+    "version": "2026.10.7",
+    "commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "builtAt": "2026-10-24T02:45:17.235Z",
+    "buildId": "2026.10.7-release-157d8c2bc3ea-2026-10-24T02-45-17.235Z"
+  },
+  "runtime_build_info_sha256": "29b4d3cd6b2db798445b56f11df7c60d6ff5408079cb4e2992bf713f23f44cfd",
+  "evaluation_role": "current-stable-pilot",
+  "campaign_target": {
+    "product": "openclaw",
+    "version": "2026.10.7",
+    "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "selection_policy": "latest-stable-at-campaign-start",
+    "release_tag": "v2026.10.7",
+    "release_url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.7",
+    "release_published_at": "2026-10-24T09:53:46Z",
+    "checked_at_utc": "2026-10-26T04:13:15.261947+00:00",
+    "npm_integrity": "sha512-iiZO+kFFBgQvxm17wn3Sc/MSC/GQu01PubAFVNA2Nn736HOHUbR0ra7a9NeW9wpjq3kDkSJ1RB7dTP+qVJFXig==",
+    "npm_tarball": "https://registry.npmjs.org/openclaw/-/openclaw-2026.10.7.tgz",
+    "node_engine": ">=24.22.1 <25 || >=26.12.1",
+    "node_version": "24.22.1",
+    "pin_policy": "Resolve GitHub stable and npm latest together before a campaign; pin version, release commit and package integrity for its duration. Historical bootstrap runs are excluded from current-release conclusions."
+  },
+  "execution_budget": {
+    "profile": "hosted",
+    "memory_limit_bytes": 3221225472,
+    "swap_limit_bytes": 0,
+    "cpu_quota_cores": 2,
+    "pids_limit": 128,
+    "timeout_seconds": 600
+  },
+  "controller_sha256": {
+    "evaluation/tools/run_local.py": "671f78a4b6fd9194454953da5f8bfb2b4b44c62ea9616ddac45fb50bb798d897",
+    "evaluation/runner/adapter_validation.py": "010d86475320ff955cf45c9068009f5de720cffe3c32f63a32c2a1f6d9118940",
+    "evaluation/runner/mcp_probe.py": "f28eac5bc0cac36ec0b1194ab872712a01b54f0973111d51e36f3d3c3ac964a8",
+    "evaluation/runner/model_validation.py": "5ed2ec0d2334c39f4dcedbe9504761321eec65aeb4fb099b0bac06a121669541",
+    "evaluation/runner/pilot.py": "735745e3817a4f3a26b81702f53d558b7b88184df0203bceb4dbcf6f6e9d9e8e",
+    "evaluation/runner/profile.mjs": "6403553ed2c89da217242badd2deb3d5e3374b3657df2ec7062f23936cf76b2b",
+    "evaluation/runner/protocol_cases.py": "c85edb11535cd854df162582316268bdf4c23af91ad3c87e6d300483eb29fca7",
+    "evaluation/runner/provider_bridge.py": "69648e0d79fb27ca2eb38267be0c576e6ba11dffa37e497a9afb9efdf3c277ae",
+    "evaluation/runner/source_followup.py": "adaa7b65215d1b56a47945f9fa43a0b6b2b0ab2b4b46222a1a0b6ac949b18b50"
+  },
+  "wrapper_exit_code": 1,
+  "whole_run_seconds": 49.77,
+  "storage_policy": {
+    "shared_installation_copied": false,
+    "downloads": 0,
+    "tmpfs_limit_bytes": 67108864,
+    "swap_limit_bytes": 0,
+    "persisted_report_limit_bytes": 1048576,
+    "runtime_state_retained": false
+  },
+  "whole_run_cgroup": {
+    "memory_peak_bytes": 1089335296,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "pids_events": "max 0\n",
+    "cpu_stat": "usage_usec 70719410\nuser_usec 63995807\nsystem_usec 6723602\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 495\nnr_throttled 98\nthrottled_usec 8329722\nnr_bursts 0\nburst_usec 0\n"
+  }
+}

@@ -8,7 +8,7 @@ The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3e
 
 [Current-release evidence](evaluation/evidence/current-stable-20261026/README.md) now contains valid two-block pilots for all three first-wave studies on this version. The earlier local build remains harness-bootstrap evidence only.
 
-**Status:** 60 experiment families and 257 scenario labels remain the full-suite plan. A [bounded native pilot runner](evaluation/runner/README.md) now executes the three first-wave architecture studies using an existing OpenClaw installation and a local deterministic provider. These pilots do not complete the suite or establish real-model task quality. Offline design validation, plan selection and token-cost calculation remain available.
+**Status:** the full campaign preserves 60 experiment families and 257 scenarios. Twenty scenarios now have candidate implementations: provider/stream faults, public hooks and independently accepted task delivery. The other 237 scenarios still need implementation. [Adapter readiness](evaluation/full-campaign.md) and full execution coverage are audited separately: earlier pilots, provider plumbing checks and golden transcript calibration do not complete the full suite. Unified architecture analysis remains locked until the complete execution audit passes.
 
 | Dimension | Focus | Planned families |
 | --- | --- | --- |

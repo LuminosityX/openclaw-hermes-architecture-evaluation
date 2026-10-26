@@ -1,0 +1,739 @@
+{
+  "kind": "native-adapter-validation",
+  "product": "openclaw",
+  "studies": [],
+  "case_id": "REL-14",
+  "full_campaign_coverage": false,
+  "observations": [
+    {
+      "scenario_id": "REL-14-S01",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_REL_14_S01_π",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 11312.606561,
+        "native_http_usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 10,
+          "total_tokens": 24
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_REL_14_S01_π",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11312.606561,
+          "native_http_usage": {
+            "prompt_tokens": 14,
+            "completion_tokens": 10,
+            "total_tokens": 24
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "6b0241abdf3bbf33862c08c0e1310a5f64bb0dda9b0675a91a40010a9aea390e",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-correct-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "completion-visible",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "fragmented-stream-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 103435714568,
+          "scenario": "REL-14-S01",
+          "token": "PILOT_ADAPTER_REL_14_S01_π",
+          "attempt": 1,
+          "stream": true,
+          "tool_results": 0,
+          "request_bytes": 8864,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200,
+            "fragment": true
+          },
+          "response_complete": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 103563940895,
+          "token": "PILOT_ADAPTER_REL_14_S01_π",
+          "pid": 4,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 103714053169,
+          "token": "PILOT_ADAPTER_REL_14_S01_π",
+          "receipt": "RECEIPT:PILOT_ADAPTER_REL_14_S01_π"
+        },
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 103792440396,
+          "scenario": "REL-14-S01",
+          "token": "PILOT_ADAPTER_REL_14_S01_π",
+          "attempt": 2,
+          "stream": true,
+          "tool_results": 1,
+          "request_bytes": 9212,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200
+          },
+          "response_complete": true
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_REL_14_S01_π": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "76cb2659fc5cf2397a0fe97767119ea3d021335a9cb0b98a55cf0cb989f5df5f",
+        "native_log_bytes": 95228
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 92,
+        "product_process_tree_cpu_user_seconds": 27.7,
+        "product_process_tree_cpu_system_seconds": 2.51,
+        "peak_sampled_pss_bytes": 1564864512,
+        "peak_sampled_rss_sum_bytes": 1738362880,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 60,
+        "peak_sampled_open_fds": 210,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "c1262ebe390e0a014a0cb20baa8921c6a9f2246d593bbc491f8a79c15badb6a2",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "REL-14-S02",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_REL_14_S02",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 11395.31477,
+        "native_http_usage": {
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_REL_14_S02",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11395.31477,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "c26dace9dfdc7f4f88c887a179b4e9e7b064fbfc6a968f9f4028228c135d0cc9",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-correct-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "completion-visible",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 124664170396,
+          "scenario": "REL-14-S02",
+          "token": "PILOT_ADAPTER_REL_14_S02",
+          "attempt": 1,
+          "stream": true,
+          "tool_results": 0,
+          "request_bytes": 8861,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200,
+            "fragment": false
+          },
+          "response_complete": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 124766496205,
+          "token": "PILOT_ADAPTER_REL_14_S02",
+          "pid": 98,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 124916598536,
+          "token": "PILOT_ADAPTER_REL_14_S02",
+          "receipt": "RECEIPT:PILOT_ADAPTER_REL_14_S02"
+        },
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 124986987083,
+          "scenario": "REL-14-S02",
+          "token": "PILOT_ADAPTER_REL_14_S02",
+          "attempt": 2,
+          "stream": true,
+          "tool_results": 1,
+          "request_bytes": 9203,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200
+          },
+          "response_complete": true
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_REL_14_S02": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "f783c1fcb7d6c6f34e857c88a6106ebc066ba980c2e3fc1cc0830cb10aeef8b8",
+        "native_log_bytes": 95207
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 89,
+        "product_process_tree_cpu_user_seconds": 27.36,
+        "product_process_tree_cpu_system_seconds": 2.53,
+        "peak_sampled_pss_bytes": 1570614272,
+        "peak_sampled_rss_sum_bytes": 1743577088,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 56,
+        "peak_sampled_open_fds": 206,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "90271a4a70ace173817490e5715c044a5afd59e38b1ea4450bc60d5252a55c66",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "REL-14-S03",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_REL_14_S03",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 13064.238209,
+        "native_http_usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 10,
+          "total_tokens": 24
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_REL_14_S03",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 13064.238209,
+          "native_http_usage": {
+            "prompt_tokens": 14,
+            "completion_tokens": 10,
+            "total_tokens": 24
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "ad6d9a6f453823e658cfea5602dcefb4bdc9580f97ca066476f58057b9e9c99b",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-correct-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "completion-visible",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 146428495393,
+          "scenario": "REL-14-S03",
+          "token": "PILOT_ADAPTER_REL_14_S03",
+          "attempt": 1,
+          "stream": true,
+          "tool_results": 0,
+          "request_bytes": 8861,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 503,
+            "error": "service_unavailable"
+          }
+        },
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 148042147184,
+          "scenario": "REL-14-S03",
+          "token": "PILOT_ADAPTER_REL_14_S03",
+          "attempt": 2,
+          "stream": true,
+          "tool_results": 0,
+          "request_bytes": 9224,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200,
+            "fragment": false
+          },
+          "response_complete": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 148105536738,
+          "token": "PILOT_ADAPTER_REL_14_S03",
+          "pid": 192,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 148255625008,
+          "token": "PILOT_ADAPTER_REL_14_S03",
+          "receipt": "RECEIPT:PILOT_ADAPTER_REL_14_S03"
+        },
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 148311314809,
+          "scenario": "REL-14-S03",
+          "token": "PILOT_ADAPTER_REL_14_S03",
+          "attempt": 3,
+          "stream": true,
+          "tool_results": 1,
+          "request_bytes": 9566,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200
+          },
+          "response_complete": true
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_REL_14_S03": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "a33c3fbeb4f0bf85be4a9ea5491fb2e6369e716b41995e2d11bd13235d74b831",
+        "native_log_bytes": 118469
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 97,
+        "product_process_tree_cpu_user_seconds": 28.61,
+        "product_process_tree_cpu_system_seconds": 2.57,
+        "peak_sampled_pss_bytes": 1662525440,
+        "peak_sampled_rss_sum_bytes": 1835999232,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 56,
+        "peak_sampled_open_fds": 213,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "4cce83812db7f00957830f8b155fa589a1389424b53765d46d5c6b44a7209349",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "REL-14-S04",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "fail",
+      "request": {
+        "token": "PILOT_ADAPTER_REL_14_S04",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 11392.984216,
+        "native_http_usage": {
+          "prompt_tokens": 14,
+          "completion_tokens": 10,
+          "total_tokens": 24
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_REL_14_S04",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11392.984216,
+          "native_http_usage": {
+            "prompt_tokens": 14,
+            "completion_tokens": 10,
+            "total_tokens": 24
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "75c51733f135df8d0e13b0f7e36f3d46f9b93fe0608e02940f44dea62e9b3332",
+      "assertions": [
+        {
+          "name": "at-least-one-native-provider-request",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "bounded-provider-attempts",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-duplicate-committed-effects",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-correct-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "completion-visible",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "opaque-field-roundtrip",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 168885718454,
+          "scenario": "REL-14-S04",
+          "token": "PILOT_ADAPTER_REL_14_S04",
+          "attempt": 1,
+          "stream": true,
+          "tool_results": 0,
+          "request_bytes": 8861,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200,
+            "fragment": false
+          },
+          "response_complete": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 168978667333,
+          "token": "PILOT_ADAPTER_REL_14_S04",
+          "pid": 287,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 169128776366,
+          "token": "PILOT_ADAPTER_REL_14_S04",
+          "receipt": "RECEIPT:PILOT_ADAPTER_REL_14_S04"
+        },
+        {
+          "kind": "scripted-provider-request",
+          "monotonic_ns": 169187123752,
+          "scenario": "REL-14-S04",
+          "token": "PILOT_ADAPTER_REL_14_S04",
+          "attempt": 2,
+          "stream": true,
+          "tool_results": 1,
+          "request_bytes": 9203,
+          "opaque_reasoning_preserved": false,
+          "path": "/v1/chat/completions",
+          "script": {
+            "status": 200
+          },
+          "response_complete": true
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_REL_14_S04": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "45e948b006c8e51ebad0ecbcc263f0ce9eae96d6d95e6adfccf6e1c6bcfcfc42",
+        "native_log_bytes": 95210
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 87,
+        "product_process_tree_cpu_user_seconds": 27.27,
+        "product_process_tree_cpu_system_seconds": 2.5199999999999996,
+        "peak_sampled_pss_bytes": 1580445696,
+        "peak_sampled_rss_sum_bytes": 1768108032,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 60,
+        "peak_sampled_open_fds": 206,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "f30a2ed7db92c6304f17427222372f6d601120a3fcca4fff59032ff080554c90",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    }
+  ],
+  "paid_model_calls": 0,
+  "storage_guard_check": {
+    "kernel_enospc_observed": true,
+    "tmpfs_total_bytes": 67108864,
+    "bytes_written_before_rejection": 67108864,
+    "probe_files_retained": false,
+    "purpose": "One-time kernel capacity check before product startup; not product disk usage."
+  },
+  "fixture_selfcheck": {
+    "fragment_reassembly": true,
+    "unicode_preserved": true,
+    "scripted_faults_validated": true
+  },
+  "validation_complete": true,
+  "fixture_and_invocation_valid": true,
+  "runtime_identity": {
+    "version": "2026.10.7",
+    "commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "builtAt": "2026-10-24T02:45:17.235Z",
+    "buildId": "2026.10.7-release-157d8c2bc3ea-2026-10-24T02-45-17.235Z"
+  },
+  "runtime_build_info_sha256": "29b4d3cd6b2db798445b56f11df7c60d6ff5408079cb4e2992bf713f23f44cfd",
+  "evaluation_role": "current-stable-pilot",
+  "campaign_target": {
+    "product": "openclaw",
+    "version": "2026.10.7",
+    "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "selection_policy": "latest-stable-at-campaign-start",
+    "release_tag": "v2026.10.7",
+    "release_url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.7",
+    "release_published_at": "2026-10-24T09:53:46Z",
+    "checked_at_utc": "2026-10-26T04:13:15.261947+00:00",
+    "npm_integrity": "sha512-iiZO+kFFBgQvxm17wn3Sc/MSC/GQu01PubAFVNA2Nn736HOHUbR0ra7a9NeW9wpjq3kDkSJ1RB7dTP+qVJFXig==",
+    "npm_tarball": "https://registry.npmjs.org/openclaw/-/openclaw-2026.10.7.tgz",
+    "node_engine": ">=24.22.1 <25 || >=26.12.1",
+    "node_version": "24.22.1",
+    "pin_policy": "Resolve GitHub stable and npm latest together before a campaign; pin version, release commit and package integrity for its duration. Historical bootstrap runs are excluded from current-release conclusions."
+  },
+  "execution_budget": {
+    "profile": "hosted",
+    "memory_limit_bytes": 3221225472,
+    "swap_limit_bytes": 0,
+    "cpu_quota_cores": 2,
+    "pids_limit": 128,
+    "timeout_seconds": 600
+  },
+  "controller_sha256": {
+    "evaluation/tools/run_local.py": "f2d5754e4010b41511efebaa011bb3e63d93eff516e09fd874cf250cba384830",
+    "evaluation/runner/adapter_validation.py": "e9a08243a1201fd7a527eded45dc6560e6f280a85929435b0aae06662a366f87",
+    "evaluation/runner/hook_cases.py": "1ccd53237335cd04699ab3471ceab94f480930f55a13864fed5f0361bc5dc377",
+    "evaluation/runner/mcp_probe.py": "f28eac5bc0cac36ec0b1194ab872712a01b54f0973111d51e36f3d3c3ac964a8",
+    "evaluation/runner/model_validation.py": "5ed2ec0d2334c39f4dcedbe9504761321eec65aeb4fb099b0bac06a121669541",
+    "evaluation/runner/pilot.py": "97db1cab0f179fed65b8d3d67f424463e74b50109699b9951d52fa983a135925",
+    "evaluation/runner/profile.mjs": "6403553ed2c89da217242badd2deb3d5e3374b3657df2ec7062f23936cf76b2b",
+    "evaluation/runner/protocol_cases.py": "32d80f299df0c61630f5785a3e6730b8a398e36b5d6369e58426b695682af306",
+    "evaluation/runner/provider_bridge.py": "69648e0d79fb27ca2eb38267be0c576e6ba11dffa37e497a9afb9efdf3c277ae",
+    "evaluation/runner/source_followup.py": "adaa7b65215d1b56a47945f9fa43a0b6b2b0ab2b4b46222a1a0b6ac949b18b50"
+  },
+  "wrapper_exit_code": 0,
+  "whole_run_seconds": 87.41,
+  "storage_policy": {
+    "shared_installation_copied": false,
+    "downloads": 0,
+    "tmpfs_limit_bytes": 67108864,
+    "swap_limit_bytes": 0,
+    "persisted_report_limit_bytes": 1048576,
+    "runtime_state_retained": false
+  },
+  "whole_run_cgroup": {
+    "memory_peak_bytes": 1688940544,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "pids_events": "max 0\n",
+    "cpu_stat": "usage_usec 135233277\nuser_usec 116569734\nsystem_usec 18663543\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 874\nnr_throttled 302\nthrottled_usec 32883184\nnr_bursts 0\nburst_usec 0\n"
+  }
+}

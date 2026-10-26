@@ -1,0 +1,8 @@
+{
+  "github_run_id": "40285210888",
+  "controller_commit": "0fb5d9a82e1d210e7932fd1e9050e19e8a5f4602",
+  "case_id": "REL-15",
+  "purpose": "candidate-adapter-validation-only",
+  "full_campaign_coverage": false,
+  "local_runtime_installation": false
+}

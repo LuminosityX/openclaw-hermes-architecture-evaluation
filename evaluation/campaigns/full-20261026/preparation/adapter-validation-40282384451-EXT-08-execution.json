@@ -1,0 +1,8 @@
+{
+  "github_run_id": "40282384451",
+  "controller_commit": "bfb9dd3937a07b4f543084e864f3b483099ec1ec",
+  "case_id": "EXT-08",
+  "purpose": "candidate-adapter-validation-only",
+  "full_campaign_coverage": false,
+  "local_runtime_installation": false
+}

@@ -1,0 +1,10 @@
+{
+  "kind": "official-provider-plugin-verification",
+  "package": "@openclaw/deepseek-provider",
+  "version": "2026.10.7",
+  "plugin_id": "deepseek",
+  "integrity_matches": true,
+  "manifest_sha256": "d71cf9daec62ca22170a6b914205501759938adb2b3a92142f918317526a661b",
+  "runtime_entry_sha256": "3e851e9120abc661eb4c5ea463943f5313fa32eb86268355ae2e9d0aec55c8e9",
+  "package_lock_sha256": "7c46bb12474d9031728915a5dfdf25b77b150e76b8e3ff3af67081d8bdcb56e1"
+}

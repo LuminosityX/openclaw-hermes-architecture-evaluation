@@ -16,6 +16,13 @@ This directory evaluates OpenClaw task execution on `main` across exactly six di
 
 ## Tooling
 
+Check active implementation readiness and frozen execution progress separately:
+
+```sh
+python3 evaluation/tools/adapter_readiness.py
+python3 evaluation/tools/campaign.py status
+```
+
 ```sh
 python3 evaluation/tools/check_design.py
 python3 -m unittest discover -s evaluation/tests -v

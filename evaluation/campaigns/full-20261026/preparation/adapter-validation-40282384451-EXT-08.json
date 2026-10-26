@@ -1,0 +1,1329 @@
+{
+  "kind": "native-adapter-validation",
+  "product": "openclaw",
+  "studies": [],
+  "case_id": "EXT-08",
+  "full_campaign_coverage": false,
+  "observations": [
+    {
+      "scenario_id": "EXT-08-S01",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_EXT_08_S01",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 11138.119501,
+        "native_http_usage": {
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11138.119501,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "4d477029328c0aacffa80e414e64a97b85075025c36420241b3bf76161639784",
+      "assertions": [
+        {
+          "name": "native-tool-hook-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "all-native-tasks-complete",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-effect-per-task",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "exactly-one-before-and-after",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "before-effect-after-order",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 95180237900,
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8853,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8459
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 95265535146,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S01",
+          "run_id": "chatcmpl_ec0633e6-d6f3-4182-8420-c80e837a1746",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s01",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 95274063412,
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "pid": 4,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 95424164225,
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S01"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 95457421243,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S01",
+          "run_id": "chatcmpl_ec0633e6-d6f3-4182-8420-c80e837a1746",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s01",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 95489274558,
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9189,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8795
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 95489461046,
+          "token": "PILOT_ADAPTER_EXT_08_S01",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S01\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S01\"}]"
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_EXT_08_S01": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "d1b97cfc203181268ba8f0c18415d429f9a54313c5ed5feadbd03598fa46238b",
+        "native_log_bytes": 95761
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 90,
+        "product_process_tree_cpu_user_seconds": 27.2,
+        "product_process_tree_cpu_system_seconds": 2.5,
+        "peak_sampled_pss_bytes": 1571525632,
+        "peak_sampled_rss_sum_bytes": 1744699392,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 60,
+        "peak_sampled_open_fds": 206,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "0587e75b2d73e258b235c8ea1b9f0802aa07aeeac1cb5312b4fa0c7e4d7dfb7a",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "EXT-08-S02",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_EXT_08_S02",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 11099.023716,
+        "native_http_usage": {
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S02",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11099.023716,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "6cf03cbdb71b8537619d4ae513bcf56c0232a2e96010113757f139eda46e5839",
+      "assertions": [
+        {
+          "name": "native-tool-hook-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "all-native-tasks-complete",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-effect-per-task",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "priority-order",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "isolated-original-parameter-copies",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "last-returned-parameters-win",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 115834554050,
+          "token": "PILOT_ADAPTER_EXT_08_S02",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8853,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8459
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 115922188167,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S02",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S02",
+          "run_id": "chatcmpl_882616ce-f84c-47a0-9215-fe66da8cca39",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s02",
+          "signal_available": true
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 115927483508,
+          "name": "before-low",
+          "token": "PILOT_ADAPTER_EXT_08_S02",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S02",
+          "run_id": "chatcmpl_882616ce-f84c-47a0-9215-fe66da8cca39",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s02",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 115934999400,
+          "token": "PILOT_ADAPTER_EXT_08_S02_LOW",
+          "pid": 100,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 116085097921,
+          "token": "PILOT_ADAPTER_EXT_08_S02_LOW",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S02_LOW"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 116115888045,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S02_LOW",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S02",
+          "run_id": "chatcmpl_882616ce-f84c-47a0-9215-fe66da8cca39",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s02",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 116146250936,
+          "token": "PILOT_ADAPTER_EXT_08_S02",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9193,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8799
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 116146318071,
+          "token": "PILOT_ADAPTER_EXT_08_S02",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S02_LOW\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S02\"}]"
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_EXT_08_S02": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "77765c52570020599bd78156923562fe5fec724eb542613395bd89823a4fd98a",
+        "native_log_bytes": 95749
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 88,
+        "product_process_tree_cpu_user_seconds": 26.71,
+        "product_process_tree_cpu_system_seconds": 2.4899999999999998,
+        "peak_sampled_pss_bytes": 1575669760,
+        "peak_sampled_rss_sum_bytes": 1747943424,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 60,
+        "peak_sampled_open_fds": 206,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "1a44e35e743090dfee049fa1dfac60adb7d6873923ff901f9d04b69495edc89c",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "EXT-08-S03",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "fail",
+      "request": {
+        "token": "PILOT_ADAPTER_EXT_08_S03",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 11409.3145,
+        "native_http_usage": {
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S03",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11409.3145,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "3e9a31771dfc4b16628e5b27082125263736c7cce175b75c2bba1560e744f81a",
+      "assertions": [
+        {
+          "name": "native-tool-hook-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "all-native-tasks-complete",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-effect-per-task",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "input-rewrite-reaches-tool",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "persistence-rewrite-reaches-provider",
+          "verdict": "fail",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "after-observer-return-ignored",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 136854427353,
+          "token": "PILOT_ADAPTER_EXT_08_S03",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8853,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8459
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 136938931030,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S03",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S03",
+          "run_id": "chatcmpl_671d2202-6430-4d22-b0dd-45a3967689a4",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s03",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 136950676421,
+          "token": "PILOT_ADAPTER_EXT_08_S03_MUT",
+          "pid": 197,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 137100777294,
+          "token": "PILOT_ADAPTER_EXT_08_S03_MUT",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S03_MUT"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 137139097684,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S03_MUT",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S03",
+          "run_id": "chatcmpl_671d2202-6430-4d22-b0dd-45a3967689a4",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s03",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 137171345427,
+          "token": "PILOT_ADAPTER_EXT_08_S03",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9193,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8799
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 137171406632,
+          "token": "PILOT_ADAPTER_EXT_08_S03",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S03_MUT\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S03\"}]"
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_EXT_08_S03": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "4cc2b8efb5031e874db090e37962deac339e2e1361f0de58008bd1e487323629",
+        "native_log_bytes": 97718
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 88,
+        "product_process_tree_cpu_user_seconds": 27.49,
+        "product_process_tree_cpu_system_seconds": 2.4200000000000004,
+        "peak_sampled_pss_bytes": 1554761728,
+        "peak_sampled_rss_sum_bytes": 1728139264,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 55,
+        "peak_sampled_open_fds": 206,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "46e228951306596b6b9db7b119c3447ad5ab7ef9c303ad0e12e261aac7c0d037",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "EXT-08-S04",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 1097.041192,
+        "native_http_usage": {
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11395.377075,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        },
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 1097.041192,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      ],
+      "metadata": {},
+      "response_excerpt_sha256": "096839483999f8de792d4d768bb3e35e3e004e4a7e1afa99061a8bedef4e6ed3",
+      "assertions": [
+        {
+          "name": "native-tool-hook-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "all-native-tasks-complete",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-effect-per-task",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "throw-and-timeout-both-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "timed-out-work-retained-in-evidence",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 157961858463,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8875,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8481
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 158068199551,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "run_id": "chatcmpl_faa91a55-0ef8-4b88-ac1b-5b608bb86b3e",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s04_hookthrow_",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 158077360186,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "pid": 293,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 158227449476,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 158272127472,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "run_id": "chatcmpl_faa91a55-0ef8-4b88-ac1b-5b608bb86b3e",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s04_hookthrow_",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 158361822097,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9251,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8857
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 158361882950,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S04_HOOKTHROW_\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S04HOOKTHROW\"}]"
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 159405529726,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8879,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8485
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 159479450827,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "run_id": "chatcmpl_c69cddf6-13ee-4d3e-92c7-ec0ab4facd59",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s04_hooktimeout_",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 159485264167,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "pid": 293,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 159635361943,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 159646780711,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "run_id": "chatcmpl_c69cddf6-13ee-4d3e-92c7-ec0ab4facd59",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s04_hooktimeout_",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 159667274591,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9263,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8869
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 159667333401,
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S04HOOKTIMEOUT\"}]"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 160050568751,
+          "name": "late-observer-settled",
+          "token": "PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S04_HOOKTIMEOUT_",
+          "run_id": "chatcmpl_c69cddf6-13ee-4d3e-92c7-ec0ab4facd59",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s04_hooktimeout_",
+          "signal_available": false
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_EXT_08_S04": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "1445830f5074b88d3b927e2f74354ed6311586c5b482ae66952b9da738390ef0",
+        "native_log_bytes": 142720
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 96,
+        "product_process_tree_cpu_user_seconds": 29.04,
+        "product_process_tree_cpu_system_seconds": 2.67,
+        "peak_sampled_pss_bytes": 1618040832,
+        "peak_sampled_rss_sum_bytes": 1791528960,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 56,
+        "peak_sampled_open_fds": 213,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "129c77b7830b27dc7d275188d45795bb65157f94c011bd118aa65b0a2b554882",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "EXT-08-S05",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_EXT_08_S05",
+        "status": 500,
+        "accepted": false,
+        "latency_ms": 12155.065412,
+        "native_http_usage": null
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S05",
+          "status": 500,
+          "accepted": false,
+          "latency_ms": 12155.065412,
+          "native_http_usage": null
+        }
+      ],
+      "metadata": {
+        "cancellation": {
+          "returncode": 0,
+          "stdout": "{\n  \"ok\": true,\n  \"abortedRunId\": null,\n  \"status\": \"aborted\"\n}\n",
+          "stderr": ""
+        }
+      },
+      "response_excerpt_sha256": "bf4387f83fd6addfaf76dad041f1001ad6cfbbbfe8149702a8c34bddd50f0b50",
+      "assertions": [
+        {
+          "name": "native-tool-hook-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "cancellation-rpc-accepted",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-effect-after-cancellation",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "no-false-completion",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "async-hook-settled",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 180477930885,
+          "token": "PILOT_ADAPTER_EXT_08_S05",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8853,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8459
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 180563640631,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S05",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S05",
+          "run_id": "chatcmpl_35a1cc05-62eb-41cd-9ab3-5f4b4cdddf84",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s05",
+          "signal_available": true
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 181800161095,
+          "name": "hook-aborted",
+          "token": "PILOT_ADAPTER_EXT_08_S05",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S05",
+          "run_id": "chatcmpl_35a1cc05-62eb-41cd-9ab3-5f4b4cdddf84",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s05",
+          "signal_available": true
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 181800492105,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S05",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S05",
+          "run_id": "chatcmpl_35a1cc05-62eb-41cd-9ab3-5f4b4cdddf84",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s05",
+          "signal_available": false
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 181810942005,
+          "name": "async-hook-settled",
+          "token": "PILOT_ADAPTER_EXT_08_S05",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S05",
+          "run_id": "chatcmpl_35a1cc05-62eb-41cd-9ab3-5f4b4cdddf84",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s05",
+          "signal_available": true
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_EXT_08_S05": {
+            "token_seen": true,
+            "receipt_seen": false,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "8e79943ad1ebb975c1403080d0b443ec6d30734eefc5c43bb8405fd617f641a7",
+        "native_log_bytes": 102230
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 93,
+        "product_process_tree_cpu_user_seconds": 27.529999999999998,
+        "product_process_tree_cpu_system_seconds": 2.5100000000000002,
+        "peak_sampled_pss_bytes": 1573365760,
+        "peak_sampled_rss_sum_bytes": 1748885504,
+        "peak_sampled_processes": 5,
+        "peak_sampled_threads": 60,
+        "peak_sampled_open_fds": 210,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "54db182ca46356c6e19fb2e0fb47370cdab6bf963ec69b437109ef5d53a54015",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    },
+    {
+      "scenario_id": "EXT-08-S06",
+      "unit": 1,
+      "fixture_validated": true,
+      "native_invoked": true,
+      "state": "pass",
+      "request": {
+        "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+        "status": 200,
+        "accepted": true,
+        "latency_ms": 12320.487172,
+        "native_http_usage": {
+          "prompt_tokens": 0,
+          "completion_tokens": 0,
+          "total_tokens": 0
+        }
+      },
+      "requests": [
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 11284.426904,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        },
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S06_DISABLED_",
+          "status": 500,
+          "accepted": false,
+          "latency_ms": 11276.984121,
+          "native_http_usage": null
+        },
+        {
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "status": 200,
+          "accepted": true,
+          "latency_ms": 12320.487172,
+          "native_http_usage": {
+            "prompt_tokens": 0,
+            "completion_tokens": 0,
+            "total_tokens": 0
+          }
+        }
+      ],
+      "metadata": {
+        "lifecycle": "Disable and re-register across explicit native Gateway restarts; not a hot-reload race"
+      },
+      "response_excerpt_sha256": "269c4166ae192f83642d1184f466766afd0a42a8eb9252c3529a238ff6262197",
+      "assertions": [
+        {
+          "name": "native-tool-hook-exercised",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "enabled-and-reenabled-complete",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "disabled-plugin-no-effect",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        },
+        {
+          "name": "one-before-hook-per-enabled-call",
+          "verdict": "pass",
+          "evidence": [
+            "native-request",
+            "independent-events"
+          ]
+        }
+      ],
+      "events": [
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 202671350932,
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8871,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8477
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 202765433873,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "run_id": "chatcmpl_26cbdd8b-4f15-4ddc-a6d1-acbd005fe1c2",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s06_initial_",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 202781219836,
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "pid": 509,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 202931325403,
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S06_INITIAL_"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 202964704537,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "run_id": "chatcmpl_26cbdd8b-4f15-4ddc-a6d1-acbd005fe1c2",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s06_initial_",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 203006158369,
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9239,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8845
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 203006342993,
+          "token": "PILOT_ADAPTER_EXT_08_S06_INITIAL_",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S06_INITIAL_\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S06INITIAL\"}]"
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 252622836761,
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "tool_results": 0,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 8875,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8481
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 252707612412,
+          "name": "before-high",
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "run_id": "chatcmpl_bfd98a7f-1f3c-4ff4-a94c-208e11cc57c3",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s06_reenabled_",
+          "signal_available": true
+        },
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 252716634074,
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "pid": 763,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0
+        },
+        {
+          "kind": "effect-commit",
+          "monotonic_ns": 252866730802,
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "receipt": "RECEIPT:PILOT_ADAPTER_EXT_08_S06_REENABLED_"
+        },
+        {
+          "kind": "hook",
+          "monotonic_ns": 252946057033,
+          "name": "after",
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "tool_name": "eval_probe",
+          "call_id": "call_0_PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "run_id": "chatcmpl_bfd98a7f-1f3c-4ff4-a94c-208e11cc57c3",
+          "session_key": "agent:main:pilot:pilot_adapter_ext_08_s06_reenabled_",
+          "signal_available": false
+        },
+        {
+          "kind": "provider-request",
+          "monotonic_ns": 252997729034,
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "tool_results": 1,
+          "tool_names": [
+            "eval_probe"
+          ],
+          "payload_bytes": 9251,
+          "tool_schema_bytes": 244,
+          "message_bytes": 8857
+        },
+        {
+          "kind": "tool-result",
+          "monotonic_ns": 252997797491,
+          "token": "PILOT_ADAPTER_EXT_08_S06_REENABLED_",
+          "receipt_visible": true,
+          "error_visible": false,
+          "excerpt": "[{\"role\": \"tool\", \"content\": \"{\\\"receipt\\\":\\\"RECEIPT:PILOT_ADAPTER_EXT_08_S06_REENABLED_\\\"}\", \"tool_call_id\": \"call0PILOTADAPTEREXT08S06REENABLED\"}]"
+        }
+      ],
+      "native_records": {
+        "tokens": {
+          "PILOT_ADAPTER_EXT_08_S06": {
+            "token_seen": true,
+            "receipt_seen": true,
+            "tables": [
+              "transcript_events",
+              "trajectory_runtime_events",
+              "session_transcript_fts",
+              "session_transcript_fts_content"
+            ],
+            "native_log_token_seen": true
+          }
+        },
+        "native_log_sha256": "414ff6189bbe166aa0600ad1fdfc564fe384967a39a9e193ba71baaa9e2ac0d9",
+        "native_log_bytes": 289751
+      },
+      "resources": {
+        "sample_interval_ms": 200,
+        "sample_count": 97,
+        "product_process_tree_cpu_user_seconds": 33.59,
+        "product_process_tree_cpu_system_seconds": 3.3400000000000003,
+        "peak_sampled_pss_bytes": 1696318464,
+        "peak_sampled_rss_sum_bytes": 1869647872,
+        "peak_sampled_processes": 7,
+        "peak_sampled_threads": 77,
+        "peak_sampled_open_fds": 250,
+        "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+      },
+      "config_sha256": "e7bd7dc0fb3b7ea94f43ac1b61a47312bbcbb306ae89005462c2e7ce0384176b",
+      "usage_note": "The missing-usage transcript deliberately omits provider usage; absent provider counters must not be normalized to zero."
+    }
+  ],
+  "paid_model_calls": 0,
+  "storage_guard_check": {
+    "kernel_enospc_observed": true,
+    "tmpfs_total_bytes": 67108864,
+    "bytes_written_before_rejection": 67108864,
+    "probe_files_retained": false,
+    "purpose": "One-time kernel capacity check before product startup; not product disk usage."
+  },
+  "fixture_selfcheck": {
+    "fragment_reassembly": true,
+    "unicode_preserved": true,
+    "scripted_faults_validated": true
+  },
+  "validation_complete": true,
+  "fixture_and_invocation_valid": true,
+  "runtime_identity": {
+    "version": "2026.10.7",
+    "commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "builtAt": "2026-10-24T02:45:17.235Z",
+    "buildId": "2026.10.7-release-157d8c2bc3ea-2026-10-24T02-45-17.235Z"
+  },
+  "runtime_build_info_sha256": "29b4d3cd6b2db798445b56f11df7c60d6ff5408079cb4e2992bf713f23f44cfd",
+  "evaluation_role": "current-stable-pilot",
+  "campaign_target": {
+    "product": "openclaw",
+    "version": "2026.10.7",
+    "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "selection_policy": "latest-stable-at-campaign-start",
+    "release_tag": "v2026.10.7",
+    "release_url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.7",
+    "release_published_at": "2026-10-24T09:53:46Z",
+    "checked_at_utc": "2026-10-26T04:13:15.261947+00:00",
+    "npm_integrity": "sha512-iiZO+kFFBgQvxm17wn3Sc/MSC/GQu01PubAFVNA2Nn736HOHUbR0ra7a9NeW9wpjq3kDkSJ1RB7dTP+qVJFXig==",
+    "npm_tarball": "https://registry.npmjs.org/openclaw/-/openclaw-2026.10.7.tgz",
+    "node_engine": ">=24.22.1 <25 || >=26.12.1",
+    "node_version": "24.22.1",
+    "pin_policy": "Resolve GitHub stable and npm latest together before a campaign; pin version, release commit and package integrity for its duration. Historical bootstrap runs are excluded from current-release conclusions."
+  },
+  "execution_budget": {
+    "profile": "hosted",
+    "memory_limit_bytes": 3221225472,
+    "swap_limit_bytes": 0,
+    "cpu_quota_cores": 2,
+    "pids_limit": 128,
+    "timeout_seconds": 600
+  },
+  "controller_sha256": {
+    "evaluation/tools/run_local.py": "f2d5754e4010b41511efebaa011bb3e63d93eff516e09fd874cf250cba384830",
+    "evaluation/runner/adapter_validation.py": "e9a08243a1201fd7a527eded45dc6560e6f280a85929435b0aae06662a366f87",
+    "evaluation/runner/hook_cases.py": "1ccd53237335cd04699ab3471ceab94f480930f55a13864fed5f0361bc5dc377",
+    "evaluation/runner/mcp_probe.py": "f28eac5bc0cac36ec0b1194ab872712a01b54f0973111d51e36f3d3c3ac964a8",
+    "evaluation/runner/model_validation.py": "5ed2ec0d2334c39f4dcedbe9504761321eec65aeb4fb099b0bac06a121669541",
+    "evaluation/runner/pilot.py": "97db1cab0f179fed65b8d3d67f424463e74b50109699b9951d52fa983a135925",
+    "evaluation/runner/profile.mjs": "6403553ed2c89da217242badd2deb3d5e3374b3657df2ec7062f23936cf76b2b",
+    "evaluation/runner/protocol_cases.py": "32d80f299df0c61630f5785a3e6730b8a398e36b5d6369e58426b695682af306",
+    "evaluation/runner/provider_bridge.py": "69648e0d79fb27ca2eb38267be0c576e6ba11dffa37e497a9afb9efdf3c277ae",
+    "evaluation/runner/source_followup.py": "adaa7b65215d1b56a47945f9fa43a0b6b2b0ab2b4b46222a1a0b6ac949b18b50"
+  },
+  "wrapper_exit_code": 0,
+  "whole_run_seconds": 179.201,
+  "storage_policy": {
+    "shared_installation_copied": false,
+    "downloads": 0,
+    "tmpfs_limit_bytes": 67108864,
+    "swap_limit_bytes": 0,
+    "persisted_report_limit_bytes": 1048576,
+    "runtime_state_retained": false
+  },
+  "whole_run_cgroup": {
+    "memory_peak_bytes": 1731420160,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "pids_events": "max 0\n",
+    "cpu_stat": "usage_usec 283136906\nuser_usec 244001246\nsystem_usec 39135660\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 1792\nnr_throttled 692\nthrottled_usec 84221999\nnr_bursts 0\nburst_usec 0\n"
+  }
+}

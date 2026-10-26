@@ -1,0 +1,8 @@
+{
+  "github_run_id": "40280942578",
+  "controller_commit": "ccfdb4f9cf6887a9e02c9fe8c4ee9a7025928427",
+  "host": "github-hosted-ubuntu-24.04",
+  "purpose": "harness-validation-only",
+  "full_campaign_coverage": false,
+  "local_runtime_installation": false
+}

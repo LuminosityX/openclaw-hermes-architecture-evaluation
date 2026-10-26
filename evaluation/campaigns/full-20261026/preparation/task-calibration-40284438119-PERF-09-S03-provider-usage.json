@@ -1,0 +1,85 @@
+{
+  "kind": "deterministic-provider-transcript-ledger",
+  "provider": "local-scripted-fixture",
+  "base_url": null,
+  "model": "deepseek-flash",
+  "campaign_spend_ceiling": null,
+  "requests": [
+    {
+      "task_id": "EVAL_PERF_09_S03_U1",
+      "request_sha256": "9e518008f459006c79246840560ba6856cf20a738c9ab781d9f4dcae230adc85",
+      "started_at_utc": "2026-10-26T07:14:24.503884+00:00",
+      "request_bytes": 9893,
+      "requested_model": "deepseek-flash",
+      "thinking": "disabled",
+      "max_output_tokens": 4096,
+      "stream": true,
+      "upstream_status": 200,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "provider_reported_cost_usd": null,
+      "invoice_reconciliation": null,
+      "usage_synthetic": true,
+      "real_provider_call": false,
+      "forwarded_to_provider": false,
+      "forwarded_to_transport": true,
+      "upstream_request_id": null,
+      "duration_ms": 0.423903,
+      "first_chunk_ms": 0.371284,
+      "response_bytes": 1192,
+      "response_id": "golden-1",
+      "response_model": "deepseek-flash",
+      "finish_reasons": [
+        "tool_calls"
+      ],
+      "stream_finished": true,
+      "usage_complete": true
+    },
+    {
+      "task_id": "EVAL_PERF_09_S03_U1",
+      "request_sha256": "456f83cacdaf26f0501d33c380d6939d68ec97bb254fd3a085685691e95ceec0",
+      "started_at_utc": "2026-10-26T07:14:24.597850+00:00",
+      "request_bytes": 10693,
+      "requested_model": "deepseek-flash",
+      "thinking": "disabled",
+      "max_output_tokens": 4096,
+      "stream": true,
+      "upstream_status": 200,
+      "usage": {
+        "prompt_tokens": 0,
+        "completion_tokens": 0,
+        "total_tokens": 0
+      },
+      "provider_reported_cost_usd": null,
+      "invoice_reconciliation": null,
+      "usage_synthetic": true,
+      "real_provider_call": false,
+      "forwarded_to_provider": false,
+      "forwarded_to_transport": true,
+      "upstream_request_id": null,
+      "duration_ms": 0.186217,
+      "first_chunk_ms": 0.153559,
+      "response_bytes": 596,
+      "response_id": "golden-2",
+      "response_model": "deepseek-flash",
+      "finish_reasons": [
+        "stop"
+      ],
+      "stream_finished": true,
+      "usage_complete": true
+    }
+  ],
+  "request_count": 2,
+  "unattributed_request_count": 0,
+  "forwarded_request_count": 2,
+  "task_protocol_maximum_requests": 16,
+  "real_provider_request_count": 0,
+  "raw_prompts_retained": false,
+  "raw_responses_retained": false,
+  "credentials_retained": false,
+  "actual_charges_known": false,
+  "limitation": "Usage metadata is not a provider invoice. Missing usage remains unknown."
+}

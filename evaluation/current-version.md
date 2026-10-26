@@ -10,6 +10,8 @@ python3 evaluation/tools/target.py check-current
 
 This command consults official public metadata and fails if the frozen target is stale or registry/release sources disagree. `target.py refresh` explicitly updates the pin before a new campaign; review that change and its runtime requirements rather than letting an in-flight experiment change versions.
 
+The active [full campaign](full-campaign.md) requires completing all experiments before unified architecture interpretation. The workflows below include historical exploratory pilots; their completion is not full-suite completion. New native adapter and task calibration also use disposable hosted runners and retain only bounded synthetic evidence.
+
 ## Avoid another local installation
 
 The manually dispatched `Current stable OpenClaw pilot` GitHub workflow installs the exact published version and compatible Node on a fresh GitHub-hosted Ubuntu runner. It checks installed package/build versions, release commit and npm lock integrity before invoking the bounded three-study pilot. Dependencies and npm caches stay on that temporary machine and are removed after the job. No runtime cache is uploaded or reused by the workflow.

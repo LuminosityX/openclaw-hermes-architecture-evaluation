@@ -68,4 +68,6 @@ For observability, measure event/argument/result/error availability, parent/chil
 
 Cross-dimensional architecture claims follow the [architecture study protocol](architecture-studies.md). A measured tradeoff needs supported benefit and cost in the same controlled workload; source evidence of design intent is a separate claim. Distinguish native config changes, topology/route boundary comparisons and patched counterfactuals. Preregister independent units, meaningful-difference margins, confounders, reversal workloads and hashed evidence artifacts before execution. Metadata validation never certifies product results or authorizes spending.
 
+For the active [full campaign](full-campaign.md), `deepseek-flash` is selected and the user explicitly authorized no monetary ceiling. Keep per-task time/retry/token/hardware limits as declared experimental conditions. Do not ask for a monetary ceiling again.
+
 Cases advance through planned, fixture-validated, adapter-validated, executed, evidence-verified and reviewed stages. Declare resource and real-usage budgets before execution; historical controller authorization does not supply them. Current CI validates design and tooling only. No numeric product score, statistical effect or architecture conclusion is generated from plan completeness.

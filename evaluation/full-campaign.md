@@ -3,6 +3,7 @@
 The current instruction is experiment first: implement the complete frozen scope, execute it, audit completion, and only then produce the unified source-backed architecture interpretation. The [frozen plan](campaigns/full-20261026/plan.json) preserves all 60 experiment families and 257 scenarios across exactly six dimensions. OpenClaw is the only product. Earlier exploratory pilots do not satisfy this campaign's coverage.
 
 ```sh
+python3 evaluation/tools/adapter_readiness.py
 python3 evaluation/tools/campaign.py status
 python3 evaluation/tools/campaign.py seal
 ```
@@ -29,4 +30,10 @@ DeepSeek exposes a moving alias, so capture discovery metadata, the returned mod
 
 Use disposable hosted runners, share one exact runtime installation within each shard, and delete that shard's owned installation/cache/state after evidence collection. Do not install a second OpenClaw runtime or copy dependency trees to the local workspace. The full campaign's compact local evidence budget is 4 MiB; runtime state and raw private trajectories are excluded. Larger synthetic evidence remains bounded in hosted artifacts and must not be pulled locally without a specific need.
 
-At campaign creation all 257 scenarios are unexecuted. The current adapter set still consists of exploratory pilots. Publishing this plan or passing repository CI does not mean the native full suite is implemented or executed.
+All 257 frozen scenarios remain unexecuted in the full campaign. Twenty candidate adapters now exist: REL-14 (4), REL-15 (5), EXT-08 (6), and PERF-09 (5). The remaining 237 scenarios are not implemented. The [preparation evidence](campaigns/full-20261026/preparation/README.md) records connection, native plumbing, protocol/hook calibration and golden task delivery checks. These development checks do not satisfy full experiment coverage or real-model task capability.
+
+`adapter_readiness.py` compares preparation proofs with the current controller hashes. A shared-controller change invalidates older preparation proofs until recalibrated. `--require-complete` refuses full-scope readiness while any adapter is missing or unvalidated. `run_task_unit.py` also checks this gate before any paid full-campaign task. Development calibration requires an explicit flag, carries `full_campaign_coverage: false`, and is rejected by the campaign completion audit.
+
+The task runner uses the pinned official [DeepSeek provider plugin](design/deepseek-plugin-pin.json). Real task execution defaults to its thinking-enabled condition with a declared 16,384 output-token limit per request, 16 model protocol requests per task, and a 180-second task deadline. These finite workload conditions are recorded separately from monetary authorization. The initial provider plumbing check instead uses the explicitly recorded non-thinking 4,096-token condition. Do not compare their outcomes as matched task-quality conditions. Golden transcript calibration calls no real provider.
+
+Publishing these adapters or passing repository CI does not mean the native full suite is implemented or executed.

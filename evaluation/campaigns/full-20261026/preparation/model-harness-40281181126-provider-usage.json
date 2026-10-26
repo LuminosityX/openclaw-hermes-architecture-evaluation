@@ -1,0 +1,84 @@
+{
+  "kind": "real-provider-request-ledger",
+  "provider": "deepseek",
+  "base_url": "https://api.deepseek.com",
+  "model": "deepseek-flash",
+  "campaign_spend_ceiling": null,
+  "requests": [
+    {
+      "task_id": "EVAL_PROVIDER_VALIDATION",
+      "request_sha256": "447cf3d1f0b1eca85e1482e64feb42d9118e2cd111fd883746092a6b88d0ef7b",
+      "started_at_utc": "2026-10-26T06:41:20.319132+00:00",
+      "request_bytes": 9053,
+      "requested_model": "deepseek-flash",
+      "thinking": "disabled",
+      "max_output_tokens": 4096,
+      "stream": true,
+      "upstream_status": 200,
+      "usage": {
+        "prompt_tokens": 2261,
+        "completion_tokens": 62,
+        "total_tokens": 2323,
+        "prompt_tokens_details": {
+          "cached_tokens": 0
+        },
+        "prompt_cache_hit_tokens": 0,
+        "prompt_cache_miss_tokens": 2261
+      },
+      "provider_reported_cost_usd": null,
+      "invoice_reconciliation": null,
+      "upstream_request_id": null,
+      "duration_ms": 1402.923685,
+      "first_chunk_ms": 563.056378,
+      "response_bytes": 9422,
+      "response_id": "959d842c-206e-49bf-ab1f-0ccbf4f64084",
+      "response_model": "deepseek-flash",
+      "finish_reasons": [
+        "tool_calls"
+      ],
+      "stream_finished": true,
+      "usage_complete": true
+    },
+    {
+      "task_id": "EVAL_PROVIDER_VALIDATION",
+      "request_sha256": "4d478de733d7c9c1f035e828b67d881cdc5c3d2a3c86a323197788c6583d8192",
+      "started_at_utc": "2026-10-26T06:41:21.983607+00:00",
+      "request_bytes": 9401,
+      "requested_model": "deepseek-flash",
+      "thinking": "disabled",
+      "max_output_tokens": 4096,
+      "stream": true,
+      "upstream_status": 200,
+      "usage": {
+        "prompt_tokens": 2352,
+        "completion_tokens": 12,
+        "total_tokens": 2364,
+        "prompt_tokens_details": {
+          "cached_tokens": 2176
+        },
+        "prompt_cache_hit_tokens": 2176,
+        "prompt_cache_miss_tokens": 176
+      },
+      "provider_reported_cost_usd": null,
+      "invoice_reconciliation": null,
+      "upstream_request_id": null,
+      "duration_ms": 1220.808105,
+      "first_chunk_ms": 419.708352,
+      "response_bytes": 4229,
+      "response_id": "683227ab-2396-45b0-aa51-1815fde6da5e",
+      "response_model": "deepseek-flash",
+      "finish_reasons": [
+        "stop"
+      ],
+      "stream_finished": true,
+      "usage_complete": true
+    }
+  ],
+  "request_count": 2,
+  "unattributed_request_count": 0,
+  "raw_prompts_retained": false,
+  "raw_responses_retained": false,
+  "credentials_retained": false,
+  "actual_charges_known": false,
+  "limitation": "Usage metadata is not a provider invoice. Missing usage remains unknown."
+}

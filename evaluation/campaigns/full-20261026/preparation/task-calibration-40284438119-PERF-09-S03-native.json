@@ -1,0 +1,125 @@
+{
+  "kind": "native-task-unit",
+  "product": "openclaw",
+  "studies": [],
+  "task_id": "EVAL_PERF_09_S03_U1",
+  "full_campaign_coverage": false,
+  "artifacts": {
+    "result.json": "{\"active_ids\": [\"item-0\", \"item-1\", \"item-10\", \"item-11\", \"item-13\", \"item-14\", \"item-15\", \"item-16\", \"item-17\", \"item-18\", \"item-2\", \"item-21\", \"item-22\", \"item-23\", \"item-3\", \"item-4\", \"item-5\", \"item-6\", \"item-7\", \"item-8\", \"item-9\"], \"totals\": {\"alpha\": \"-175.87\", \"beta\": \"-302.45\", \"gamma\": \"303.71\"}}"
+  },
+  "independent_events": [
+    {
+      "kind": "task-tool-call",
+      "monotonic_ns": 152743715383,
+      "task_id": "EVAL_PERF_09_S03_U1",
+      "operation": "write",
+      "path": "result.json",
+      "sequence": 1
+    },
+    {
+      "kind": "artifact-write",
+      "monotonic_ns": 152743865678,
+      "task_id": "EVAL_PERF_09_S03_U1",
+      "path": "result.json",
+      "bytes": 307,
+      "sequence": 2
+    }
+  ],
+  "storage_guard_check": {
+    "kernel_enospc_observed": true,
+    "tmpfs_total_bytes": 67108864,
+    "bytes_written_before_rejection": 67108864,
+    "probe_files_retained": false,
+    "purpose": "One-time kernel capacity check before product startup; not product disk usage."
+  },
+  "fixture_selfcheck": {
+    "valid": true,
+    "read_write_positive_control": true,
+    "outside_path_denied": true,
+    "service_lost_ack_and_idempotency_control": false,
+    "control_state_retained": false
+  },
+  "native_http_status": 200,
+  "response_sha256": "67e5d9c49c63dbd76cb2b890dc9e099e74ac062ddfcd6df56197b992d42a356c",
+  "response_bytes": 346,
+  "completion_ms": 5934.448294,
+  "resources": {
+    "sample_interval_ms": 200,
+    "sample_count": 47,
+    "product_process_tree_cpu_user_seconds": 14.92,
+    "product_process_tree_cpu_system_seconds": 1.66,
+    "peak_sampled_pss_bytes": 1715131392,
+    "peak_sampled_rss_sum_bytes": 1887420416,
+    "peak_sampled_processes": 5,
+    "peak_sampled_threads": 56,
+    "peak_sampled_open_fds": 214,
+    "limitation": "Sampled live Gateway descendants; short-lived processes or final CPU can be missed. RSS sum is not physical memory. Includes startup, warmup and collector perturbation."
+  },
+  "config_sha256": "acacb558e261747482d516629e9304a538b6e5a1c6b7b771b196601c20603864",
+  "input_integrity": {
+    "input-a.csv": true,
+    "input-b.csv": true
+  },
+  "runtime_identity": {
+    "version": "2026.10.7",
+    "commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "builtAt": "2026-10-24T02:45:17.235Z",
+    "buildId": "2026.10.7-release-157d8c2bc3ea-2026-10-24T02-45-17.235Z"
+  },
+  "runtime_build_info_sha256": "29b4d3cd6b2db798445b56f11df7c60d6ff5408079cb4e2992bf713f23f44cfd",
+  "evaluation_role": "current-stable-pilot",
+  "campaign_target": {
+    "product": "openclaw",
+    "version": "2026.10.7",
+    "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "selection_policy": "latest-stable-at-campaign-start",
+    "release_tag": "v2026.10.7",
+    "release_url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.7",
+    "release_published_at": "2026-10-24T09:53:46Z",
+    "checked_at_utc": "2026-10-26T04:13:15.261947+00:00",
+    "npm_integrity": "sha512-iiZO+kFFBgQvxm17wn3Sc/MSC/GQu01PubAFVNA2Nn736HOHUbR0ra7a9NeW9wpjq3kDkSJ1RB7dTP+qVJFXig==",
+    "npm_tarball": "https://registry.npmjs.org/openclaw/-/openclaw-2026.10.7.tgz",
+    "node_engine": ">=24.22.1 <25 || >=26.12.1",
+    "node_version": "24.22.1",
+    "pin_policy": "Resolve GitHub stable and npm latest together before a campaign; pin version, release commit and package integrity for its duration. Historical bootstrap runs are excluded from current-release conclusions."
+  },
+  "execution_budget": {
+    "profile": "hosted",
+    "memory_limit_bytes": 3221225472,
+    "swap_limit_bytes": 0,
+    "cpu_quota_cores": 2,
+    "pids_limit": 128,
+    "timeout_seconds": 300
+  },
+  "controller_sha256": {
+    "evaluation/tools/run_local.py": "eeeb0d0d9ccbbb76aa6172390eafac44e1c63002747361ed803db2c57c4d1ce1",
+    "evaluation/runner/adapter_validation.py": "e35c17fb0579dd6db2c4a3a274e7f7987a59af8fb1c29b43dad8aa8f08525df7",
+    "evaluation/runner/function_probe.py": "2444ec1a6f721d9e0242a99f558320561734710ebff077d17457340e8cb3a18f",
+    "evaluation/runner/hook_cases.py": "1755a59f7609ffd4e5c4ff7e9df399981d472448e3b570db57452f60fb4dd3f8",
+    "evaluation/runner/mcp_probe.py": "f28eac5bc0cac36ec0b1194ab872712a01b54f0973111d51e36f3d3c3ac964a8",
+    "evaluation/runner/model_validation.py": "5ed2ec0d2334c39f4dcedbe9504761321eec65aeb4fb099b0bac06a121669541",
+    "evaluation/runner/pilot.py": "97db1cab0f179fed65b8d3d67f424463e74b50109699b9951d52fa983a135925",
+    "evaluation/runner/profile.mjs": "6403553ed2c89da217242badd2deb3d5e3374b3657df2ec7062f23936cf76b2b",
+    "evaluation/runner/protocol_cases.py": "e208d0d677a936543ed06562f64ddd47620cc37495e843e81ec2d371685b6ea5",
+    "evaluation/runner/provider_bridge.py": "69648e0d79fb27ca2eb38267be0c576e6ba11dffa37e497a9afb9efdf3c277ae",
+    "evaluation/runner/source_followup.py": "adaa7b65215d1b56a47945f9fa43a0b6b2b0ab2b4b46222a1a0b6ac949b18b50",
+    "evaluation/runner/task_cases.py": "5120be01f163cb985b434d86fddfe6cf8f5f92af069de03de79294f0a77006cb",
+    "evaluation/runner/task_unit.py": "7d02d2afc2f70c5596130a3c095367c59cf69406a869c2fad2e230151693798c"
+  },
+  "wrapper_exit_code": 0,
+  "whole_run_seconds": 11.84,
+  "storage_policy": {
+    "shared_installation_copied": false,
+    "downloads": 0,
+    "tmpfs_limit_bytes": 67108864,
+    "swap_limit_bytes": 0,
+    "persisted_report_limit_bytes": 1048576,
+    "runtime_state_retained": false
+  },
+  "whole_run_cgroup": {
+    "memory_peak_bytes": 1723461632,
+    "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+    "pids_events": "max 0\n",
+    "cpu_stat": "usage_usec 18701641\nuser_usec 15815883\nsystem_usec 2885758\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 116\nnr_throttled 50\nthrottled_usec 5391376\nnr_bursts 0\nburst_usec 0\n"
+  }
+}

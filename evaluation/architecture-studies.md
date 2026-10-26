@@ -1,5 +1,7 @@
 # Architecture tradeoff studies
 
+The active [full campaign](full-campaign.md) supersedes the earlier exploratory execution sequence: finish the complete frozen experiment scope, audit completion, then perform unified source-backed interpretation. Source reading during preparation/execution supports adapter correctness and harness repair; it does not produce interim architecture verdicts.
+
 The six dimensions remain the reporting axes. The 60 case families remain the coverage inventory. Seven architecture studies compose those cases around a design mechanism, so the same workload can expose both benefits and costs. They are not additional dimensions. The [study specification](design/architecture-studies.json) remains the confirmatory plan; its selector does not enable execution. An explicitly invoked [bounded native runner](runner/README.md) now implements first-wave exploratory pilots. Pilot execution does not complete every scenario or certify a tradeoff.
 
 ## Questions and first wave

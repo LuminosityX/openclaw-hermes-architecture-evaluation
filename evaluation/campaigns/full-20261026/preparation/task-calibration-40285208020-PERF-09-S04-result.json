@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "plan_sha256": "95322a35ede386e1554b28e0a55e7c89fb27a929aaaf95e3dbe0dacc8f1e03ae",
+  "product": "openclaw",
+  "target_version": "2026.10.7",
+  "target_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+  "scenario_id": "PERF-09-S04",
+  "unit": 1,
+  "state": "pass",
+  "fixture_validated": true,
+  "native_invoked": true,
+  "run_id": "hosted-development",
+  "evidence": [
+    "native/summary.json",
+    "provider-usage.json",
+    "installation.json",
+    "provider-plugin.json"
+  ],
+  "assertions": [
+    {
+      "name": "required-artifact-delivered",
+      "verdict": "pass",
+      "evidence": [
+        "task-artifact",
+        "independent-task-oracle"
+      ]
+    },
+    {
+      "name": "independent-exact-deliverable",
+      "verdict": "pass",
+      "evidence": [
+        "task-artifact",
+        "independent-task-oracle"
+      ]
+    },
+    {
+      "name": "immutable-inputs-unchanged",
+      "verdict": "pass",
+      "evidence": [
+        "native/summary.json:input_integrity"
+      ]
+    }
+  ],
+  "public_fixture_sha256": "ef38e5b45f3f23b9aaa746dead7ee22b7d75d00ca8e33f67128e060c631b4b3c",
+  "thinking": "disabled",
+  "full_campaign_coverage": false,
+  "model_execution": "golden-scripted-fixture",
+  "acceptance_values": null,
+  "full_campaign_development_calibration": true
+}
