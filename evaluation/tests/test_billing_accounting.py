@@ -24,3 +24,10 @@ class BillingAccountingTest(unittest.TestCase):
         result=account(dict(requests=[self.record(started_at_utc='2026-10-27T02:00:00+00:00')]))
         self.assertIsNone(result['calculated_usd'])
         self.assertIsNotNone(result['requests'][0]['calculated_usd_bounds'])
+
+    def test_unfinished_admitted_attempt_is_not_omitted_from_total(self):
+        result=account(dict(requests=[self.record()],real_provider_request_count=2))
+        self.assertEqual(result['real_attempt_count'],2)
+        self.assertEqual(result['unfinished_attempts_with_unknown_usage'],1)
+        self.assertIsNone(result['input_tokens_inclusive'])
+        self.assertIsNone(result['calculated_usd'])

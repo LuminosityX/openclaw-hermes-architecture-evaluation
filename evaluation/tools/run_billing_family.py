@@ -54,7 +54,7 @@ def unit(args,plan,installation,sid,index,calibration):
     native=json.loads((directory/'native/summary.json').read_text());ledger=json.loads((directory/'provider-usage.json').read_text());accounting=account(ledger)
     turns=native.get('billing_native_turns',[]);assertions=[]
     def check(name,value):assertions.append(dict(name=name,verdict='pass' if value else 'fail',evidence=['native/summary.json','provider-usage.json','accounting.json']))
-    check('every-provider-attempt-has-task-attribution',bool(accounting['requests']) and all(r['task_id']==task['task_id'] for r in accounting['requests']))
+    check('every-provider-attempt-has-task-attribution',bool(accounting['requests']) and accounting.get('unfinished_attempts_with_unknown_usage',0)==0 and all(r['task_id']==task['task_id'] for r in accounting['requests']))
     check('reported-token-categories-are-preserved-without-double-counting',all(r['category_values_valid'] and r['input_partition_valid'] and r['reasoning_subset_valid'] for r in accounting['requests']))
     check('actual-invoice-fields-remain-unknown-without-an-invoice',accounting['actual_invoice_usd'] is None and accounting['provider_reported_usd'] is None)
     if sid.endswith('01'):check('successful-native-task-produces-correct-answer',bool(turns) and '3973' in turns[0]['response'].get('content',''))
