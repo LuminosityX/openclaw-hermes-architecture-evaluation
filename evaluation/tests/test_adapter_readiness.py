@@ -3,10 +3,12 @@ import copy
 import hashlib
 from pathlib import Path
 import sys
+import json
+import tempfile
 import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from adapter_readiness import readiness, native_validation, SOURCES
+from adapter_readiness import readiness, native_validation, SOURCES, load_proofs
 from campaign import load_plan
 from suite import ROOT
 
@@ -20,6 +22,13 @@ class ReadinessTests(unittest.TestCase):
 
     def test_pilot_evidence_is_rejected(self):
         with self.assertRaisesRegex(ValueError,'candidate-adapter'): native_validation(load_plan(),[dict(kind='exploratory-pilot')])
+
+    def test_adjacent_installation_metadata_is_not_an_adapter_proof(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)
+            (root/'adapter-validation-123-REL-14.json').write_text(json.dumps(dict(kind='native-adapter-validation')))
+            (root/'adapter-validation-123-REL-14-installation.json').write_text(json.dumps(dict(kind='published-installation-check')))
+            self.assertEqual(len(load_proofs(root)),1)
 
     def test_failed_product_observation_can_validate_only_exact_controller(self):
         plan=load_plan()

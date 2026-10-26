@@ -87,7 +87,10 @@ def workload(scenario_id,unit):
         files['solution.py']='def reconcile(rows):\n    total = sum(float(r["amount"]) for r in rows)\n    return {"USD": str(total)}\n'
         sample=[dict(amount='0.10',currency='USD',kind='charge',status='active'),dict(amount='0.20',currency='USD',kind='charge',status='active')]
         files['public_tests.py']=public_test('reconcile',sample,{'USD':'0.30'})
-        inputs=[[],sample]
+        inputs=[[],sample,
+                [dict(amount='0.005',currency='USD',kind='charge',status='active') for _ in range(2)],
+                [dict(amount='0.005',currency='EUR',kind='refund',status='active')],
+                [dict(amount='1000.00',currency='CNY',kind='charge',status='cancelled')]]
         for _ in range(8):
             inputs.append([dict(amount=f'{rng.randrange(2000)/100:.2f}',currency=rng.choice(['USD','EUR','CNY']),
                                 kind=rng.choice(['charge','refund']),status=rng.choice(['active','active','cancelled'])) for _ in range(rng.randrange(1,20))])

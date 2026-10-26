@@ -5,6 +5,7 @@ from collections import Counter
 import hashlib
 import json
 from pathlib import Path
+import re
 
 from campaign import DEFAULT_PLAN, load_plan, scenario_index
 from suite import ROOT, require
@@ -15,7 +16,7 @@ SOURCES={
     'EXT-08':['evaluation/runner/hook_cases.py','evaluation/runner/pilot.py','evaluation/runner/adapter_validation.py','evaluation/tools/run_local.py'],
     'PERF-09':['evaluation/runner/task_cases.py','evaluation/runner/task_unit.py','evaluation/runner/function_probe.py',
                'evaluation/runner/pilot.py','evaluation/tools/run_local.py','evaluation/tools/run_task_unit.py',
-               'evaluation/tools/task_workloads.py','evaluation/tools/task_acceptance.py','evaluation/tools/model_relay.py'],
+               'evaluation/tools/task_workloads.py','evaluation/tools/task_acceptance.py','evaluation/tools/model_relay.py','evaluation/tools/task_transcripts.py'],
 }
 
 
@@ -56,7 +57,8 @@ def readiness(plan,proofs=()):
 
 
 def load_proofs(directory):
-    return [json.loads(path.read_text()) for path in sorted(Path(directory).glob('adapter-validation-*.json'))]
+    return [json.loads(path.read_text()) for path in sorted(Path(directory).glob('adapter-validation-*.json'))
+            if re.fullmatch(r'adapter-validation-\d+-(?:REL|SEC|PERF|COST|EXT|OBS)-\d{2}\.json',path.name)]
 
 
 def main():

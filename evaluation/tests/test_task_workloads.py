@@ -5,6 +5,7 @@ import unittest
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
 from task_workloads import workload, judge, dependency_result
+from task_transcripts import MONEY_CODE, GRAPH_CODE
 
 
 class TaskWorkloadTests(unittest.TestCase):
@@ -26,6 +27,18 @@ class TaskWorkloadTests(unittest.TestCase):
     def test_dependency_oracle_includes_referenced_nodes_deduplicates_and_detects_cycle(self):
         self.assertEqual(dependency_result({'z':['a','a'],'b':[]}),['a','b','z'])
         self.assertEqual(dependency_result({'x':['x']}),{'error':'ValueError'})
+
+    def test_golden_functions_pass_all_independent_variants_and_fractional_cent_boundaries(self):
+        for sid,code,function in [('PERF-09-S01',MONEY_CODE,'reconcile'),('PERF-09-S02',GRAPH_CODE,'dependency_order')]:
+            namespace={};exec(code,namespace)
+            for unit in range(1,7):
+                oracle=workload(sid,unit)['oracle']
+                actual=[]
+                for arguments in oracle['inputs']:
+                    try: actual.append(namespace[function](arguments))
+                    except ValueError: actual.append(dict(error='ValueError'))
+                self.assertEqual(actual,oracle['expected'])
+        self.assertEqual(workload('PERF-09-S01',1)['oracle']['expected'][2],{'USD':'0.01'})
 
     def test_older_or_draft_research_answer_fails(self):
         import json
