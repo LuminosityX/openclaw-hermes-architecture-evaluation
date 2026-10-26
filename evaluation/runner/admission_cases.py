@@ -69,6 +69,7 @@ class AdmissionFixture(OperationFixture):
 
 def configure(root):
     config=service.configure(root);config['agents']['defaults']['maxConcurrent']=1
+    config['gateway']['controlUi'].update(enabled=True,allowedOrigins=['http://127.0.0.1:18789'])
     pilot.save(root/'config.json',config);return config
 
 
@@ -100,6 +101,10 @@ def run_scenario(root,scenario,unit=1):
         while time.monotonic()<deadline and fixture.receipts.get(control)!=1:time.sleep(.1)
         if fixture.receipts.get(control)!=1:raise RuntimeError('Actual native admitted control did not dispatch and complete')
         metadata['native_chat_send_control']=positive;fixture.register(token);identity=str(uuid.uuid5(uuid.NAMESPACE_URL,token))
+        initialized=token+'_TARGET_SESSION_READY';fixture.register(initialized)
+        prepared=gateway.request(initialized,session_key=token.lower())
+        if not prepared['accepted'] or fixture.receipts.get(initialized)!=1:raise RuntimeError('Actual initialized native session required by restart-safe admission was not established')
+        metadata['target_session_initialization']=prepared
         with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
             blocker=None
             if mode!='before-append':

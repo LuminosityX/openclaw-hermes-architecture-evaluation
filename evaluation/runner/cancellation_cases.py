@@ -28,7 +28,7 @@ class CancellationFixture(AuthorizationFixture):
     def __init__(self):
         self.controls=[];self.control_written=threading.Event();self.control_returned=threading.Event()
         self.harness_events=[];self.pause_entered=threading.Event();self.pause_release=threading.Event();self.pause_release.set()
-        self.parent_token=None;self.parent_entered=threading.Event();self.parent_release=threading.Event();self.parent_release.set()
+        self.parent_token=None;self.parent_returns=[];self.parent_entered=threading.Event();self.parent_release=threading.Event();self.parent_release.set()
         super().__init__();self.gate_timeout_seconds=30
     def handler(self):
         base=super().handler();owner=self
@@ -54,6 +54,7 @@ class CancellationFixture(AuthorizationFixture):
                     users=[(i,re.search(r'PILOT_[A-Z0-9_]+',str(m.get('content','')))) for i,m in enumerate(body.get('messages',[])) if m.get('role')=='user']
                     marked=[(i,m.group()) for i,m in users if m];index,token=marked[-1] if marked else (0,None)
                     if token==owner.parent_token and any(m.get('role')=='tool' for m in body['messages'][index+1:]):
+                        owner.parent_returns=[m for m in body['messages'][index+1:] if m.get('role')=='tool']
                         owner.event('actual-parent-model-wait',token=token);owner.parent_entered.set()
                         if not owner.parent_release.wait(timeout=20):owner.event('parent-model-gate-timeout');return self.send(dict(error='parent-gate-timeout'),504)
                     original=self.rfile;self.rfile=io.BytesIO(raw)
@@ -145,7 +146,7 @@ def run_scenario(root,scenario,unit=1):
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
                 pending=pool.submit(gateway.request,token)
                 if not fixture.parent_entered.wait(timeout=15) or not wait_started(peer,child):raise RuntimeError('Actual live parent and child MCP work were not both established')
-                text=json.dumps(fixture.tool_returns.get(token,[]));matches=re.findall(r'agent:[a-z0-9_-]+:subagent:[a-zA-Z0-9-]+',text)
+                text=json.dumps(fixture.parent_returns);matches=re.findall(r'agent:[a-z0-9_-]+:subagent:[a-zA-Z0-9-]+',text)
                 if not matches:raise RuntimeError('Actual native child session identity was not returned')
                 metadata['actual_child_session']=matches[0];stop()
                 if not fixture.control_returned.wait(timeout=5):raise RuntimeError('Native active parent Stop did not return')

@@ -44,8 +44,11 @@ if(['before-append','before-client-ack'].includes(spec.mode)){
 }
 const client=await gatewayClient(spec);
 try{
- const owner=await client.connect({identity,scopes:['operator.admin'],port:server?18790:18789});
- if(!owner.result.ok)throw new Error('Actual wire owner connection failed: '+JSON.stringify(owner.result));
+ const bootstrap=await client.paired({scopes:['operator.admin']});
+ if(!bootstrap.result.ok)throw new Error('Actual bootstrap owner connection failed');
+ const owner=await client.paired({identity,ui:true,origin:'http://127.0.0.1:18789',scopes:['operator.admin'],port:server?18790:18789,
+  buildId:bootstrap.result.payload.server.buildId,version:bootstrap.result.payload.server.version},bootstrap);
+ if(!owner.result.ok)throw new Error('Actual Control UI wire owner connection failed: '+JSON.stringify(owner.result));
  const health=await owner.rpc('health',{});if(!health.ok)throw new Error('Actual wire health control failed');
  console.log(JSON.stringify({ready:true}));
  const response=await owner.rpc('chat.send',{sessionKey:spec.session_key,message:'Execute the deterministic operation for '+spec.token,idempotencyKey:spec.idempotency_key},25000);
