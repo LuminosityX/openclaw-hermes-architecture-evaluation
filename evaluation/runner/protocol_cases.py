@@ -169,6 +169,16 @@ def configure(root,scenario):
         provider=config['models']['providers']['fixture']
         provider['models'].append(dict(provider['models'][0],id='fallback-model',name='Unavailable fallback fixture'))
         config['agents']['defaults']['model']['fallbacks']=['fixture/fallback-model']
+    if scenario=='REL-14-S04':
+        config['models']['mode']='replace'
+        provider=config['models']['providers'].pop('fixture')
+        provider['models'][0].update(id='deepseek-flash',name='DeepSeek-shaped deterministic replay',reasoning=True)
+        config['models']['providers']['deepseek']=provider
+        config['agents']['defaults']['model']['primary']='deepseek/deepseek-flash'
+        config['agents']['defaults']['thinkingDefault']='high'
+        config['plugins']['allow'].append('deepseek')
+        config['plugins']['load']['paths'].append('/runtime/node_modules/@openclaw/deepseek-provider')
+        config['plugins']['entries']['deepseek']=dict(enabled=True)
     pilot.save(root/'config.json',config)
     return config
 

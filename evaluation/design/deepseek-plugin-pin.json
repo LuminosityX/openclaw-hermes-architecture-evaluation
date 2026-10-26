@@ -1,0 +1,10 @@
+{
+  "package": "@openclaw/deepseek-provider",
+  "version": "2026.10.7",
+  "plugin_id": "deepseek",
+  "integrity": "sha512-KoCG5YsiravzREKDTHX+JiBykkF7fSgXS7d4oL3OcXQ1rlFk8U2psHGStuDLGLeakusjHpHKbTewqWh7g56Xxg==",
+  "registry_tarball": "https://registry.npmjs.org/@openclaw/deepseek-provider/-/deepseek-provider-2026.10.7.tgz",
+  "compatible_host": ">=2026.10.7",
+  "selection": "Official provider plugin matching the frozen OpenClaw release; checked 2026-10-26",
+  "usage": "DeepSeek-specific reasoning replay and real-model provider integration; generic OpenAI replay is a separate condition"
+}

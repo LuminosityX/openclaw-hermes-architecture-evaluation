@@ -43,9 +43,12 @@ def main():
                 else: requests,metadata=[gateway.request(token,session_key='adapter-'+hashlib.sha256(token.encode()).hexdigest()[:24])],{}
                 request=requests[-1]
                 events=fixture.events[begin:]
-                assertions=module.acceptance(sid,requests,events,metadata) if args.case=='EXT-08' else module.acceptance(sid,request,events)
                 invoked=any(e['kind'] in {'scripted-provider-request','provider-request'} for e in events)
-                native=pilot.native_evidence(root,[token])
+                native=pilot.native_evidence(root,[token,*([token+'_PERSISTED'] if sid=='EXT-08-S03' else [])])
+                if sid=='EXT-08-S03':
+                    receipt=native['tokens'][token+'_PERSISTED']
+                    metadata['persisted_receipt_visible']=receipt['receipt_seen'] and 'transcript_events' in receipt['tables']
+                assertions=module.acceptance(sid,requests,events,metadata) if args.case=='EXT-08' else module.acceptance(sid,request,events)
                 observation.update(native_invoked=invoked,state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',
                     request={k:v for k,v in request.items() if k!='response_excerpt'},
                     requests=[{k:v for k,v in r.items() if k!='response_excerpt'} for r in requests],metadata=metadata,

@@ -159,7 +159,7 @@ def acceptance(scenario,requests,events,metadata):
     if mode=='mutation':
         replay=[e for e in events if e['kind']=='tool-result']
         check('input-rewrite-reaches-tool',len(effects)==1 and effects[0]['token'].endswith('_MUT'))
-        check('persistence-rewrite-reaches-provider',any('_PERSISTED' in e.get('excerpt','') for e in replay))
+        check('persistence-rewrite-reaches-native-transcript',metadata.get('persisted_receipt_visible') is True)
         check('after-observer-return-ignored',not any('AFTER_OBSERVER_RETURN_MUST_BE_IGNORED' in e.get('excerpt','') for e in replay))
     if mode=='observer-errors':
         check('throw-and-timeout-both-exercised',len([e for e in hooks if e.get('name')=='after'])==2)

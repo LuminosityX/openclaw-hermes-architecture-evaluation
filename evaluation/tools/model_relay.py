@@ -22,11 +22,13 @@ MAX_RESPONSE=8*1024**2
 TASK_PATTERN=re.compile(r'EVAL_[A-Z0-9_-]{1,90}')
 
 
-def request_body(data,max_output_tokens=4096):
+def request_body(data,max_output_tokens=4096,thinking='disabled'):
     if not isinstance(data,dict) or not isinstance(data.get('messages'),list):
         raise ValueError('Expected chat messages')
     # Retain the native protocol payload; replace only declared provider settings.
-    body=dict(data,model='deepseek-flash',max_tokens=max_output_tokens,thinking={'type':'disabled'})
+    if thinking not in {'disabled','enabled'}: raise ValueError('Unknown declared thinking condition')
+    if type(max_output_tokens) is not int or not 512<=max_output_tokens<=32768: raise ValueError('Finite declared output-token condition required')
+    body=dict(data,model='deepseek-flash',max_tokens=max_output_tokens,thinking={'type':thinking})
     body.pop('max_completion_tokens',None)
     if body.get('stream'):
         body['stream_options']={'include_usage':True}
@@ -96,10 +98,11 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
     daemon_threads=True
     block_on_close=False
 
-    def __init__(self,path,key,max_output_tokens=4096,open_request=None):
+    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled'):
         if not key: raise ValueError('DeepSeek key is required')
         self.key=key
         self.max_output_tokens=max_output_tokens
+        self.thinking=thinking
         self.open_request=open_request or urllib.request.build_opener(NoRedirect()).open
         self.records=[]
         self.lock=threading.Lock()
@@ -131,12 +134,12 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
                     raw=self.rfile.read(size)
                     if len(raw)!=size: raise ValueError('Incomplete local request')
                     if self.path!='/v1/chat/completions': return self.error(404,'Only the fixed completion endpoint is exposed')
-                    body=request_body(json.loads(raw),owner.max_output_tokens)
+                    body=request_body(json.loads(raw),owner.max_output_tokens,owner.thinking)
                 except (ValueError,TypeError): return self.error(400,'Invalid bounded completion request')
                 raw=json.dumps(body,ensure_ascii=False,separators=(',',':')).encode()
                 record=dict(task_id=task_id(body),request_sha256=hashlib.sha256(raw).hexdigest(),
                             started_at_utc=datetime.now(timezone.utc).isoformat(),request_bytes=len(raw),
-                            requested_model='deepseek-flash',thinking='disabled',max_output_tokens=owner.max_output_tokens,
+                            requested_model='deepseek-flash',thinking=owner.thinking,max_output_tokens=owner.max_output_tokens,
                             stream=bool(body.get('stream')),upstream_status=None,usage=None,
                             provider_reported_cost_usd=None,invoice_reconciliation=None)
                 started=time.monotonic_ns()

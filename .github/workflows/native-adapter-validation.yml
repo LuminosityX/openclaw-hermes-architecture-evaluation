@@ -53,9 +53,13 @@ jobs:
           npm_config_fund: 'false'
           npm_config_audit: 'false'
         run: |
-          npm install --prefix "$RUNNER_TEMP/openclaw-eval-runtime" --save-exact "openclaw@$OPENCLAW_EVAL_VERSION"
+          npm install --prefix "$RUNNER_TEMP/openclaw-eval-runtime" --save-exact "openclaw@$OPENCLAW_EVAL_VERSION" '@openclaw/deepseek-provider@2026.10.7'
           test "$(du -sm "$RUNNER_TEMP/openclaw-eval-runtime" "$RUNNER_TEMP/openclaw-npm-cache" | awk '{s+=$1} END {print s}')" -le 4096
           mkdir -p "$RUNNER_TEMP/openclaw-eval-artifact"
+          python3 evaluation/tools/provider_plugin.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-eval-runtime/package-lock.json" \
+            > "$RUNNER_TEMP/openclaw-eval-artifact/provider-plugin.json"
           python3 evaluation/tools/target.py verify-installation \
             --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
             --package-lock "$RUNNER_TEMP/openclaw-eval-runtime/package-lock.json" \
