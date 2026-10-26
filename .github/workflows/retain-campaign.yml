@@ -2,7 +2,7 @@ name: Retain formal campaign evidence in GitHub
 
 on:
   workflow_run:
-    workflows: [Remaining mechanism experiments]
+    workflows: [Remaining mechanism experiments, Real-model injection experiments]
     types: [completed]
   workflow_dispatch:
     inputs:

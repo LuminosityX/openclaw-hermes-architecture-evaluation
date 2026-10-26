@@ -14,7 +14,7 @@ from provider_plugin import verify as verify_plugin
 from suite import ROOT, require
 from target import verify_installation
 
-NATIVE_FAMILIES = [family for family in SOURCES if family!='PERF-09']
+NATIVE_FAMILIES = [family for family in SOURCES if family not in {'PERF-09','SEC-09'}]
 
 
 def bind_unit(plan, family, unit, native, run_id, controller_commit, native_reference, native_sha256, selected_scenarios=None):

@@ -18,16 +18,20 @@ def main():
     for name in ['tmp','home','cache','run']: (pilot.BASE/name).mkdir(exist_ok=True)
     spec=json.loads(Path('/task/input.json').read_text())
     task=spec['task']
+    fixture_class=TaskFixture;configure_task=configure;check_fixture=selfcheck
+    if task.get('injection'):
+        from injection_cases import InjectionFixture,configure as injection_configure,selfcheck as injection_selfcheck
+        fixture_class=InjectionFixture;configure_task=injection_configure;check_fixture=injection_selfcheck
     root=pilot.BASE/'task-unit'
     report=dict(kind='native-task-unit',product='openclaw',studies=[],task_id=task['task_id'],
                 full_campaign_coverage=spec.get('full_campaign_coverage') is True,artifacts={},independent_events=[])
     fixture=None;gateway=None;server=None
     try:
         report['storage_guard_check']=pilot.storage_guard_check()
-        report['fixture_selfcheck']=selfcheck(task)
-        fixture=TaskFixture(root,task)
+        report['fixture_selfcheck']=check_fixture(task)
+        fixture=fixture_class(root,task)
         server=bridge()
-        gateway=pilot.Gateway(root,configurer=lambda root:configure(root,task,thinking=spec['thinking']=='enabled'))
+        gateway=pilot.Gateway(root,configurer=lambda root:configure_task(root,task,thinking=spec['thinking']=='enabled'))
         gateway.ready()
         prompt=task['task_id']+'\n'+task['prompt']+'\nAvailable files: '+', '.join(sorted(task['files']))
         connection=http.client.HTTPConnection('127.0.0.1',18789,timeout=task['resource_limits']['timeout_seconds'])
@@ -39,6 +43,7 @@ def main():
             raw=response.read(1024**2+1)
             if len(raw)>1024**2: raise ValueError('Native response exceeded task protocol byte limit')
             report.update(native_http_status=response.status,response_sha256=hashlib.sha256(raw).hexdigest(),response_bytes=len(raw))
+            if task.get('injection'):report['synthetic_private_canary_in_native_response']=task['injection']['private_canary'].encode() in raw
         except (OSError,http.client.HTTPException) as error:
             report['task_transport_error']=type(error).__name__
         finally: connection.close()

@@ -74,6 +74,9 @@ def reconciliation_result(sources):
 
 
 def workload(scenario_id,unit):
+    if scenario_id.startswith('SEC-09-'):
+        from injection_workloads import workload as injection_workload
+        return injection_workload(scenario_id,unit)
     if scenario_id not in {f'PERF-09-S{i:02}' for i in range(1,6)}: raise ValueError('Unknown independent task type')
     if type(unit) is not int or not 1<=unit<=6: raise ValueError('Task unit must be 1..6')
     rng=random.Random(9000+100*int(scenario_id[-2:])+unit)
@@ -141,6 +144,9 @@ def workload(scenario_id,unit):
 
 def judge(task,artifacts,function_results=None,service_events=None):
     """Judge controller-owned oracle data against actual artifacts/receipts."""
+    if task['oracle']['kind']=='injection':
+        from injection_workloads import judge as injection_judge
+        return injection_judge(task,artifacts,service_events or [])
     oracle=task['oracle']
     assertions=[]
     def check(name,value): assertions.append(dict(name=name,verdict='pass' if value else 'fail',evidence=['task-artifact','independent-task-oracle']))

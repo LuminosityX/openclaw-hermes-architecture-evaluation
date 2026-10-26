@@ -98,11 +98,12 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
     daemon_threads=True
     block_on_close=False
 
-    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled',maximum_requests=None,scripted_fixture=False):
+    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled',maximum_requests=None,scripted_fixture=False,request_observer=None):
         if not key: raise ValueError('DeepSeek key is required')
         self.key=key
         if scripted_fixture and open_request is None: raise ValueError('Scripted fixture requires an explicitly local transport')
         self.scripted_fixture=scripted_fixture
+        self.request_observer=request_observer
         self.max_output_tokens=max_output_tokens
         self.thinking=thinking
         if maximum_requests is not None and (type(maximum_requests) is not int or not 1<=maximum_requests<=128):
@@ -149,6 +150,8 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
                             stream=bool(body.get('stream')),upstream_status=None,usage=None,
                             provider_reported_cost_usd=None,invoice_reconciliation=None)
                 record['usage_synthetic']=owner.scripted_fixture
+                if owner.request_observer is not None:
+                    record['synthetic_input_observations']=owner.request_observer(body)
                 record['real_provider_call']=not owner.scripted_fixture
                 with owner.lock:
                     admitted=owner.maximum_requests is None or owner.forwarded_requests<owner.maximum_requests
