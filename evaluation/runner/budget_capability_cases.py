@@ -56,7 +56,7 @@ def missing_goal(messages):
 class BudgetFixture(AuthorizationFixture):
     def __init__(self):
         self.catalogues=[];self.batch_token=None;self.children=[];self.batch_ids=[];self.batch_emitted=False;self.retry_token=None;self.retry_injected=False
-        self.focus_goal_token=None
+        self.focus_goal_token=None;self.focused_calls={}
         super().__init__()
     def handler(self):
         base=super().handler();owner=self
@@ -73,12 +73,17 @@ class BudgetFixture(AuthorizationFixture):
                 focus=owner.focus_goal_token
                 focused=[i for i,message in enumerate(body.get('messages',[])) if message.get('role')=='user' and focus and focus in str(message.get('content',''))]
                 if focus and focused:
-                    identifier='owned_goal_read_'+hashlib.sha256(focus.encode()).hexdigest()[:20]
-                    results=[m for m in body['messages'][focused[-1]+1:] if m.get('role')=='tool' and m.get('tool_call_id')==identifier]
+                    identifier='ownedgoalread'+hashlib.sha256(focus.encode()).hexdigest()[:20]
+                    # Native compatibility shaping may normalize call IDs. The
+                    # actual explicit read message fences its own tool results;
+                    # completion notifications are user messages, not tool results.
+                    results=[m for m in body['messages'][focused[0]+1:] if m.get('role')=='tool']
                     names=[t.get('function',{}).get('name') for t in tools]
                     if results:
                         owner.tool_returns[focus]=results;message=dict(role='assistant',content='ACCEPTED:'+focus);finish='stop'
                     else:
+                        owner.focused_calls[focus]=owner.focused_calls.get(focus,0)+1
+                        if owner.focused_calls[focus]>3:return self.send(dict(error=dict(message='Owned reference goal-read protocol did not settle',type='invalid_request_error')),400)
                         tool='get_goal';arguments={}
                         if tool not in names and 'tool_call' in names:tool='tool_call';arguments=dict(id='get_goal',args={})
                         message=dict(role='assistant',content=None,tool_calls=[dict(id=identifier,type='function',function=dict(name=tool,arguments=json.dumps(arguments)))]);finish='tool_calls'
@@ -158,7 +163,7 @@ def run_scenario(root,scenario,unit=1):
         metadata['native_operator_pause']=pause
         parent=read_goal(token+'_PARENT_GOAL')
         if not parent or parent['id']!=goal['id'] or parent.get('status')!='paused':raise RuntimeError('Native paused goal and its budget could not be independently read')
-        fixture.batch_token=token+'_SIBLINGS';fixture.children=[token+'_CHILD_1',token+'_CHILD_2'];fixture.batch_ids=['owned_budget_'+hashlib.sha256((token+str(i)).encode()).hexdigest()[:20] for i in range(2)]
+        fixture.batch_token=token+'_SIBLINGS';fixture.children=[token+'_CHILD_1',token+'_CHILD_2'];fixture.batch_ids=['ownedbudget'+hashlib.sha256((token+str(i)).encode()).hexdigest()[:20] for i in range(2)]
         for child in fixture.children:fixture.child_tokens.add(child);fixture.plan(child,'get_goal',{},'')
         result=gateway.request(fixture.batch_token,session_key=token.lower());requests.append(result)
         deadline=time.monotonic()+25
