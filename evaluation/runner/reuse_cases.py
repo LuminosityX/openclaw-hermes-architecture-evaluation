@@ -1,6 +1,8 @@
 """Paired native baseline/reuse tasks; learned AGENTS is produced by the agent."""
 import hashlib
 import json
+import re
+import shutil
 from pathlib import Path
 import time
 
@@ -43,7 +45,14 @@ def execute(root,task,thinking,report,fixture):
                 result=turn(gateway,session,prompt,task['reuse']['later_task_timeout_seconds'])
                 text=artifact.read_text() if artifact.is_file() and not artifact.is_symlink() and artifact.stat().st_size<=8192 else None
                 record['answers'].append(dict(index=index,**result,artifact_text=text,artifact_sha256=hashlib.sha256(text.encode()).hexdigest() if text is not None else None))
-            record['resources']=gateway.sampler.summary();resources.append(record['resources']);gateway.stop();gateway=None
+            record['resources']=gateway.sampler.summary();resources.append(record['resources'])
+            native_log=directory/'gateway-native.log'
+            if native_log.is_file():
+                lines=native_log.read_text(errors='replace').splitlines()
+                record['native_error_lines']=[line[:1500] for line in lines if re.search(r'error|failed|SQLITE|ENOSPC|admission|not ready',line,re.I)][-16:]
+            usage=shutil.disk_usage(pilot.BASE)
+            record['owned_tmpfs_before_arm_cleanup']=dict(total_bytes=usage.total,used_bytes=usage.used,free_bytes=usage.free)
+            gateway.stop();record['native_gateway_tail']=''.join(gateway.log_tail)[-4000:];gateway=None
             for name,content in task['files'].items():
                 path=directory/'workspace'/name;integrity[name]=integrity[name] and path.is_file() and not path.is_symlink() and path.read_text()==content
             series[arm]=record

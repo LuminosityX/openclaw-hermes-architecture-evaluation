@@ -2,6 +2,16 @@ name: Real-model reuse-cost experiments
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: Formal execution or development-only calibration
+        type: choice
+        options: [formal, calibration]
+        default: formal
+      scenario_ids:
+        description: JSON array of pending scenarios; calibration may use one job
+        type: string
+        default: '["COST-03-S01","COST-03-S02","COST-03-S03","COST-03-S04"]'
 
 permissions:
   contents: read
@@ -15,7 +25,7 @@ jobs:
       fail-fast: false
       max-parallel: 4
       matrix:
-        scenario: [COST-03-S01, COST-03-S02, COST-03-S03, COST-03-S04]
+        scenario: ${{ fromJSON(inputs.scenario_ids) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 150
     env:
@@ -30,6 +40,7 @@ jobs:
           import os,sys
           sys.path.insert(0,'evaluation/tools')
           from campaign import DEFAULT_PLAN,records_from
+          assert os.environ['EVAL_SCENARIO'] in {'COST-03-S01','COST-03-S02','COST-03-S03','COST-03-S04'}
           assert not any(r['scenario_id']==os.environ['EVAL_SCENARIO'] and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results'))
           PY
       - name: Prepare one shared pinned runtime
@@ -41,6 +52,7 @@ jobs:
             --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
             --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-campaign-result" --case COST-03 --mode calibration
       - name: Execute six paired independent real-provider sequence units
+        if: inputs.mode == 'formal'
         env:
           DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
         run: |
