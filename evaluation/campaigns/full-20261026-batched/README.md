@@ -59,7 +59,7 @@ SEC-11 follows its [registered wire protocol](security-protocol.md). It uses syn
 
 PERF-09 uses real `deepseek-flash` API calls with the official pinned provider plugin, thinking enabled, a 16,384 output-token ceiling per request, 16 protocol requests per task and a 180-second task deadline. Functional answers, citations and external effects are accepted independently of the model's final text. Correct artifacts alone cannot hide a missed deadline or native HTTP failure. Provider usage is recorded separately; actual invoiced charges remain unknown. The user has not set a campaign monetary ceiling.
 
-The [provider accounting totals](provider-usage-totals.json) retain 75 real-provider task attempts and 539 requests, with 7,725,452 known inclusive input tokens and 184,467 known output tokens. Known cache-hit input is 6,791,424 and cache-miss input is 934,028; these partition input rather than add to it. Missing counters remain explicit in the accounting record. Actual invoiced charges remain unknown; no campaign monetary ceiling is set. These counters do not complete COST-07.
+The [provider accounting totals](provider-usage-totals.json) retain 75 real-provider experiment units and 539 requests, with 7,725,452 known inclusive input tokens and 184,467 known output tokens. Known cache-hit input is 6,791,424 and cache-miss input is 934,028; these partition input rather than add to it. Missing counters remain explicit in the accounting record. Actual invoiced charges remain unknown; no campaign monetary ceiling is set. These counters do not complete COST-07.
 
 ## Evidence and cloud collection incident
 
