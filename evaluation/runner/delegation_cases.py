@@ -27,7 +27,7 @@ def owner_lease(root):
         try:
             if not connection.execute("select 1 from sqlite_master where type='table' and name='state_leases'").fetchone():continue
             for owner,expiry,heartbeat,payload in connection.execute("select owner,expires_at,heartbeat_at,payload_json from state_leases NOT INDEXED where scope='gateway-owner' and lease_key='global' limit 2"):
-                data=json.loads(payload);rows.append(dict(database=str(path.relative_to(root)),owner_sha256=hashlib.sha256(owner.encode()).hexdigest(),expires_at_ms=expiry,heartbeat_at_ms=heartbeat,pid=data.get('pid'),port=data.get('port'),observed_at_ms=int(time.time()*1000)))
+                data=json.loads(payload);rows.append(dict(database=str(path.relative_to(root)),owner_sha256=hashlib.sha256(owner.encode()).hexdigest(),expires_at_ms=expiry,heartbeat_at_ms=heartbeat,pid=data.get('owner',{}).get('pid'),port=data.get('port'),observed_at_ms=int(time.time()*1000)))
         finally:connection.close()
     if len(rows)!=1:raise RuntimeError('Actual native Gateway owner lease is missing or ambiguous')
     return rows[0]
