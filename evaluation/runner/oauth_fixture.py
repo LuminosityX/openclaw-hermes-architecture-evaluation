@@ -104,7 +104,7 @@ class OAuthPeer(McpHTTPFixture):
         class Handler(base):
             def challenge(self,scope=False):
                 self.send_response(403 if scope else 401)
-                value='Bearer resource_metadata="'+RESOURCE.replace('/mcp','/.well-known/oauth-protected-resource/mcp')+'"'
+                value='Bearer resource_metadata="'+urlsplit(RESOURCE)._replace(path='/.well-known/oauth-protected-resource/mcp',query='',fragment='').geturl()+'"'
                 if scope:value+=', error="insufficient_scope", scope="mcp.write"'
                 self.send_header('WWW-Authenticate',value);self.send_header('Content-Length','0');self.end_headers()
 

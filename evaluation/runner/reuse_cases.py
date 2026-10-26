@@ -50,6 +50,7 @@ def execute(root,task,thinking,report,fixture):
             if native_log.is_file():
                 lines=native_log.read_text(errors='replace').splitlines()
                 record['native_error_lines']=[line[:1500] for line in lines if re.search(r'error|failed|SQLITE|ENOSPC|admission|not ready',line,re.I)][-16:]
+            record['largest_owned_files']=[dict(path=str(p.relative_to(directory)),bytes=p.stat().st_size) for p in sorted((p for p in directory.rglob('*') if p.is_file() and not p.is_symlink()),key=lambda p:p.stat().st_size,reverse=True)[:8]]
             usage=shutil.disk_usage(pilot.BASE)
             record['owned_tmpfs_before_arm_cleanup']=dict(total_bytes=usage.total,used_bytes=usage.used,free_bytes=usage.free)
             gateway.stop();record['native_gateway_tail']=''.join(gateway.log_tail)[-4000:];gateway=None

@@ -7,6 +7,7 @@ import tempfile
 from pathlib import Path
 import sys
 import unittest
+from unittest.mock import patch
 from urllib.parse import urlencode,urlsplit,parse_qs
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runner'))
@@ -50,6 +51,12 @@ class OAuthAuthorityTest(unittest.TestCase):
         self.assertEqual(self.peer.receipts['owned-read'],1)
         self.peer.revoked=True;refresh['refresh_token']=rotated['refresh_token']
         self.assertEqual(self.call('POST','/token',refresh)[0],400)
+
+    def test_resource_metadata_challenge_preserves_a_host_starting_with_mcp(self):
+        with patch('oauth_fixture.RESOURCE','https://mcp.evaluation.test:18085/mcp'):
+            status,headers,_=self.call('POST','/mcp',dict(jsonrpc='2.0',id=1,method='initialize'),18085)
+        self.assertEqual(status,401)
+        self.assertEqual(headers['WWW-Authenticate'],'Bearer resource_metadata="https://mcp.evaluation.test:18085/.well-known/oauth-protected-resource/mcp"')
 
 
 class OAuthTlsFixtureTest(unittest.TestCase):
