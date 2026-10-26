@@ -8,7 +8,7 @@ The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3e
 
 [Current-release evidence](evaluation/evidence/current-stable-20261026/README.md) now contains valid two-block pilots for all three first-wave studies on this version. The earlier local build remains harness-bootstrap evidence only.
 
-**Status:** [168 of 257 scenarios have completed formal cloud execution](evaluation/campaigns/full-20261026-batched/README.md), with 672 independent observations: 155 scenarios pass and 13 retain failed acceptance observations. Another 89 scenarios remain incomplete. Running batches and missing adapters are not counted. Unified architecture analysis remains locked until the complete execution audit passes.
+**Status:** [172 of 257 scenarios have completed formal cloud execution](evaluation/campaigns/full-20261026-batched/README.md), with 696 independent observations: 158 scenarios pass and 14 retain failed acceptance observations. Another 85 scenarios remain incomplete. Running batches and missing adapters are not counted. Unified architecture analysis remains locked until the complete execution audit passes.
 
 | Dimension | Focus | Planned families |
 | --- | --- | --- |

@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **168/257 scenarios completed**, with **672 independent observations**. 155 scenarios pass and 13 retain failure observations. Another 89 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **172/257 scenarios completed**, with **696 independent observations**. 158 scenarios pass and 14 retain failure observations. Another 85 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -33,6 +33,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | PERF-10 Long-context and multi-turn task completion | 5 | 30 | [40330267375](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40330267375) |
 | COST-01 Resident baseline and marginal session memory | 5 | 30 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | COST-02 Initialization and component reuse | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
+| COST-03 Learning and context cost amortization | 4 | 24 | [40344473835](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40344473835) |
 | COST-04 Disk and inode amplification | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
 | COST-06 Detailed hardware usage and cleanup accounting | 6 | 36 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | EXT-01 Extension replacement during active work | 4 | 12 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
@@ -50,11 +51,11 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | reliability | 32 / 58 |
 | security | 37 / 54 |
 | performance | 37 / 41 |
-| resources_cost | 19 / 33 |
+| resources_cost | 23 / 33 |
 | extensibility | 23 / 39 |
 | observability | 20 / 32 |
 
-Scenarios retaining failed acceptance observations: REL-06-S01, REL-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, EXT-05-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results; source-backed architectural diagnosis remains deferred.
+Scenarios retaining failed acceptance observations: REL-06-S01, REL-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, EXT-05-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results; source-backed architectural diagnosis remains deferred.
 
 Passing conditions apply only to the declared fixtures, workload sizes, deadlines and hardware bounds. In particular, PERF-09 uses five synthetic task types with six variants each; it does not establish general task-solving ability.
 
@@ -62,7 +63,7 @@ SEC-11 follows its [registered wire protocol](security-protocol.md). It uses syn
 
 PERF-09 uses real `deepseek-flash` API calls with the official pinned provider plugin, thinking enabled, a 16,384 output-token ceiling per request, 16 protocol requests per task and a 180-second task deadline. Functional answers, citations and external effects are accepted independently of the model's final text. Correct artifacts alone cannot hide a missed deadline or native HTTP failure. Provider usage is recorded separately; actual invoiced charges remain unknown. The user has not set a campaign monetary ceiling.
 
-The [provider accounting totals](provider-usage-totals.json) retain 75 real-provider experiment units and 539 requests, with 7,725,452 known inclusive input tokens and 184,467 known output tokens. Known cache-hit input is 6,791,424 and cache-miss input is 934,028; these partition input rather than add to it. Missing counters remain explicit in the accounting record. Actual invoiced charges remain unknown; no campaign monetary ceiling is set. These counters do not complete COST-07.
+The [provider accounting totals](provider-usage-totals.json) retain 99 real-provider experiment units and 1992 requests, with 13,887,077 known inclusive input tokens and 339,109 known output tokens. Known cache-hit input is 12,032,128 and cache-miss input is 1,854,949; these partition input rather than add to it. Missing counters remain explicit in the accounting record. Actual invoiced charges remain unknown; no campaign monetary ceiling is set. These counters do not complete COST-07.
 
 ## Evidence and cloud collection incident
 
