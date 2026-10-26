@@ -22,6 +22,7 @@ from suite import ROOT, require
 from target import verify_installation
 from task_acceptance import function_results
 from task_workloads import judge, workload
+from task_transcripts import provider_for
 
 
 def main():
@@ -34,7 +35,9 @@ def main():
     parser.add_argument('--unit',type=int,choices=range(1,7),required=True)
     parser.add_argument('--thinking',choices=['enabled','disabled'],default='enabled')
     parser.add_argument('--validate-adapter',action='store_true')
+    parser.add_argument('--scripted-provider',action='store_true',help='Golden local transcript: zero real model calls, development calibration only')
     args=parser.parse_args()
+    if args.scripted_provider and not args.validate_adapter: parser.error('Golden fixture transcripts are never full campaign task-quality evidence')
     plan=load_plan()
     if not args.validate_adapter:
         require(readiness(plan,load_proofs(DEFAULT_PLAN.parent/'preparation'))['ready_for_full_execution'],
@@ -42,7 +45,10 @@ def main():
     require(os.geteuid()==0,'Hosted task controller requires root for owned cgroups/namespaces')
     installation=verify_installation(plan['target'],args.runtime_modules,args.package_lock)
     plugin=verify_plugin(args.runtime_modules,args.package_lock)
-    key=os.environ.pop('DEEPSEEK_API_KEY','')
+    if args.scripted_provider:
+        os.environ.pop('DEEPSEEK_API_KEY',None)
+        key='synthetic-golden-fixture'
+    else: key=os.environ.pop('DEEPSEEK_API_KEY','')
     require(bool(key),'DEEPSEEK_API_KEY is not configured')
     task=workload(args.scenario,args.unit)
     args.output.mkdir(parents=True,exist_ok=False)
@@ -55,7 +61,8 @@ def main():
         input_path=root/'input.json'
         input_path.write_text(json.dumps(dict(task=public,thinking=args.thinking),ensure_ascii=False))
         relay=Relay(root/'provider.sock',key,thinking=args.thinking,
-                    max_output_tokens=task['maximum_output_tokens_per_request'],maximum_requests=task['maximum_model_requests'])
+                    max_output_tokens=task['maximum_output_tokens_per_request'],maximum_requests=task['maximum_model_requests'],
+                    open_request=provider_for(task) if args.scripted_provider else None,scripted_fixture=args.scripted_provider)
         key=''
         thread=threading.Thread(target=relay.serve_forever,daemon=True);thread.start()
         try:
@@ -87,12 +94,14 @@ def main():
                 evidence=['native/summary.json','provider-usage.json','installation.json','provider-plugin.json'],
                 assertions=verdict['assertions'],public_fixture_sha256=task['public_fixture_sha256'],thinking=args.thinking,
                 full_campaign_coverage=not args.validate_adapter,
+                model_execution='golden-scripted-fixture' if args.scripted_provider else 'real-deepseek-api',
                 acceptance_values=outputs,full_campaign_development_calibration=args.validate_adapter)
     if harness_failure: result['reason']='Native task fixture or invocation failed; inspect bounded native/provider evidence'
     validate_result(result,plan,allow_development=args.validate_adapter)
     (args.output/'task-result.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(dict(scenario=args.scenario,unit=args.unit,state=result['state'],full_campaign_coverage=result['full_campaign_coverage'])))
     if harness_failure: parser.exit(1,'Native task acceptance is not valid campaign evidence\n')
+    if args.scripted_provider and not verdict['accepted']: parser.exit(1,'Golden transcript did not produce its independently accepted artifact; investigate the candidate adapter\n')
 
 
 if __name__=='__main__': main()
