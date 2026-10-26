@@ -58,6 +58,13 @@ def checkpoint(root):
         sessions=sorted({r['session_key'] for r in state['commits'].values() if r.get('session_key')}))
 
 
+def observed_preflight_refusal(result,events):
+    """A native boundary outcome needs both the response and a real callback."""
+    return (result.get('status',0)>=400
+        and 'Preflight compaction required but failed' in result.get('response_excerpt','')
+        and any(e.get('event_type')=='compact-no-transcript-rewrite' for e in events))
+
+
 def toggle(root,enabled):
     env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
     command=[pilot.NODE,pilot.CLI,'plugins','enable' if enabled else 'disable',ENGINE]
@@ -87,16 +94,24 @@ def run_scenario(root,scenario,unit=1):
                 if not before['exists'] or not before['keys']:raise RuntimeError('Native accepted-turn contract did not invoke reference commit persistence')
             row.update(native_invoked=True,fixture_validated=True)
             if mode=='context-budget':
+                boundary_start=len(fixture.context_events);accepted_primers=0;preflight_refusal=None
                 for index in range(8):
                     item=token+'_PLAIN_'+str(index);fixture.register(item)
                     # Public varied text, not an oracle-specific summary or a hidden answer.
                     filler=' '.join(hashlib.sha256((str(index)+':'+str(i)).encode()).hexdigest()[:12] for i in range(1300))[:16384]
                     result=privacy_cases.request(gateway,item,'agent:main:pilot:'+token.lower(),private_prompt='Public context workload '+filler);requests.append(result)
-                    if not result['accepted']:raise RuntimeError('Reference bounded-assembly primer failed before the registered context condition was established')
+                    if not result['accepted']:
+                        if accepted_primers and observed_preflight_refusal(result,fixture.context_events[boundary_start:]):
+                            preflight_refusal=result;break
+                        raise RuntimeError('Reference bounded-assembly primer failed without a proven native context-boundary outcome')
+                    accepted_primers+=1
                 conditions=[e for e in fixture.context_events if e['event_type']=='assemble' and e['input_estimated_tokens']>e['supplied_budget']]
-                if not conditions:raise RuntimeError('Registered reference character-estimate context budget was never actually crossed')
-                check('reference-assembly-reduces-whole-history-under-supplied-budget',all(e['output_estimated_tokens']<=e['supplied_budget'] and e['output_messages']<e['input_messages'] for e in conditions))
-                metadata['budget_crossing_events']=conditions
+                if not conditions and not preflight_refusal:raise RuntimeError('Neither supplied assembly budget nor native preflight context boundary was exercised')
+                check('context-limit-task-continues-with-reference-component',preflight_refusal is None)
+                if conditions:
+                    check('reference-assembly-reduces-whole-history-under-supplied-budget',all(e['output_estimated_tokens']<=e['supplied_budget'] and e['output_messages']<e['input_messages'] for e in conditions))
+                metadata.update(budget_crossing_events=conditions,accepted_public_primers=accepted_primers,native_preflight_refusal=preflight_refusal,
+                    boundary_scope='An observed native preflight refusal after positive task/commit controls is a failed continuation assertion for this assembly-only reference. It is not an assembly-budget crossing or proof that all context engines fail.')
             elif mode=='restart':
                 old_pid=gateway.process.pid;old_keys=set(before['keys']);gateway.stop()
                 gateway=pilot.Gateway(directory,configurer=service.reuse);gateway.ready();wait_control(gateway,fixture,token+'_RESTART_READY')
@@ -130,6 +145,7 @@ def run_scenario(root,scenario,unit=1):
             independent_context_events=fixture.context_events,independent_events=fixture.events,independent_receipts=fixture.receipts,paid_model_calls=0)
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2300],metadata=metadata)
     finally:
+        row.update(requests=requests,independent_context_events=fixture.context_events,independent_events=fixture.events,independent_receipts=fixture.receipts)
         if gateway:gateway.stop();row['native_gateway_tail']=''.join(gateway.log_tail)[-3000:]
         fixture.close();shutil.rmtree(root,ignore_errors=True);row['owned_state_retained']=root.exists()
     return row
