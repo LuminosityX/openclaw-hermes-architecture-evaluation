@@ -51,3 +51,6 @@ The task runner uses the pinned official [DeepSeek provider plugin](design/deeps
 Publishing these adapters or passing repository CI does not mean the native full suite is implemented or executed.
 
 The [remaining-mechanisms workflow](../.github/workflows/remaining-mechanisms.yml) calibrates each selected family against the native pinned runtime, then runs its prescribed independent units at the same hashes in the same hosted shard. Family-level concurrency avoids replacing unrelated queued batches. Optional explicit pending scenario IDs allow validity repairs without repeating accepted observations. Existing accepted scenarios are rejected before installation and by the formal controller.
+
+
+The completed frozen scope is documented in the [completion audit](campaigns/full-20261026-batched/completion-audit.json) and [unified architecture analysis](reports/full-20261026-architecture.md).

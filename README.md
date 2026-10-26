@@ -10,6 +10,8 @@ The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3e
 
 **Status:** [253 of 257 scenarios have completed formal cloud execution](evaluation/campaigns/full-20261026-batched/README.md), with 969 independent observations: 224 scenarios pass and 29 retain failed acceptance observations. 4 other scenarios have verified native nonapplicability, disclosed separately from measured coverage. No scenarios remain incomplete. The complete execution audit has passed. The completed audit now permits unified source-backed architecture analysis.
 
+Read the [completed campaign architecture analysis](evaluation/reports/full-20261026-architecture.md) for source-backed mechanisms, cross-dimension tradeoffs, measurement limits and the retained failed acceptance observations.
+
 
 | Dimension | Focus | Planned families |
 | --- | --- | --- |
@@ -63,3 +65,5 @@ Historical product pins and grades apply only to the [V6 protocol](v6/protocol/p
 Raw trajectories, state databases, runtime installations, results and credentials stay outside version control. Repository documentation is in English; frozen inputs, upstream quotations and multilingual test strings retain their original language.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for contribution, reporting and licensing terms.
+
+Read the [completed campaign architecture analysis](evaluation/reports/full-20261026-architecture.md) for source-backed mechanisms, cross-dimension tradeoffs, measurement limits and retained failed acceptance observations.
