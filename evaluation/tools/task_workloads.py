@@ -77,6 +77,9 @@ def workload(scenario_id,unit):
     if scenario_id.startswith('SEC-09-'):
         from injection_workloads import workload as injection_workload
         return injection_workload(scenario_id,unit)
+    if scenario_id.startswith('PERF-10-'):
+        from conversation_workloads import workload as conversation_workload
+        return conversation_workload(scenario_id,unit)
     if scenario_id not in {f'PERF-09-S{i:02}' for i in range(1,6)}: raise ValueError('Unknown independent task type')
     if type(unit) is not int or not 1<=unit<=6: raise ValueError('Task unit must be 1..6')
     rng=random.Random(9000+100*int(scenario_id[-2:])+unit)

@@ -30,6 +30,7 @@ def bridge(path='/relay/provider.sock',port=18081):
                 return
             connection=UnixConnection(path)
             try:
+                with self.server.forward_lock:self.server.forwarded_requests+=1
                 connection.request('POST',self.path,self.rfile.read(size),{'Content-Type':'application/json'})
                 response=connection.getresponse()
                 self.send_response(response.status)
@@ -43,6 +44,7 @@ def bridge(path='/relay/provider.sock',port=18081):
             except OSError: pass
             finally: connection.close()
     server=ThreadingHTTPServer(('127.0.0.1',port),Handler)
+    server.forwarded_requests=0;server.forward_lock=threading.Lock()
     server.daemon_threads=True
     threading.Thread(target=server.serve_forever,daemon=True).start()
     return server

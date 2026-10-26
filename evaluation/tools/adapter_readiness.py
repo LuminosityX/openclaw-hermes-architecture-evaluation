@@ -48,6 +48,10 @@ SOURCES['SEC-09']=[*SOURCES['PERF-09'],'evaluation/runner/injection_cases.py','e
     'evaluation/tools/run_injection_family.py','evaluation/runner/provider_bridge.py','evaluation/tools/provider_connection.py']
 SOURCES['SEC-08']=[*SOURCES['SEC-01'],'evaluation/runner/privacy_cases.py']
 SOURCES['OBS-02']=[*SOURCES['REL-02'],'evaluation/runner/collector_cases.py']
+SOURCES['PERF-10']=[*SOURCES['PERF-09'],'evaluation/runner/provider_bridge.py','evaluation/runner/conversation_cases.py',
+    'evaluation/runner/recovery_cases.py','evaluation/runner/mechanism_cases.py','evaluation/runner/service_path_cases.py',
+    'evaluation/runner/hook_cases.py','evaluation/runner/operation_fixture.py',
+    'evaluation/tools/conversation_workloads.py','evaluation/tools/run_injection_family.py']
 
 
 def native_validation(plan,proofs):

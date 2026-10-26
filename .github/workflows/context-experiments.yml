@@ -1,0 +1,74 @@
+name: Real-model long-conversation experiments
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  execute:
+    concurrency:
+      group: openclaw-formal-${{ matrix.scenario }}
+      cancel-in-progress: false
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        scenario: [PERF-10-S01, PERF-10-S02, PERF-10-S03, PERF-10-S04, PERF-10-S05]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    env:
+      EVAL_SCENARIO: ${{ matrix.scenario }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Reject accepted units before installation
+        run: |
+          python3 - <<'PY'
+          import os,sys
+          sys.path.insert(0,'evaluation/tools')
+          from campaign import DEFAULT_PLAN,records_from
+          assert not any(r['scenario_id']==os.environ['EVAL_SCENARIO'] and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results'))
+          PY
+      - name: Prepare the shared disposable pinned runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Calibrate all native conversation paths without paid requests
+        run: |
+          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_injection_family.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
+            --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-campaign-result" --case PERF-10 --mode calibration
+      - name: Execute six independent real-model units of this scenario
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          sudo --preserve-env=DEEPSEEK_API_KEY,GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_injection_family.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
+            --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-campaign-result" --case PERF-10 --mode formal --scenarios "$EVAL_SCENARIO"
+      - name: Bound native records, provider counters and provenance
+        if: always()
+        run: |
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-result'
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())<=8*1024**2
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: campaign-${{ matrix.scenario }}
+          path: ${{ runner.temp }}/openclaw-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove owned installation, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-campaign-result"
