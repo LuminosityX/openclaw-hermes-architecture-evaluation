@@ -20,11 +20,12 @@ import recovery_cases
 import scheduling_cases
 import effect_recovery_cases
 import policy_resolution_cases
+import network_boundary_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06','REL-04','PERF-03','REL-02','SEC-05'],required=True)
+    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10'],required=True)
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     parser.add_argument('--scenario',action='append',help='Explicit selected pending scenario; formal units only')
     args=parser.parse_args()
@@ -44,6 +45,7 @@ def main():
     if args.case=='PERF-03':module=scheduling_cases
     if args.case=='REL-02':module=effect_recovery_cases
     if args.case=='SEC-05':module=policy_resolution_cases
+    if args.case=='SEC-10':module=network_boundary_cases
     selected=[sid for sid in module.SCENARIOS if sid.startswith(args.case+'-') and (not args.scenario or sid in args.scenario)]
     if args.scenario and (len(args.scenario)!=len(set(args.scenario)) or set(args.scenario)!=set(selected)):
         parser.error('Selected scenarios must be distinct members of the selected family')
@@ -53,6 +55,7 @@ def main():
         report['storage_guard_check']=pilot.storage_guard_check()
         report['fixture_selfcheck']=mechanism_cases.selfcheck()
         if args.case=='REL-06':report['uid_environment_preflight']=relocation_cases.environment_selfcheck()
+        if args.case=='SEC-10':report['network_environment_preflight']=network_boundary_cases.environment_selfcheck()
         for sid in selected:
             row=module.run_scenario(pilot.BASE/sid.lower(),sid,args.campaign_unit or 1)
             report['observations'].append(row)

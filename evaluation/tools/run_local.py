@@ -64,12 +64,15 @@ def decode_report(stdout):
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
-def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False):
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
     if identity_migration:
         if not ssh_backend:raise ValueError('Owned identity migration requires the explicit hosted non-user-namespace profile')
         capabilities+=['--cap-add','CAP_CHOWN','--cap-add','CAP_KILL']
+    if network_fixture:
+        if not ssh_backend:raise ValueError('Owned network addresses require the explicit hosted non-user-namespace profile')
+        capabilities+=['--cap-add','CAP_NET_ADMIN','--cap-add','CAP_NET_BIND_SERVICE']
     identity_directories=['--dir','/toolchain','--chmod','0755','/toolchain',
         '--dir','/runtime','--chmod','0755','/runtime',
         '--dir','/etc','--chmod','0755','/etc',
@@ -118,12 +121,13 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
-    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
+    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7),help='Formal independent unit, invoked by the readiness-checked hosted campaign controller')
     parser.add_argument('--native-scenario',action='append',help='Selected pending formal scenario, passed to the family driver')
     parser.add_argument('--task-input',type=Path,help='Public task specification only; hidden oracle remains on the host')
     args = parser.parse_args()
     if args.adapter_validation=='REL-06' and not (args.hosted_profile and args.ssh_backend):parser.error('UID relocation is restricted to the explicit disposable hosted profile')
+    if args.adapter_validation=='SEC-10' and not (args.hosted_profile and args.ssh_backend):parser.error('Network fixtures are restricted to the explicit disposable hosted profile')
     if args.native_scenario and not args.campaign_unit:parser.error('Scenario selection requires a formal unit; calibration remains whole-family')
     if args.campaign_unit and (not args.adapter_validation or not args.hosted_profile or args.allow_historical_bootstrap):
         parser.error('Formal family units require the pinned hosted native-family adapter')
@@ -173,7 +177,7 @@ def main():
             driver='mechanism_validation.py'
         if args.adapter_validation=='SEC-11':
             driver='gateway_auth_cases.py'
-        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05'}:
+        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10'}:
             driver='service_path_validation.py'
         driver_args=[] if args.model_validation or args.task_input else ['--case',args.adapter_validation] if args.adapter_validation else ['--study',args.study,'--blocks',str(args.blocks),*(['--ssh-backend'] if args.ssh_backend else [])]
         if args.campaign_unit:
@@ -183,7 +187,7 @@ def main():
             for scenario in args.native_scenario:driver_args+=['--scenario',scenario]
         command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
                                   measurement_group=group if driver in {'mechanism_validation.py','service_path_validation.py'} else None,
-                                  identity_migration=args.adapter_validation=='REL-06')
+                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation=='SEC-10')
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
