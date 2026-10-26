@@ -112,7 +112,9 @@ def main():
         try:
             report = json.loads(stdout)
         except ValueError:
-            raise RuntimeError('Pilot failed before JSON report: ' + stderr[-2000:] + stdout[-2000:]) from None
+            report=dict(kind='pilot-aborted',product='openclaw',studies=[],
+                        harness_error='Inner namespace exited before publishing a JSON report',
+                        stderr_tail=stderr[-2000:],stdout_tail=stdout[-2000:])
         report.update(runtime_identity=build, runtime_build_info_sha256=hashlib.sha256(build_path.read_bytes()).hexdigest(),
                       evaluation_role=role,campaign_target=target,
                       controller_sha256=controller_hashes,
@@ -121,7 +123,8 @@ def main():
                           tmpfs_limit_bytes=args.tmpfs_mib*1024**2, swap_limit_bytes=0,
                           persisted_report_limit_bytes=1024**2, runtime_state_retained=False),
                       whole_run_cgroup=dict(memory_peak_bytes=int((group/'memory.peak').read_text()),
-                          memory_events=(group/'memory.events').read_text(),cpu_stat=(group/'cpu.stat').read_text()))
+                          memory_events=(group/'memory.events').read_text(),
+                          pids_events=(group/'pids.events').read_text(),cpu_stat=(group/'cpu.stat').read_text()))
         encoded = (json.dumps(report,ensure_ascii=False,indent=2)+'\n').encode()
         if len(encoded) > 1024**2:
             raise RuntimeError('Summary exceeds the 1 MiB evidence budget')
@@ -130,7 +133,7 @@ def main():
         print(json.dumps(dict(report=str(args.output/'summary.json'), bytes=len(encoded),
                               exit_code=process.returncode, studies=[dict(study=s.get('study'),status=s.get('status'),valid=s.get('valid')) for s in report.get('studies',[])],
                               storage_policy=report['storage_policy']),ensure_ascii=False))
-        if process.returncode:
+        if process.returncode or report.get('harness_error'):
             raise RuntimeError('Pilot reported a harness/validity failure; inspect the bounded summary')
     except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
         parser.exit(1, f'FAIL: {error}\n')
