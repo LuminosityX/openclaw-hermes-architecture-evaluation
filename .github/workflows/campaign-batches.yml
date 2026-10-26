@@ -44,7 +44,8 @@ jobs:
       - name: Bound original native records and retain installation provenance
         if: always()
         run: |
-          mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
           if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
             cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
           fi
@@ -106,7 +107,8 @@ jobs:
       - name: Bound task, usage and acceptance evidence
         if: always()
         run: |
-          mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
           if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
             cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
           fi

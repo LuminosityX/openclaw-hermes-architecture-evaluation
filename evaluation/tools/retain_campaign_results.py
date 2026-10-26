@@ -50,6 +50,7 @@ def compact_results(plan,metadata,artifact,payload):
         rows.append(dict(row,original_evidence_paths=references,evidence=[url+'#'+ref for ref in references],
                          hosted_artifact_id=artifact['id']))
     manifest=dict(kind='hosted-formal-evidence-manifest',github_run_id=str(metadata['id']),
+        workflow_conclusion=metadata.get('conclusion'),execution_harness_failures=execution.get('harness_failures',[]),
         controller_commit=metadata['head_sha'],plan_sha256=plan['plan_sha256'],artifact_id=artifact['id'],
         artifact_name=artifact['name'],artifact_url=url,artifact_zip_sha256=hashlib.sha256(payload).hexdigest(),
         artifact_expires_at=artifact.get('expires_at'),files={path:dict(bytes=len(data),sha256=hashlib.sha256(data).hexdigest()) for path,data in sorted(files.items())},
