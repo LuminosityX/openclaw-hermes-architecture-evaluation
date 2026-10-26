@@ -17,3 +17,11 @@ class ContextBoundaryTest(unittest.TestCase):
         self.assertTrue(observed_preflight_refusal(
             {'status':500,'response_excerpt':'{"error":"Preflight compaction required but failed: reference declined"}'},
             [{'event_type':'assemble'},{'event_type':'compact-no-transcript-rewrite'}]))
+
+    def test_masked_http_error_needs_fresh_specific_native_error_and_callback(self):
+        masked={'status':500,'response_excerpt':'{"error":{"message":"internal error"}}'}
+        events=[{'event_type':'compact-no-transcript-rewrite'}]
+        self.assertFalse(observed_preflight_refusal(masked,events))
+        self.assertTrue(observed_preflight_refusal(masked,events,
+            '[openai-compat] chat completion failed: Error: Preflight compaction required but failed: reference declined'))
+        self.assertFalse(observed_preflight_refusal({'status':None},events))

@@ -58,10 +58,10 @@ def checkpoint(root):
         sessions=sorted({r['session_key'] for r in state['commits'].values() if r.get('session_key')}))
 
 
-def observed_preflight_refusal(result,events):
+def observed_preflight_refusal(result,events,native_log=''):
     """A native boundary outcome needs both the response and a real callback."""
-    return (result.get('status',0)>=400
-        and 'Preflight compaction required but failed' in result.get('response_excerpt','')
+    return (isinstance(result.get('status'),int) and result['status']>=400
+        and 'Preflight compaction required but failed' in (result.get('response_excerpt','')+native_log)
         and any(e.get('event_type')=='compact-no-transcript-rewrite' for e in events))
 
 
@@ -99,10 +99,12 @@ def run_scenario(root,scenario,unit=1):
                     item=token+'_PLAIN_'+str(index);fixture.register(item)
                     # Public varied text, not an oracle-specific summary or a hidden answer.
                     filler=' '.join(hashlib.sha256((str(index)+':'+str(i)).encode()).hexdigest()[:12] for i in range(1300))[:16384]
+                    prior_log=set(gateway.log_tail)
                     result=privacy_cases.request(gateway,item,'agent:main:pilot:'+token.lower(),private_prompt='Public context workload '+filler);requests.append(result)
+                    fresh_log=''.join(line for line in gateway.log_tail if line not in prior_log)
                     if not result['accepted']:
-                        if accepted_primers and observed_preflight_refusal(result,fixture.context_events[boundary_start:]):
-                            preflight_refusal=result;break
+                        if accepted_primers and observed_preflight_refusal(result,fixture.context_events[boundary_start:],fresh_log):
+                            preflight_refusal=dict(response=result,actual_native_log=fresh_log[-6000:]);break
                         raise RuntimeError('Reference bounded-assembly primer failed without a proven native context-boundary outcome')
                     accepted_primers+=1
                 conditions=[e for e in fixture.context_events if e['event_type']=='assemble' and e['input_estimated_tokens']>e['supplied_budget']]
