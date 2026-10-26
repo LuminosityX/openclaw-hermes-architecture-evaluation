@@ -56,6 +56,7 @@ def missing_goal(messages):
 class BudgetFixture(AuthorizationFixture):
     def __init__(self):
         self.catalogues=[];self.batch_token=None;self.children=[];self.batch_ids=[];self.batch_emitted=False;self.retry_token=None;self.retry_injected=False
+        self.focus_goal_token=None
         super().__init__()
     def handler(self):
         base=super().handler();owner=self
@@ -69,6 +70,26 @@ class BudgetFixture(AuthorizationFixture):
                 if owner.retry_token and owner.retry_token in raw.decode() and not owner.retry_injected:
                     owner.retry_injected=True;owner.event('actual-budget-probe-provider-503',token=owner.retry_token)
                     return self.send(dict(error=dict(message='Owned provider temporarily unavailable',type='server_error')),503)
+                focus=owner.focus_goal_token
+                focused=[i for i,message in enumerate(body.get('messages',[])) if message.get('role')=='user' and focus and focus in str(message.get('content',''))]
+                if focus and focused:
+                    identifier='owned_goal_read_'+hashlib.sha256(focus.encode()).hexdigest()[:20]
+                    results=[m for m in body['messages'][focused[-1]+1:] if m.get('role')=='tool' and m.get('tool_call_id')==identifier]
+                    names=[t.get('function',{}).get('name') for t in tools]
+                    if results:
+                        owner.tool_returns[focus]=results;message=dict(role='assistant',content='ACCEPTED:'+focus);finish='stop'
+                    else:
+                        tool='get_goal';arguments={}
+                        if tool not in names and 'tool_call' in names:tool='tool_call';arguments=dict(id='get_goal',args={})
+                        message=dict(role='assistant',content=None,tool_calls=[dict(id=identifier,type='function',function=dict(name=tool,arguments=json.dumps(arguments)))]);finish='tool_calls'
+                    owner.event('actual-focused-native-goal-read',token=focus,tool_results=len(results))
+                    common=dict(id='owned-native-goal-read',created=1760000000,model='fixture-model')
+                    if not body.get('stream'):return self.send(dict(**common,object='chat.completion',choices=[dict(index=0,message=message,finish_reason=finish)],usage=dict(prompt_tokens=0,completion_tokens=0,total_tokens=0)))
+                    delta=dict(message)
+                    if delta.get('tool_calls'):delta['tool_calls']=[dict(index=i,**v) for i,v in enumerate(delta['tool_calls'])]
+                    self.send_response(200);self.send_header('Content-Type','text/event-stream');self.end_headers()
+                    for value,reason in [(delta,None),({},finish)]:self.wfile.write(('data: '+json.dumps(dict(**common,object='chat.completion.chunk',choices=[dict(index=0,delta=value,finish_reason=reason)]))+'\n\n').encode())
+                    self.wfile.write(b'data: [DONE]\n\n');self.wfile.flush();return
                 marked=[match.group() for message in body.get('messages',[]) if message.get('role')=='user' and (match:=re.search(r'PILOT_[A-Z0-9_]+',str(message.get('content',''))))]
                 if owner.batch_token and marked and marked[-1]==owner.batch_token:
                     results=[m for m in body.get('messages',[]) if m.get('role')=='tool' and m.get('tool_call_id') in owner.batch_ids]
@@ -119,7 +140,10 @@ def run_scenario(root,scenario,unit=1):
     fixture=BudgetFixture();peer=TimeoutPeer() if mode=='tool-timeout' else None;gateway=None;metadata={};requests=[]
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def read_goal(item):
-        fixture.plan(item,'get_goal',{},'');result=gateway.request(item,session_key=token.lower());requests.append(result);return goal_from(fixture.tool_returns.get(item,[]))
+        fixture.plan(item,'get_goal',{},'');fixture.focus_goal_token=item
+        try:
+            result=gateway.request(item,session_key=token.lower());requests.append(result);return goal_from(fixture.tool_returns.get(item,[]))
+        finally:fixture.focus_goal_token=None
     try:
         contracts=contract_check();gateway=pilot.Gateway(root,configurer=lambda p:configure(p,mode));gateway.ready();wait_control(gateway,fixture,token+'_READY')
         initialized=token+'_SESSION';fixture.register(initialized)
