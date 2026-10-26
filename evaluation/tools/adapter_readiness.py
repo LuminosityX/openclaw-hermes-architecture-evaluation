@@ -57,6 +57,8 @@ SOURCES['COST-03']=[*SOURCES['PERF-10'],'evaluation/runner/reuse_cases.py','eval
 
 SOURCES['OBS-04']=[*SOURCES['SEC-08'],'evaluation/runner/retention_cases.py','evaluation/runner/backup_cases.py']
 
+SOURCES['OBS-06']=[*SOURCES['SEC-08'],'evaluation/runner/trajectory_cases.py']
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""
