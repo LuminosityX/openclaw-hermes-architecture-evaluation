@@ -143,7 +143,7 @@ class Effects:
 
 
 def guest_command(args,root,group):
-    command=['bwrap','--unshare-pid','--unshare-ipc','--unshare-uts','--unshare-cgroup','--die-with-parent','--new-session','--clearenv','--cap-drop','ALL','--uid',str(UID),'--gid',str(UID),
+    command=['bwrap','--unshare-pid','--unshare-ipc','--unshare-uts','--unshare-cgroup','--die-with-parent','--new-session','--clearenv','--cap-drop','ALL','--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SETPCAP',
         '--ro-bind','/usr','/usr','--symlink','usr/bin','/bin','--symlink','usr/lib','/lib','--symlink','usr/lib64','/lib64','--proc','/proc','--dev','/dev',
         '--dir','/toolchain','--ro-bind',str(args.node),'/toolchain/node','--ro-bind',str(args.runtime_modules),'/runtime/node_modules',
         '--ro-bind',str(ROOT/'evaluation/runner'),'/driver','--ro-bind',str(root/'private-spec.json'),'/input/spec.json','--ro-bind',str(root/'peer'),'/peer','--bind',str(root/'evidence'),'/evidence',
@@ -152,7 +152,7 @@ def guest_command(args,root,group):
         '--setenv','OPENCLAW_SKIP_CHANNELS','1','--setenv','OPENCLAW_DISABLE_BUNDLED_PLUGINS','1']
     for path in ['/etc/passwd','/etc/group','/etc/ssl/certs','/etc/localtime']:
         if Path(path).exists():command+=['--ro-bind',path,path]
-    command+=['/usr/bin/python3','/driver/multihost_'+('gateway' if args.role=='gateway' else 'node')+'.py']
+    command+=['/usr/bin/setpriv','--reuid=65534','--regid=65534','--clear-groups','--bounding-set=-all','--inh-caps=-all','--ambient-caps=-all','/usr/bin/python3','/driver/multihost_'+('gateway' if args.role=='gateway' else 'node')+'.py']
     return command
 
 
