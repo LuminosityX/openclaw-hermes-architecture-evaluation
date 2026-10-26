@@ -36,3 +36,13 @@ MCP configuration, `docs/cli/doctor.md`, and `docs/gateway/logging.md`.
 Heavy execution occurs only on disposable hosted workers; calibration must pass
 before formal units. All owned runtime/cache/state is deleted, and raw bounded
 artifacts expire after 30 days. Unified architectural interpretation stays deferred.
+
+SEC-03 adds four native setup/path controls. The SSH cases first run a successful
+native exec against an owned loopback SSH backend, then stop that actual backend
+or point workspace initialization inside the read-only runtime bind mount. A
+separate owned file detects any accidental Gateway-host fallback. The symlink
+case uses a public before-tool hook to change an initially allowed link to an
+owned outside-workspace canary immediately before native read dispatch, with
+an independent event and link-target check. The allowed-file scenario remains
+a positive control. Loopback SSH here tests native setup failure handling; it
+does not establish isolation between independent hosts.

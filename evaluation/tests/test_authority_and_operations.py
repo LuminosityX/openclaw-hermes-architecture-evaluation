@@ -10,6 +10,7 @@ sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runner'))
 import execution_authority_cases as authority
 import operational_diagnosis_cases as operations
 from operation_fixture import OperationFixture
+import isolation_setup_cases
 
 
 class AuthorityAndOperationsTests(unittest.TestCase):
@@ -22,6 +23,18 @@ class AuthorityAndOperationsTests(unittest.TestCase):
             self.assertTrue(config['tools']['fs']['workspaceOnly'])
             self.assertEqual(config['tools']['exec'],dict(host='gateway',security='full',ask='off'))
             self.assertEqual(config['agents']['defaults']['sandbox']['mode'],'off')
+
+    def test_setup_family_scope_and_fault_command_effect_is_independently_visible(self):
+        plan=json.loads((Path(__file__).resolve().parents[1]/'campaigns/full-20261026-batched/plan.json').read_text())
+        expected={s['id'] for c in plan['cases'] if c['id']=='SEC-03' for s in c['scenarios']}
+        self.assertEqual(expected,set(isolation_setup_cases.SCENARIOS))
+        import shlex,subprocess
+        with tempfile.TemporaryDirectory() as directory:
+            destination=Path(directory)/'owned-effect.txt'
+            arguments=isolation_setup_cases.command(destination,'SYNTHETIC_EXPECTED_EFFECT')
+            result=subprocess.run(shlex.split(arguments['command']),capture_output=True,text=True,timeout=5,check=True)
+            self.assertEqual(destination.read_text(),'SYNTHETIC_EXPECTED_EFFECT')
+            self.assertIn('SYNTHETIC_EXPECTED_EFFECT',result.stdout)
 
     def test_ambiguous_or_absent_diagnostic_records_remain_unknown(self):
         self.assertEqual(operations.diagnose('service stopped')['cause'],'unknown')

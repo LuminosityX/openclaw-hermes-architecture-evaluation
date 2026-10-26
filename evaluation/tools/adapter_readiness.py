@@ -33,6 +33,7 @@ for _family in ['REL-09','EXT-01','PERF-08']:
 SOURCES['SEC-01']=[*SOURCES['PERF-01'],'evaluation/runner/execution_authority_cases.py',
     'evaluation/runner/operation_fixture.py','evaluation/runner/protocol_cases.py','evaluation/runner/mcp_probe.py']
 SOURCES['OBS-05']=[*SOURCES['PERF-01'],'evaluation/runner/operational_diagnosis_cases.py']
+SOURCES['SEC-03']=[*SOURCES['SEC-01'],'evaluation/runner/isolation_setup_cases.py']
 
 
 def native_validation(plan,proofs):

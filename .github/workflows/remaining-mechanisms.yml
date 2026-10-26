@@ -54,6 +54,9 @@ jobs:
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
+      - name: Prepare the owned SSH sandbox test backend
+        if: matrix.family == 'SEC-03'
+        run: test -x /usr/sbin/sshd || { sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends openssh-server; }
       - name: Calibrate the selected adapter against native OpenClaw
         run: |
           sudo python3 evaluation/tools/run_local.py \
