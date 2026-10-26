@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **213/257 scenarios completed**, with **819 independent observations**. 185 scenarios pass and 28 retain failure observations. Another 44 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **217/257 scenarios completed**, with **831 independent observations**. 189 scenarios pass and 28 retain failure observations. Another 40 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -47,6 +47,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | EXT-04 Context and persistence contracts | 4 | 12 | [40361165262](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40361165262) |
 | EXT-05 MCP transport and content contracts | 4 | 12 | [40311646155](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40311646155) |
 | EXT-06 AGENTS.md and external Skill inputs | 4 | 12 | [40309632222](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40309632222) |
+| EXT-07 External tools, plugins, and harnesses | 4 | 12 | [40369665651](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40369665651) |
 | EXT-08 Hook ordering, mutation and error semantics | 6 | 18 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | EXT-09 Plugin composition and public architecture boundaries | 5 | 15 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | OBS-01 Authorization decision reconstruction | 4 | 12 | [40359237907](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40359237907) |
@@ -62,7 +63,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | security | 54 / 54 |
 | performance | 37 / 41 |
 | resources_cost | 23 / 33 |
-| extensibility | 31 / 39 |
+| extensibility | 35 / 39 |
 | observability | 28 / 32 |
 
 Scenarios retaining failed acceptance observations: REL-06-S01, REL-06-S04, SEC-02-S02, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results; source-backed architectural diagnosis remains deferred.
