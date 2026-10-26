@@ -20,5 +20,8 @@ class AddonMountTest(unittest.TestCase):
             command=sandbox_command(modules,Path('/node'),128,[],ssh_backend=True,official_addon=True)
             start=command.index(str(project));self.assertEqual(command[start-1:start+2],['--ro-bind',str(project),str(project)])
             self.assertIn('/official-addon.json',command)
+            pairs=[command[i:i+3] for i in range(len(command)-2) if command[i]=='--ro-bind']
+            self.assertIn(['--ro-bind',str(modules),str(modules)],pairs)
+            self.assertNotIn(['--ro-bind',str(prefix),str(prefix)],pairs)
             template['project_root']=name;path.write_text(json.dumps(template))
             with self.assertRaisesRegex(ValueError,'owned hosted runtime'):sandbox_command(modules,Path('/node'),128,[],official_addon=True)

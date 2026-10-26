@@ -110,7 +110,8 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         if template.get('kind')!='native-official-addon-install-template' or not Path(template['package_root']).resolve().is_relative_to(project):raise ValueError('Invalid native addon install template')
         snapshot=runtime_modules.parent/'official-addon-state.sqlite'
         if not snapshot.is_file() or snapshot.stat().st_size>4*1024**2:raise ValueError('Native addon machine-state snapshot is missing or exceeds 4 MiB')
-        command+=['--ro-bind',str(project),str(project),'--ro-bind',str(template_path),'/official-addon.json',
+        command+=['--ro-bind',str(runtime_modules),str(runtime_modules),
+            '--ro-bind',str(project),str(project),'--ro-bind',str(template_path),'/official-addon.json',
             '--ro-bind',str(snapshot),'/official-addon-state.sqlite']
     return command + ['--', '/usr/bin/python3', '/driver/'+driver, *driver_args]
 
