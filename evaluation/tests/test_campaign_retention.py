@@ -1,13 +1,15 @@
 """Original evidence binding and bounded in-memory retention."""
 import io
+import gzip
 import json
 from pathlib import Path
 import sys
 import unittest
+import tempfile
 import zipfile
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from campaign import load_plan
+from campaign import load_plan,records_from,audit
 from retain_campaign_results import bounded_archive,compact_results
 
 
@@ -44,6 +46,21 @@ class RetentionTests(unittest.TestCase):
         self.assertTrue(rows[0]['evidence'][0].startswith('https://github.com/'))
         self.assertEqual(manifest['files']['unit-1/summary.json']['bytes'],len(files['unit-1/summary.json']))
         self.assertFalse(manifest['local_raw_evidence_retained'])
+
+    def test_lossless_small_records_preserve_audit_and_duplicate_detection(self):
+        plan,files=self.fixture();rows=json.loads(files['results.json'])
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name);encoded=json.dumps(rows).encode()
+            (root/'record.json.gz').write_bytes(gzip.compress(encoded,mtime=0))
+            self.assertEqual(records_from(root),rows)
+            self.assertEqual(audit(plan,records_from(root))['accepted_observation_count'],1)
+            (root/'duplicate.json').write_bytes(encoded)
+            with self.assertRaisesRegex(ValueError,'same independent unit'):audit(plan,records_from(root))
+
+    def test_compressed_result_expansion_is_bounded_in_memory(self):
+        with tempfile.TemporaryDirectory() as name:
+            root=Path(name);(root/'oversized.json.gz').write_bytes(gzip.compress(b'0'*(8*1024**2+1),mtime=0))
+            with self.assertRaisesRegex(ValueError,'Expanded result'):records_from(root)
 
     def test_missing_receipt_evidence_is_not_retained_as_completed(self):
         plan,files=self.fixture()

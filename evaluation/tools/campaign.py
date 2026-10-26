@@ -5,6 +5,7 @@ import argparse
 from collections import Counter
 from datetime import datetime, timezone
 import hashlib
+import gzip
 import json
 from pathlib import Path
 
@@ -130,8 +131,13 @@ def audit(plan,records):
 def records_from(directory):
     records=[]
     if directory.exists():
-        for path in sorted(directory.glob('*.json')):
-            data=json.loads(path.read_text(),object_pairs_hook=unique_object)
+        for path in sorted([*directory.glob('*.json'),*directory.glob('*.json.gz')]):
+            if path.suffix=='.gz':
+                require(path.stat().st_size<=8*1024**2,'Compressed result file exceeds its byte bound')
+                with gzip.open(path,'rb') as source:raw=source.read(8*1024**2+1)
+                require(len(raw)<=8*1024**2,'Expanded result file exceeds its byte bound')
+                data=json.loads(raw,object_pairs_hook=unique_object)
+            else:data=json.loads(path.read_text(),object_pairs_hook=unique_object)
             records.extend(data if isinstance(data,list) else [data])
     return records
 

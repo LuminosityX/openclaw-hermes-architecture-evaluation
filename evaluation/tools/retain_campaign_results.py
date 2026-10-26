@@ -2,6 +2,7 @@
 """Retain compact formal results; inspect bounded hosted ZIPs in memory only."""
 import argparse
 import hashlib
+import gzip
 import io
 import json
 from pathlib import Path, PurePosixPath
@@ -93,8 +94,16 @@ def main():
         rows,manifest=compact_results(plan,metadata,artifact,payload,args.exclude_scenarios,args.exclusion_reason)
         excluded.update(row['scenario_id'] for row in manifest.get('validity_exclusions',[]))
         suffix=str(args.run_id)+'-'+artifact['name']+'.json'
-        pending[DEFAULT_PLAN.parent/'results'/suffix]=json.dumps(rows,ensure_ascii=False,separators=(',',':'))+'\n'
-        pending[DEFAULT_PLAN.parent/'hosted-evidence'/suffix]=json.dumps(manifest,ensure_ascii=False,separators=(',',':'))+'\n'
+        result_path=DEFAULT_PLAN.parent/'results'/suffix
+        encoded=(json.dumps(rows,ensure_ascii=False,separators=(',',':'))+'\n').encode()
+        if result_path.exists():pending[result_path]=encoded
+        else:
+            compressed=result_path.with_suffix('.json.gz')
+            if compressed.exists():
+                require(gzip.decompress(compressed.read_bytes())==encoded,'Refusing to overwrite different compressed evidence')
+                pending[compressed]=compressed.read_bytes()
+            else:pending[compressed]=gzip.compress(encoded,mtime=0)
+        pending[DEFAULT_PLAN.parent/'hosted-evidence'/suffix]=(json.dumps(manifest,ensure_ascii=False,separators=(',',':'))+'\n').encode()
     require(pending or skipped,'No formal campaign artifacts found')
     require(excluded==set(args.exclude_scenarios),'Requested validity exclusion did not match actual hosted records')
     if not pending:
@@ -104,17 +113,17 @@ def main():
     new=[]
     for path,data in pending.items():
         if path.exists():
-            require(path.read_text()==data,'Refusing to overwrite different retained evidence')
+            require(path.read_bytes()==data,'Refusing to overwrite different retained evidence')
         elif path.parent.name=='results':
-            new.extend(json.loads(data))
+            new.extend(json.loads(gzip.decompress(data) if path.suffix=='.gz' else data))
     report=audit(plan,existing+new)
     retained=sum(p.stat().st_size for p in (ROOT/'evaluation/campaigns').rglob('*') if p.is_file())
-    additional=sum(len(data.encode()) for path,data in pending.items() if not path.exists())
+    additional=sum(len(data) for path,data in pending.items() if not path.exists())
     require(retained+additional<=plan['resource_policy']['maximum_local_campaign_evidence_bytes'],'Compact retention would exceed the local 4 MiB campaign budget')
     for path,data in pending.items():
         if not path.exists():
             path.parent.mkdir(parents=True,exist_ok=True)
-            path.write_text(data)
+            path.write_bytes(data)
     print(json.dumps(dict(run_id=args.run_id,new_formal_records=len(new),measured_scenarios=report['measured_scenarios'],
         accepted_observations=report['accepted_observation_count'],remaining_scenarios=len(report['missing_or_invalid_scenarios']),
         analysis_allowed=report['analysis_allowed'],total_local_campaign_bytes=retained+additional,

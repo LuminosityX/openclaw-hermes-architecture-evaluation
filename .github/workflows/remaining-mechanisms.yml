@@ -72,6 +72,7 @@ jobs:
           npm_config_ignore_scripts: 'true'
         run: |
           npm install --prefix "$RUNNER_TEMP/openclaw-campaign-runtime" --save-exact '@openclaw/diagnostics-otel@2026.10.7'
+          sudo chown -R root:root -- "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules/@openclaw/diagnostics-otel"
           python3 - <<'PY'
           import hashlib,json,os,sys
           from pathlib import Path
@@ -90,7 +91,7 @@ jobs:
           (metadata/'installation.json').write_text(json.dumps(installed)+'\n')
           (metadata/'provider-plugin.json').write_text(json.dumps(verify(modules,lock))+'\n')
           (metadata/'package-lock.json').write_text(json.dumps(inventory,separators=(',',':'))+'\n')
-          (metadata/'observability-addon.json').write_text(json.dumps(dict(name=package['name'],version=package['version'],registry_integrity=entry['integrity'],package_sha256=hashlib.sha256((modules/'@openclaw/diagnostics-otel/package.json').read_bytes()).hexdigest(),purpose='Official optional addon required for native OTLP collection; installed once on this disposable hosted runner only'))+'\n')
+          (metadata/'observability-addon.json').write_text(json.dumps(dict(name=package['name'],version=package['version'],registry_integrity=entry['integrity'],package_sha256=hashlib.sha256((modules/'@openclaw/diagnostics-otel/package.json').read_bytes()).hexdigest(),installed_uid=(modules/'@openclaw/diagnostics-otel').stat().st_uid,purpose='Official optional addon required for native OTLP collection; installed once on this disposable hosted runner and owned by the root evaluator identity before the read-only namespace mount'))+'\n')
           PY
           test "$(du -sm "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" | awk '{s+=$1} END {print s}')" -le 4096
       - name: Resolve the executable and prepare owned UID-readable toolchain if needed
