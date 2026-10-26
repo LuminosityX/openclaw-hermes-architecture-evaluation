@@ -38,7 +38,7 @@ jobs:
       EVAL_FAMILY: ${{ matrix.family }}
       EVAL_MODE: ${{ inputs.mode }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
-      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || matrix.family == 'OBS-02' && 128 || 64 }}
+      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04') && 128 || 64 }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
