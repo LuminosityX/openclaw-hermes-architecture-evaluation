@@ -15,6 +15,16 @@ from task_workloads import workload
 
 
 class CampaignExecutionTests(unittest.TestCase):
+    def test_pending_scenario_binding_requires_exact_selection(self):
+        plan,native=self.fixture()
+        native['observations']=native['observations'][:1]
+        arguments=(plan,'REL-14',1,native,'123','controller','unit-1/summary.json','a'*64)
+        with self.assertRaisesRegex(ValueError,'missing or duplicated'):
+            bind_unit(*arguments)
+        rows=bind_unit(*arguments,selected_scenarios=['REL-14-S01'])
+        self.assertEqual(len(rows),1)
+        with self.assertRaisesRegex(ValueError,'outside'):
+            bind_unit(*arguments,selected_scenarios=['SEC-11-S01'])
     def test_correct_artifact_does_not_hide_task_timeout_or_native_http_failure(self):
         task=workload('PERF-09-S01',1)
         good=dict(native_http_status=200,completion_ms=100)

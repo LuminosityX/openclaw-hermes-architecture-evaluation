@@ -21,8 +21,19 @@ try{
  report.granted_scopes=selected.scopes;
  for(const operation of spec.operations){
   const started=performance.now();
-  const result=await selected.rpc(operation.method,operation.params);
-  report.responses.push({method:operation.method,result,latency_ms:performance.now()-started});
+  let result=await selected.rpc(operation.method,operation.params);
+  const refresh=[];
+  // sessions.usage explicitly distinguishes a refreshing cache from finalized
+  // usage. A temporary zero cannot be scored as a missing token measurement.
+  if(operation.method==='sessions.usage'){
+   const pending=value=>value?.ok&&(value.payload?.cacheStatus?.status==='refreshing'||value.payload?.sessions?.some(row=>row.computing));
+   while(pending(result)&&performance.now()-started<20000){
+    refresh.push({elapsed_ms:performance.now()-started,cache_status:result.payload?.cacheStatus,totals:result.payload?.totals});
+    await new Promise(resolve=>setTimeout(resolve,500));
+    result=await selected.rpc(operation.method,operation.params);
+   }
+  }
+  report.responses.push({method:operation.method,result,latency_ms:performance.now()-started,refresh_observations:refresh});
  }
 }catch(error){report.harness_error=error.name+': '+error.message;}
 finally{client.close();}

@@ -51,6 +51,19 @@ class RetentionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'evidence path is missing'):
             compact_results(plan,dict(id=123,head_sha='abc'),dict(id=456,name='campaign-REL-14'),archive(files))
 
+    def test_invalid_observation_is_quarantined_with_original_evidence_not_promoted(self):
+        plan,files=self.fixture()
+        rows,manifest=compact_results(plan,dict(id=123,head_sha='abc'),dict(id=456,name='campaign-REL-14'),
+            archive(files),['REL-14-S01'],'Explicit synthetic oracle validity incident')
+        self.assertEqual(rows,[])
+        self.assertEqual(manifest['original_record_count'],1)
+        self.assertEqual(manifest['record_count'],0)
+        self.assertEqual(manifest['validity_exclusions'][0]['original_state'],'pass')
+        self.assertTrue(manifest['validity_exclusions'][0]['original_record_sha256'])
+        self.assertIn('unit-1/summary.json',manifest['files'])
+        with self.assertRaisesRegex(ValueError,'documented reason'):
+            compact_results(plan,dict(id=123,head_sha='abc'),dict(id=456,name='campaign-REL-14'),archive(files),['REL-14-S01'])
+
 
 if __name__=='__main__':
     unittest.main()

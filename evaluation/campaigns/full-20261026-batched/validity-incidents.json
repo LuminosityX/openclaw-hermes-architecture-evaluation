@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "incidents": [
+    {
+      "run_id": "40306085535",
+      "controller_commit": "f7880a7bab97cf28ae0da17d4a5ed8d45abf5b29",
+      "scenarios": ["OBS-07-S04"],
+      "units": [1, 2, 3],
+      "classification": "invalid-immediate-usage-oracle",
+      "reason": "The public sessions.usage response explicitly declared computing=true and cacheStatus.status=refreshing. The harness compared temporary zero aggregate totals as if final, although chat.history already contained the expected 82 input and 14 output tokens. These three observations must not count as product failures or accepted formal coverage.",
+      "preservation": "Original hosted results and native summaries remain unchanged. Retention manifests record explicit validity exclusions with original record and artifact hashes.",
+      "correction": "Poll the documented pending/computing state for at most twenty seconds; preserve refresh observations and the final response. Calibrate the entire family, then rerun only the three pending OBS-07-S04 units. Other valid scenarios are not repeated.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
+    }
+  ]
+}

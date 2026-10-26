@@ -8,6 +8,11 @@ on:
         default: '["PERF-01","PERF-02","PERF-04","COST-02","COST-04","OBS-07"]'
         required: true
         type: string
+      scenario_ids:
+        description: Optional JSON array of explicitly pending scenarios within the selected family
+        default: '[]'
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -26,6 +31,7 @@ jobs:
     timeout-minutes: 60
     env:
       EVAL_FAMILY: ${{ matrix.family }}
+      EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -40,7 +46,11 @@ jobs:
           from run_campaign_family import NATIVE_FAMILIES
           family=os.environ['EVAL_FAMILY']
           assert family in NATIVE_FAMILIES
-          assert not any(r['scenario_id'].startswith(family+'-') for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units already exist; select only pending work'
+          import json
+          case=next(c for c in load_plan()['cases'] if c['id']==family)
+          selected=json.loads(os.environ['EVAL_SCENARIOS']) or [s['id'] for s in case['scenarios']]
+          assert len(selected)==len(set(selected)) and set(selected)<={s['id'] for s in case['scenarios']}
+          assert not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units already exist; select only pending work'
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
@@ -55,11 +65,19 @@ jobs:
             "$RUNNER_TEMP/openclaw-campaign-proofs/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"
       - name: Execute all prescribed independent units only after matching calibration
         run: |
-          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_campaign_family.py \
-            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
-            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
-            --node "$(command -v node)" --case "$EVAL_FAMILY" \
-            --proofs "$RUNNER_TEMP/openclaw-campaign-proofs" --output "$RUNNER_TEMP/openclaw-campaign-result"
+          python3 - <<'PY'
+          import json,os,shutil,subprocess
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          command=['sudo','--preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA','python3','evaluation/tools/run_campaign_family.py',
+              '--runtime-modules',str(root/'openclaw-campaign-runtime/node_modules'),
+              '--package-lock',str(root/'openclaw-campaign-runtime/package-lock.json'),
+              '--node',shutil.which('node'),'--case',os.environ['EVAL_FAMILY'],
+              '--proofs',str(root/'openclaw-campaign-proofs'),'--output',str(root/'openclaw-campaign-result')]
+          selected=json.loads(os.environ['EVAL_SCENARIOS'])
+          if selected:command+=['--scenarios',*selected]
+          subprocess.run(command,check=True)
+          PY
       - name: Collect bounded calibration and formal provenance
         if: always()
         run: |

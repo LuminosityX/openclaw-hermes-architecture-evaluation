@@ -54,6 +54,13 @@ tasks after restart; the external resource sampler is identical in both arms.
 One matched pair per independent unit cannot alone establish statistical
 significance or a universal observer overhead.
 
+Usage queries that explicitly report `computing` or `refreshing` are polled for
+at most twenty seconds, retaining the intermediate states. Temporary zero totals
+are not treated as a finalized missing-usage observation. The original immediate
+oracle incident in run 40306085535 is quarantined in `validity-incidents.json`;
+its native evidence remains unchanged, and only the affected pending scenario
+is formally rerun after new whole-family calibration.
+
 Public contracts are pinned to OpenClaw source
 `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`:
 
