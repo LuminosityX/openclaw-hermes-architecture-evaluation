@@ -27,7 +27,7 @@ def main():
     def history(key):return rpc('chat.history',dict(sessionKey=key,limit=100,maxBytes=131072,toolResultMaxChars=16000))
     def token(scenario,suffix='ACTION'):return 'PILOT_MULTI_S'+str(scenario)+'_U'+str(spec['unit'])+'_'+suffix
     def request(item,key):
-        fixture.plan(item,'exec',dict(command='/usr/bin/python3 /driver/multihost_workload.py '+item,yieldMs=10000,timeout=90),'RECEIPT:'+item)
+        fixture.plan(item,'exec',dict(command='/usr/bin/python3 /driver/multihost_workload.py '+item,yieldMs=10000,timeoutSeconds=90),'RECEIPT:'+item)
         connection=http.client.HTTPConnection('127.0.0.1',18789,timeout=150);started=time.monotonic_ns()
         try:
             connection.request('POST','/v1/chat/completions',json.dumps(dict(model='openclaw',messages=[dict(role='user',content='Perform the owned deterministic operation '+item)],stream=False)),{'Content-Type':'application/json','Authorization':'Bearer '+pilot.TOKEN,'x-openclaw-session-key':key})
