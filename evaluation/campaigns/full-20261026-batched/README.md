@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **158/257 scenarios completed**, with **642 independent observations**. 148 scenarios pass and 10 retain failure observations. Another 99 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **162/257 scenarios completed**, with **654 independent observations**. 152 scenarios pass and 10 retain failure observations. Another 95 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -17,6 +17,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | SEC-01 Execution-surface authority | 5 | 15 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568), [40309312751](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40309312751) |
 | SEC-03 Isolation setup and path races | 4 | 12 | [40308702865](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40308702865) |
 | SEC-05 Policy resolution across entry points | 4 | 12 | [40324442544](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40324442544) |
+| SEC-07 OAuth authorization lifecycle | 4 | 12 | [40344473707](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40344473707) |
 | SEC-08 User privacy across storage, logs, exports and deletion | 5 | 15 | [40326304203](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40326304203) |
 | SEC-09 Indirect prompt injection and data exfiltration | 5 | 15 | [40325062987](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40325062987) |
 | SEC-10 Network egress, SSRF and redirect boundaries | 5 | 15 | [40323668721](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323668721) |
@@ -46,7 +47,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
 | reliability | 32 / 58 |
-| security | 33 / 54 |
+| security | 37 / 54 |
 | performance | 37 / 41 |
 | resources_cost | 19 / 33 |
 | extensibility | 23 / 39 |
