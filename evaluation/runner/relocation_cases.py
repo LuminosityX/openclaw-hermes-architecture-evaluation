@@ -16,6 +16,13 @@ import service_path_cases as service
 SCENARIOS={f'REL-06-S{i:02}':name for i,name in enumerate(['state-only','workspace-only','uid-only','combined'],1)}
 
 
+def environment_selfcheck():
+    def drop():os.setgroups([]);os.setgid(1001);os.setuid(1001)
+    execution=subprocess.run([pilot.NODE,'--version'],capture_output=True,text=True,timeout=10,preexec_fn=drop)
+    if execution.returncode:raise RuntimeError('UID toolchain preflight failed before migration experiments: '+execution.stderr[:1500])
+    return dict(actual_uid=1001,node_version=execution.stdout.strip(),executable_and_crypto_startup_valid=True)
+
+
 def owned_chown(path,uid):
     """Never follow links or leave the explicitly owned /scratch subtree."""
     if path==pilot.BASE or pilot.BASE not in path.parents:raise RuntimeError('Ownership mutation is outside the owned fixture paths')

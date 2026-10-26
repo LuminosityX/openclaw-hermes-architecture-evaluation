@@ -46,6 +46,7 @@ def main():
     try:
         report['storage_guard_check']=pilot.storage_guard_check()
         report['fixture_selfcheck']=mechanism_cases.selfcheck()
+        if args.case=='REL-06':report['uid_environment_preflight']=relocation_cases.environment_selfcheck()
         for sid in selected:
             row=module.run_scenario(pilot.BASE/sid.lower(),sid,args.campaign_unit or 1)
             report['observations'].append(row)

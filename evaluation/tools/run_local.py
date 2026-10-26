@@ -71,7 +71,9 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         if not ssh_backend:raise ValueError('Owned identity migration requires the explicit hosted non-user-namespace profile')
         capabilities+=['--cap-add','CAP_CHOWN','--cap-add','CAP_KILL']
     identity_directories=['--dir','/toolchain','--chmod','0755','/toolchain',
-        '--dir','/runtime','--chmod','0755','/runtime'] if identity_migration else []
+        '--dir','/runtime','--chmod','0755','/runtime',
+        '--dir','/etc','--chmod','0755','/etc',
+        '--dir','/etc/ssl','--chmod','0755','/etc/ssl'] if identity_migration else []
     command = ['bwrap', *namespaces, '--die-with-parent', '--new-session', '--clearenv', '--cap-drop', 'ALL', *capabilities,
                *identity_directories,
                '--ro-bind', '/usr', '/usr', '--symlink', 'usr/bin', '/bin',
@@ -90,6 +92,8 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
     for name in ['/etc/passwd', '/etc/group', '/etc/localtime', '/etc/ssl/certs']:
         if Path(name).exists():
             command += ['--ro-bind', name, name]
+    if identity_migration and Path('/etc/ssl/openssl.cnf').is_file():
+        command += ['--ro-bind','/etc/ssl/openssl.cnf','/etc/ssl/openssl.cnf']
     if relay_socket:
         command += ['--ro-bind',str(relay_socket),'/relay/provider.sock']
     if task_input:
