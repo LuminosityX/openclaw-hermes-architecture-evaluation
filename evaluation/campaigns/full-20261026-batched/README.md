@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **249/257 scenarios completed**, with **945 independent observations**. 215 scenarios pass and 34 retain failure observations. Another 4 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **253/257 scenarios completed**, with **969 independent observations**. 219 scenarios pass and 34 retain failure observations. Another 0 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -39,6 +39,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | PERF-04 Fairness during a slow task | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535), [40309012602](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40309012602) |
 | PERF-05 Admission and overload behavior | 4 | 24 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | PERF-06 State contention under parallel sessions | 4 | 24 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
+| PERF-07 Actual multi-host execution | 4 | 24 | [40409340938](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40409340938) |
 | PERF-08 Sustained load and recycling | 4 | 24 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
 | PERF-09 Problem-solving ability on independently accepted tasks | 5 | 30 | [40291350809](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809) |
 | PERF-10 Long-context and multi-turn task completion | 5 | 30 | [40330267375](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40330267375) |
@@ -75,7 +76,7 @@ Verified nonapplicability requires an actual native capability probe and pinned 
 | --- | ---: |
 | reliability | 58 / 58 |
 | security | 54 / 54 |
-| performance | 37 / 41 |
+| performance | 41 / 41 |
 | resources_cost | 29 / 33 |
 | extensibility | 39 / 39 |
 | observability | 32 / 32 |
