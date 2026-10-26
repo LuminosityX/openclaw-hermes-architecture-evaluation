@@ -3,6 +3,7 @@ import concurrent.futures
 import hashlib
 import http.client
 import json
+import os
 from pathlib import Path
 import subprocess
 import time
@@ -49,7 +50,11 @@ def main():
         config['gateway']['trustedProxies']=['127.0.0.1','::1']
         pilot.save(directory/'config.json',config);return config
     try:
-        gateway=pilot.Gateway(root,configurer=configure,drop_capabilities=True);gateway.ready(timeout=100)
+        status=Path('/proc/self/status').read_text()
+        caps={line.split(':',1)[0]:line.split(':',1)[1].strip() for line in status.splitlines() if line.startswith(('CapEff:','CapBnd:'))}
+        if os.geteuid()!=65534 or any(int(value,16) for value in caps.values()) or len(caps)!=2:raise RuntimeError('Native namespace UID/capability boundary was not established')
+        report['native_namespace_security']=dict(uid=os.geteuid(),capabilities=caps)
+        gateway=pilot.Gateway(root,configurer=configure);gateway.ready(timeout=100)
         # Complete this arm before publishing the remote endpoint to host B.
         local=[]
         for suffix in ['FIRST','SECOND']:
