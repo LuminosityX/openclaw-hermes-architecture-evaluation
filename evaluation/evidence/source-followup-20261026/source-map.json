@@ -1,0 +1,325 @@
+{
+  "kind": "pinned-source-anchors",
+  "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+  "sources": [
+    {
+      "id": "S01",
+      "path": "src/gateway/server-lanes.ts",
+      "sha256": "62e60e3952568b9944a8c56afbf36cca3e199cae95c420a9b67105d3548931af",
+      "full_module_bytes": 3667,
+      "anchors": [
+        {
+          "start": 26,
+          "end": 35,
+          "symbol": "resolveGatewayLaneConcurrency",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/gateway/server-lanes.ts#L26-L35",
+          "text": "export function resolveGatewayLaneConcurrency(cfg: OpenClawConfig): GatewayLaneConcurrency {\n  const cron = resolveCronMaxConcurrentRuns();\n  return {\n    cron,\n    // The reservation guarantees one slot, but hooks may use every free slot\n    // inside the shared budget. A one-wide lane would serialize unrelated hooks.\n    hookDispatch: cfg.hooks?.enabled === true ? cron : 0,\n    main: resolveAgentMaxConcurrent(cfg),\n    subagent: resolveSubagentMaxConcurrent(cfg),\n  };"
+        },
+        {
+          "start": 75,
+          "end": 83,
+          "symbol": "applyGatewayLaneConcurrency",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/gateway/server-lanes.ts#L75-L83",
+          "text": "  setCommandLaneConcurrency(CommandLane.Main, concurrency.main);\n  if (opts.gatewayStart) {\n    // sessions.send work uses a shared nested lane with no config knob.\n    setCommandLaneConcurrency(CommandLane.Nested, 1);\n  }\n  setCommandLaneConcurrency(CommandLane.Subagent, concurrency.subagent);\n  // Recall can be awaited while its parent holds a main or subagent slot.\n  // Keep a separate, finite helper budget shared by every agent and session.\n  setCommandLaneConcurrency(CommandLane.ActiveMemory, concurrency.subagent);"
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "path": "src/agents/embedded-agent-runner/run-orchestrator.ts",
+      "sha256": "de450a9a91ab406ac33c932941edd38390b539e623dbdbfd58f480c99decd49c",
+      "full_module_bytes": 33955,
+      "anchors": [
+        {
+          "start": 160,
+          "end": 195,
+          "symbol": "session/global lane ownership",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/embedded-agent-runner/run-orchestrator.ts#L160-L195",
+          "text": "  const sessionLane = resolveSessionLane(params.sessionKey?.trim() || params.sessionId);\n  const globalLane = resolveGlobalLane(params.lane, params);\n  // Outer fallback attempts defer session suspension only while another\n  // candidate remains. Direct and final-candidate runs suspend normally.\n  // Detached runs neither write durable metadata nor claim the outer deferral.\n  const failureSuspension =\n    params.sessionPersistence === \"detached\" ? undefined : resolveSessionSuspensionTarget();\n  const suspendForFailure = (suspensionParams: SessionSuspensionParams) => {\n    if (!failureSuspension) {\n      return;\n    }\n    const suspension = {\n      ...suspensionParams,\n      // A caller-supplied id wins; the run owns unregistered agent directories.\n      agentId: suspensionParams.agentId ?? params.agentId,\n    };\n    if (failureSuspension.mode === \"defer\") {\n      failureSuspension.defer(suspension);\n      return;\n    }\n    void suspendSession(suspension);\n  };\n  const laneController = createEmbeddedRunLaneController({\n    getLifecycleGeneration: () => lifecycleGeneration,\n    getParams: () => params,\n    globalLane,\n    initialQueuedLifecycleGeneration: queuedLifecycleGeneration,\n    sessionLane,\n    setLifecycleGeneration: (generation) => {\n      lifecycleGeneration = generation;\n    },\n    setParams: (nextParams) => {\n      params = nextParams;\n    },\n  });\n  const { enqueueGlobal, enqueueSession, noteLaneTaskProgress, throwIfAborted } = laneController;"
+        },
+        {
+          "start": 210,
+          "end": 229,
+          "symbol": "global admission after session maintenance",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/embedded-agent-runner/run-orchestrator.ts#L210-L229",
+          "text": "  const requestOwners = captureExecRequestOwners(params);\n  const runSession = async () => {\n    throwIfAborted();\n    // Same-session reads below must see any prior deferred transcript rewrite.\n    // Checkpoint before the global lane so unrelated sessions can still start\n    // while this session waits on its own maintenance lane.\n    if (!params.sessionManager || params.sessionManager.getSessionTarget()) {\n      params.replyOperation?.markWaitingForDeferredMaintenance();\n      try {\n        await waitForDeferredTurnMaintenanceForSession(params.sessionKey);\n        // Maintenance can finish while its transcript projection is still rebuilding.\n        // Settle that projection before the next attempt reads the bounded history.\n        await waitForSessionTranscriptProjection(runSessionTarget, laneController.abortSignal);\n      } finally {\n        params.replyOperation?.markDeferredMaintenanceWaitEnded();\n      }\n    }\n    throwIfAborted();\n    return enqueueGlobal(async () => {\n      const started = Date.now();"
+        },
+        {
+          "start": 717,
+          "end": 733,
+          "symbol": "outer session admission",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/embedded-agent-runner/run-orchestrator.ts#L717-L733",
+          "text": "  return enqueueSession(() =>\n    withExecRequestTurn(\n      {\n        identity: {\n          runId: params.runId,\n          sessionKey: params.sessionKey,\n          sessionId: params.sessionId,\n          agentId: params.agentId,\n        },\n        owners: requestOwners,\n        abortSignal: params.abortSignal,\n      },\n      runSession,\n    ),\n  ).finally(() => {\n    revokeMessageActionTurnCapability(recoveryMessageActionTurnCapability);\n  });"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "path": "src/agents/embedded-agent-runner/run/lane-controller.ts",
+      "sha256": "618fb905f8fe5d18e6ffffa497fcfb8215af8201a0ccb4563034ef300798c4ef",
+      "full_module_bytes": 17560,
+      "anchors": [
+        {
+          "start": 275,
+          "end": 292,
+          "symbol": "enqueueCommandInLane adapter",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/embedded-agent-runner/run/lane-controller.ts#L275-L292",
+          "text": "  const enqueue = <T>(\n    params: Pick<LaneParams, \"enqueue\">,\n    lane: string,\n    task: () => Promise<T>,\n    opts: CommandQueueEnqueueOptions,\n    allowPendingGlobalAdmissionHeartbeat = false,\n  ): Promise<T> => {\n    if (!params.enqueue) {\n      noteLaneWaitIfBusy(lane);\n    }\n    const queueOptions = withLaneTimeout(\n      withRunLaneWait(opts),\n      allowPendingGlobalAdmissionHeartbeat,\n    );\n    return params.enqueue\n      ? params.enqueue(task, queueOptions)\n      : enqueueCommandInLane(lane, task, queueOptions);\n  };"
+        },
+        {
+          "start": 380,
+          "end": 446,
+          "symbol": "global and session admission",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/embedded-agent-runner/run/lane-controller.ts#L380-L446",
+          "text": "            assertAgentRunLifecycleGenerationCurrent(lifecycleGeneration);\n            releaseQueuedContext(\"admitted\");\n            // Queue-stage rotation may rebind, but placement admitted into a retired runtime must fail.\n            claimAgentRunContext(params.runId, {\n              ...existingContext,\n              agentId: params.agentId ?? existingContext?.agentId,\n              sessionKey: params.sessionKey ?? existingContext?.sessionKey,\n              sessionId: params.sessionId ?? existingContext?.sessionId,\n              lifecycleGeneration,\n              lastActiveAt: Date.now(),\n            });\n            // Queue dequeue can still block on writer or placement admission.\n            params.replyOperation?.markGlobalLaneWaitEnded();\n            params.onLaneWait?.({ waitMs: 0, queuedAhead: 0, waiting: false });\n          },\n        ),\n      );\n    };\n    const params = options.getParams();\n    let queuedRun: Promise<EmbeddedAgentRunResult>;\n    try {\n      queuedRun = enqueue(params, options.globalLane, taskWithCurrentLifecycle, globalOpts);\n    } catch (error) {\n      finishGlobalLaneAdmission();\n      throw error;\n    }\n    return queuedRun.finally(finishGlobalLaneAdmission).catch(rethrowQueueError);\n  };\n  const enqueueSession = async <T>(task: () => Promise<T>, opts?: CommandQueueEnqueueOptions) => {\n    const releaseForeground =\n      sessionLanePolicy.priority === \"foreground\"\n        ? await beginForegroundSessionMaintenance(\n            options.getParams().sessionKey ?? options.getParams().sessionId,\n          )\n        : undefined;\n    try {\n      const sessionOpts: CommandQueueEnqueueOptions = {\n        ...opts,\n        abortSignal,\n        priority: sessionLanePolicy.priority,\n        onQueued: noteCapacityWait,\n      };\n      const admittedTask = () => {\n        endCapacityWait();\n        return task();\n      };\n      const params = options.getParams();\n      // Session admission, deferred maintenance, and global admission share one queue owner.\n      releaseQueuedRunContext = retainQueuedAgentRunContext(\n        params.runId,\n        options.getLifecycleGeneration(),\n      );\n      if (releaseQueuedRunContext && params.abortSignal) {\n        if (params.abortSignal.aborted) {\n          releaseQueuedContext(\"abandoned\");\n        } else {\n          queuedRunAbortSignal = params.abortSignal;\n          queuedRunAbortSignal.addEventListener(\"abort\", abandonQueuedContext, { once: true });\n        }\n      }\n      let queuedRun: Promise<T>;\n      try {\n        queuedRun = enqueue(params, options.sessionLane, admittedTask, sessionOpts, true);\n      } catch (error) {\n        releaseQueuedContext(\"abandoned\");\n        throw error;\n      }"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "path": "src/process/command-queue.ts",
+      "sha256": "a0649c9e0828bfca34637287601bc0f72eaa5379af195b513af0ce0deb9c97f5",
+      "full_module_bytes": 27382,
+      "anchors": [
+        {
+          "start": 343,
+          "end": 389,
+          "symbol": "async task admission and slot release",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/process/command-queue.ts#L343-L389",
+          "text": "  state.draining = true;\n  let started = 0;\n  try {\n    while (\n      started < maxStarts &&\n      state.activeTaskIds.size < state.maxConcurrent &&\n      state.queue.length > 0 &&\n      canAdmitInGroup(lane)\n    ) {\n      const entry = dequeueLaneQueue(state.queue) as QueueEntry;\n      const waitedMs = Math.floor(performance.now()) - entry.enqueuedAt;\n      const activeBeforeStart = state.activeTaskIds.size;\n      const taskId = getQueueState().nextTaskId++;\n      const taskGeneration = state.generation;\n      // Commit the admission before invoking callbacks or logging. Both can\n      // synchronously re-enter the queue, and the shared budget must already\n      // account for this task when that nested admission is evaluated.\n      state.activeTaskIds.add(taskId);\n      started += 1;\n      const startTime = Date.now();\n      void (async () => {\n        try {\n          if (waitedMs >= entry.warnAfterMs) {\n            try {\n              entry.onWait?.(waitedMs, entry.queuedAheadAtEnqueue);\n            } catch (err) {\n              diag.error(`lane onWait callback failed: lane=${lane} error=\"${String(err)}\"`);\n            }\n            diag.warn(\n              `lane wait exceeded: lane=${lane} waitedMs=${waitedMs} queueAhead=${entry.queuedAheadAtEnqueue} ` +\n                `activeAhead=${entry.activeAheadAtEnqueue} activeNow=${activeBeforeStart} queueBehind=${state.queue.length}`,\n              entry.taskIdentity,\n            );\n          }\n          logLaneDequeue(lane, waitedMs, state.queue.length);\n          return await runQueueEntryTask(entry, {\n            lane,\n            taskId,\n            generation: taskGeneration,\n          });\n        } finally {\n          // Admission diagnostics and task cleanup can throw too. Release and\n          // pump exactly once, without letting an old generation free new work.\n          if (taskGeneration === state.generation) {\n            state.activeTaskIds.delete(taskId);\n            drainReadyCommandLane(lane, state);\n          }"
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "path": "src/agents/tool-search-config.ts",
+      "sha256": "2d96c8239d191673a644e886480ac35490096de1c949b5d7e6a384a7a2a66369",
+      "full_module_bytes": 1551,
+      "anchors": [
+        {
+          "start": 12,
+          "end": 21,
+          "symbol": "default enabled and explicit false",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/tool-search-config.ts#L12-L21",
+          "text": "function readToolSearchConfig(config?: OpenClawConfig): Record<string, unknown> {\n  const tools = isRecord(config?.tools) ? config.tools : undefined;\n  const toolSearch = tools?.toolSearch;\n  if (toolSearch === undefined || toolSearch === true) {\n    return { enabled: true };\n  }\n  if (toolSearch === false) {\n    return { enabled: false };\n  }\n  return isRecord(toolSearch) ? toolSearch : {};"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "path": "src/agents/tool-search-runtime.ts",
+      "sha256": "c98b9c0597cfe53de9d07d4ca0b637ccb341e91aaf365726bf4084c23df69047",
+      "full_module_bytes": 24511,
+      "anchors": [
+        {
+          "start": 81,
+          "end": 109,
+          "symbol": "findEntry id-or-name",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/tool-search-runtime.ts#L81-L109",
+          "text": "function findEntry(\n  catalog: ToolSearchCatalogSession,\n  id: string,\n  options?: CatalogVisibilityOptions & ToolLookupErrorOptions,\n  match: \"id-or-name\" | \"exact-id\" = \"id-or-name\",\n): ToolSearchCatalogEntry {\n  const needle = id.trim();\n  const entries = match === \"exact-id\" ? catalog.entries : visibleCatalogEntries(catalog, options);\n  const exactIdEntry = entries.find((candidate) => candidate.id === needle);\n  if (exactIdEntry) {\n    return exactIdEntry;\n  }\n  const namedEntries =\n    match === \"exact-id\" ? [] : entries.filter((candidate) => candidate.name === needle);\n  if (namedEntries.length > 1) {\n    throw new ToolInputError(`Ambiguous tool name: ${needle}; use an exact tool id.`);\n  }\n  const namedEntry = namedEntries[0];\n  if (!namedEntry) {\n    throw new ToolInputError(\n      formatUnknownToolIdError(\n        needle,\n        entries,\n        match === \"exact-id\" ? { ...options, exactIdOnly: true } : options,\n      ),\n    );\n  }\n  return namedEntry;\n}"
+        },
+        {
+          "start": 313,
+          "end": 320,
+          "symbol": "call without search/describe",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/tool-search-runtime.ts#L313-L320",
+          "text": "  call = async (id: string, input?: unknown, options?: ToolSearchCallOptions) => {\n    const catalog = resolveCatalog(this.ctx);\n    return await this.callEntry(\n      findEntry(catalog, id, { ...options, codeModeSkills: this.ctx.codeModeSkills }),\n      input,\n      options,\n    );\n  };"
+        },
+        {
+          "start": 419,
+          "end": 430,
+          "symbol": "direct executable invocation",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/tool-search-runtime.ts#L419-L430",
+          "text": "    const executeTool =\n      this.ctx.executeTool ??\n      (async (params: Parameters<ToolSearchCatalogToolExecutor>[0]) => {\n        const result = await params.tool.execute(\n          params.toolCallId,\n          params.input,\n          params.signal,\n          params.onUpdate,\n          undefined as never,\n        );\n        return await params.acceptResultBeforeProjection(result);\n      });"
+        },
+        {
+          "start": 519,
+          "end": 547,
+          "symbol": "validation and result acceptance",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/tool-search-runtime.ts#L519-L547",
+          "text": "    let acceptedResult: AgentToolResult<unknown> | undefined;\n    try {\n      const result = validateExecution\n        ? await runWithToolExecutionValidation(\n            toolCallId,\n            async (finalInput) => {\n              if (validateInput) {\n                await assertCatalogInputMatchesSchema(entry, finalInput);\n              }\n              if (outputVariants) {\n                // Retain the prepared primitive, not an input object the tool can mutate.\n                executedOutputSelection = captureToolOutputSelection(\n                  outputVariants.inputProperty,\n                  finalInput,\n                );\n              }\n            },\n            runExecution,\n          )\n        : await runExecution();\n      acceptedResult = await acceptResultBeforeProjection(result);\n      if (options?.parentToolCallId) {\n        this.terminalTargetBatchByParent.set(\n          options.parentToolCallId,\n          this.terminalTargetBatchByParent.get(options.parentToolCallId) !== false &&\n            acceptedResult.terminate === true,\n        );\n      }\n      return { tool: compactToolSearchCatalogEntry(entry), result: acceptedResult };"
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "path": "src/plugins/loader-runtime-candidate.ts",
+      "sha256": "0404abbb028a2f8cbcd03c112e08a077758393f3dbbc60f328085b16ae2214e7",
+      "full_module_bytes": 26784,
+      "anchors": [
+        {
+          "start": 593,
+          "end": 625,
+          "symbol": "register on PluginInstance",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/plugins/loader-runtime-candidate.ts#L593-L625",
+          "text": "    const registerPlugin = () => {\n      const ownedDefinition = instance?.wrap(definition) ?? definition;\n      // Headless nodes also use non-activating registries; their commands remain available.\n      if (!cliMetadata) {\n        for (const command of ownedDefinition?.nodeHostCommands ?? []) {\n          params.registryBuilder.registerNodeHostCommand(record, command);\n        }\n      }\n      if (registrationPlan.runFullActivationOnlyRegistrations) {\n        if (ownedDefinition?.reload) {\n          params.registryBuilder.registerReload(record, ownedDefinition.reload);\n        }\n        for (const collector of ownedDefinition?.securityAuditCollectors ?? []) {\n          params.registryBuilder.registerSecurityAuditCollector(record, collector);\n        }\n      }\n      const api = params.registryBuilder.createApi(record, {\n        config: context.cfg,\n        pluginConfig: validatedConfig.value,\n        hookPolicy: entry?.hooks,\n        registrationMode: registrationPlan.mode,\n      });\n      return withProfile(\n        { pluginId: record.id, source: record.source },\n        `${registrationPlan.mode}:register`,\n        () => runPluginRegisterSyncInRegistry(register, api, registry, record.id),\n      );\n    };\n    if (instance) {\n      instance.run(registerPlugin);\n    } else {\n      registerPlugin();\n    }"
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "path": "src/plugins/plugin-instance.ts",
+      "sha256": "7892336dcf4e5f21c0012987a7544e28428a030806fafe00ec2aaa2afa86225c",
+      "full_module_bytes": 28554,
+      "anchors": [
+        {
+          "start": 161,
+          "end": 174,
+          "symbol": "run",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/plugins/plugin-instance.ts#L161-L174",
+          "text": "  run<T>(run: () => T): T {\n    const current = this.activeCall();\n    if (current) {\n      return this.invoke(run, { token: current.token, release: () => undefined });\n    }\n    const scoped = pluginInvocationContext.getStore()?.lookup(this);\n    if (scoped) {\n      return scoped.run(run);\n    }\n    if (!this.accepting || this.owner?.revoked) {\n      throw new PluginInstanceUnavailableError(this.pluginId);\n    }\n    return this.invoke(run);\n  }"
+        },
+        {
+          "start": 361,
+          "end": 415,
+          "symbol": "invoke",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/plugins/plugin-instance.ts#L361-L415",
+          "text": "  private invoke<T>(\n    run: () => T,\n    { token, release }: PluginInstanceCallLease = this.lease(),\n    cleanupFailures?: Set<unknown>,\n  ): T {\n    const cleanup = this.calls.get(token)?.cleanup === true;\n    const held: { registry?: PluginRegistry } = {};\n    try {\n      return this.enter(\n        token,\n        () => {\n          const value = run();\n          const completion = resolvePluginReturnPromise(value);\n          if (completion) {\n            const settled = mapPluginReturnPromise(\n              completion,\n              async (result) => {\n                held.registry = undefined;\n                await release();\n                if (this.forcedRetirement && !cleanup && !this.hasToken(token)) {\n                  throw new PluginInstanceUnavailableError(this.pluginId);\n                }\n                return result;\n              },\n              async (error: unknown) => {\n                held.registry = undefined;\n                cleanupFailures?.add(error);\n                // Preserve the call's failure; lifecycle observers still receive cleanup failures.\n                await release()?.catch(() => {});\n                throw error;\n              },\n            );\n            if (settled.host) {\n              valueInstances.setHost(settled.value, this);\n            } else {\n              valueInstances.set(settled.value, this);\n            }\n            // Then getters and assimilation can execute plugin code; retain the admitting scope.\n            // SAFETY: Promise-like calls retain their resolved value while joining owner cleanup.\n            return settled.value as T;\n          }\n          held.registry = undefined;\n          void release();\n          if (this.forcedRetirement && !cleanup && !this.hasToken(token)) {\n            throw new PluginInstanceUnavailableError(this.pluginId);\n          }\n          return value;\n        },\n        held,\n      );\n    } catch (error) {\n      held.registry = undefined;\n      cleanupFailures?.add(error);\n      void release();\n      throw error;"
+        },
+        {
+          "start": 419,
+          "end": 429,
+          "symbol": "async invocation scope",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/plugins/plugin-instance.ts#L419-L429",
+          "text": "  private enter<T>(token: object, run: () => T, held?: { registry?: PluginRegistry }): T {\n    pluginInvocationContext.getStore()?.lookup(this);\n    const current = invocation.getStore();\n    const call =\n      current?.instance === this && current.token === token\n        ? current\n        : { instance: this, token, parent: current };\n    if (!this.owner) {\n      const enter = () => invocation.run(call, run);\n      // Deferred setup imports use the same SDK resolver facts as their initial load.\n      return this.setupCache ? withPluginCache(this.setupCache, enter) : enter();"
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "path": "src/plugins/registry-registrars-tools-hooks.ts",
+      "sha256": "94a0fd3c81f677da510e3b451b870e1dea1cc1391624eaf24357743c7404e79c",
+      "full_module_bytes": 16322,
+      "anchors": [
+        {
+          "start": 220,
+          "end": 267,
+          "symbol": "registerTool factory",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/plugins/registry-registrars-tools-hooks.ts#L220-L267",
+          "text": "  const registerTool = (\n    record: PluginRecord,\n    tool: AnyAgentTool | OpenClawPluginToolFactory | OpenClawPluginToolFactory<2>,\n    opts?: OpenClawPluginToolOptions,\n  ) => {\n    if (pluginsWithChannelRegistrationConflict.has(record.id)) {\n      return;\n    }\n    let declaredNames = declaredToolNames.get(record);\n    if (!declaredNames) {\n      declaredNames = new Set(normalizePluginToolContractNames(record.contracts));\n      declaredToolNames.set(record, declaredNames);\n    }\n    if (declaredNames.size === 0) {\n      reportRegistrationError(\n        record,\n        \"plugin must declare contracts.tools before registering agent tools\",\n      );\n      return;\n    }\n    const names = [...(opts?.names ?? []), ...(opts?.name ? [opts.name] : [])];\n    const optional = opts?.optional === true;\n    const versioned = typeof tool !== \"function\" && \"contextVersion\" in tool;\n    if (versioned && (tool.contextVersion !== 2 || typeof tool.create !== \"function\")) {\n      reportRegistrationError(record, \"unsupported plugin tool context version\");\n      return;\n    }\n    const factory: OpenClawPluginToolFactory =\n      typeof tool === \"function\"\n        ? tool\n        : versioned\n          ? (ctx) => {\n              if (!ctx.assertInvocationCurrent) {\n                throw new Error(\"Version 2 tool factories require host invocation authority\");\n              }\n              return tool.create({\n                ...ctx,\n                get senderIsOwner() {\n                  return ctx.senderIsOwner;\n                },\n                assertInvocationCurrent: ctx.assertInvocationCurrent,\n              });\n            }\n          : (_ctx: OpenClawPluginToolContext) => tool;\n    if (typeof tool !== \"function\" && !versioned) {\n      names.push(tool.name);\n    }\n    const normalized = normalizePluginToolNames(names);"
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "path": "src/agents/agent-tools.before-tool-call.wrapper.ts",
+      "sha256": "677fe716e438278e84ef18ea3f4108b88f2b694596e97469fce93f28b98b470a",
+      "full_module_bytes": 25514,
+      "anchors": [
+        {
+          "start": 573,
+          "end": 603,
+          "symbol": "error observation and rethrow",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-tools.before-tool-call.wrapper.ts#L573-L603",
+          "text": "      } catch (err) {\n        if (hookOptions.emitDiagnostics) {\n          emitTrustedDiagnosticEventWithPrivateData(\n            {\n              type: \"tool.execution.error\",\n              ...eventBase,\n              durationMs: Date.now() - startedAt,\n              ...resolveToolErrorDiagnostic(err, signal),\n            },\n            buildToolContentPrivateData(toolContentPolicy, {\n              input: executeParams,\n              includeOutput: false,\n            }),\n          );\n        }\n        await recordLoopOutcome({\n          ctx,\n          toolName: normalizedToolName,\n          toolParams: executeParams,\n          toolCallId,\n          error: err,\n          resultContentSource:\n            isTrustedToolExecutionPreflightError(err) || (signal?.aborted && err === signal.reason)\n              ? undefined\n              : tool.resultContentSource,\n          toolCallOrdinal,\n        });\n        throw err;\n      } finally {\n        liveness.close();\n      }"
+        },
+        {
+          "start": 624,
+          "end": 648,
+          "symbol": "prepared execute and dispose",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-tools.before-tool-call.wrapper.ts#L624-L648",
+          "text": "  wrappedTool.execute = async (\n    toolCallId,\n    params,\n    signal,\n    onUpdate,\n    ...executionArgs: unknown[]\n  ) => {\n    const prepared = await prepareExecution({\n      toolCallId,\n      args: params,\n      signal,\n      onUpdate,\n      executionArgs,\n    });\n    try {\n      if (prepared.kind === \"immediate\") {\n        if (prepared.outcome.kind === \"error\") {\n          throw prepared.outcome.error;\n        }\n        return prepared.outcome.result;\n      }\n      return await prepared.execute();\n    } finally {\n      prepared.dispose();\n    }"
+        }
+      ]
+    },
+    {
+      "id": "S11",
+      "path": "src/agents/sandbox/shared.ts",
+      "sha256": "d32fcdf0acf8bb775a6c3880bdac659e3df3b9d250cad86349a4d7dbb83a2cff",
+      "full_module_bytes": 5964,
+      "anchors": [
+        {
+          "start": 55,
+          "end": 88,
+          "symbol": "resolveSandboxScopeKey",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/sandbox/shared.ts#L55-L88",
+          "text": "function resolveSandboxScopeKey(\n  scope: \"session\" | \"agent\" | \"shared\",\n  sessionKey: string,\n  workspaceDir: string,\n  agentId?: string,\n  isolationSubject?: SandboxIsolationSubject,\n) {\n  const trimmed = sessionKey.trim() || \"main\";\n  if (scope === \"shared\" && !isolationSubject) {\n    return \"shared\";\n  }\n  // Co-hosted workspaces may reuse agent and session keys, but must never\n  // converge on one runtime, registry entry, or materialized skills workspace.\n  const workspaceSuffix = `:workspace:${hashTextSha256(resolveUserPath(workspaceDir)).slice(0, 32)}`;\n  if (isolationSubject) {\n    const resolvedAgentId = agentId\n      ? normalizeAgentId(agentId)\n      : resolveAgentIdFromSessionKey(trimmed);\n    // Preserve existing profile paths. Other creators cannot adopt a profile's resources,\n    // even when their raw IDs collide; their canonical session owns a separate namespace.\n    const subject =\n      isolationSubject.kind === \"profile\"\n        ? `principal:${hashTextSha256(isolationSubject.profileId).slice(0, 32)}`\n        : `required-session:${hashTextSha256(isolationSubject.sessionKey).slice(0, 32)}`;\n    return `agent:${resolvedAgentId}:${subject}${workspaceSuffix}`;\n  }\n  if (scope === \"session\") {\n    return `${trimmed}${workspaceSuffix}`;\n  }\n  const resolvedAgentId = agentId\n    ? normalizeAgentId(agentId)\n    : resolveAgentIdFromSessionKey(trimmed);\n  return `agent:${resolvedAgentId}${workspaceSuffix}`;\n}"
+        }
+      ]
+    },
+    {
+      "id": "S12",
+      "path": "src/agents/sandbox/remote-shell-backend.ts",
+      "sha256": "c229a38def6ac8470edc46c05f2b19fb148367583f7007d453ff12f59384bb09",
+      "full_module_bytes": 17167,
+      "anchors": [
+        {
+          "start": 97,
+          "end": 116,
+          "symbol": "exec command in selected workspace",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/sandbox/remote-shell-backend.ts#L97-L116",
+          "text": "      buildExecSpec: async ({ command, workdir, env, usePty }) => {\n        const remoteWorkdir = workdir ?? this.params.runtimePaths.remoteWorkspaceDir;\n        const remoteCommand = buildValidatedExecRemoteCommand({\n          command,\n          workdir: remoteWorkdir,\n          env: {},\n        });\n        await this.ensureRuntime();\n        const session = await this.createSession();\n        try {\n          if (!this.consumeRefreshedSkillsForNextExec(remoteWorkdir)) {\n            await this.refreshRemoteSkillsWorkspace(session);\n          }\n          this.params.createParams.assertRuntimeCurrent?.();\n          const prepared = await session.prepareExec({\n            remoteCommand,\n            env,\n            tty: usePty,\n          });\n          try {"
+        },
+        {
+          "start": 436,
+          "end": 447,
+          "symbol": "resolveRemoteShellRuntimePaths",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/sandbox/remote-shell-backend.ts#L436-L447",
+          "text": "// Preserve existing remote workspace identities across transport changes.\nexport function resolveRemoteShellRuntimePaths(\n  workspaceRoot: string,\n  scopeKey: string,\n): ResolvedRemoteRuntimePaths {\n  const runtimeId = buildRemoteShellRuntimeId(scopeKey);\n  const runtimeRootDir = path.posix.join(workspaceRoot, runtimeId);\n  return {\n    runtimeId,\n    runtimeRootDir,\n    remoteWorkspaceDir: path.posix.join(runtimeRootDir, \"workspace\"),\n    remoteAgentWorkspaceDir: path.posix.join(runtimeRootDir, \"agent\"),"
+        }
+      ]
+    },
+    {
+      "id": "S13",
+      "path": "src/agents/sandbox/remote-shell-command.ts",
+      "sha256": "d491d2305b4bfafc620525b16a6701894dc3dc4f0dccea356adc7148318fabe9",
+      "full_module_bytes": 13528,
+      "anchors": [
+        {
+          "start": 171,
+          "end": 195,
+          "symbol": "cd plus shell command",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/sandbox/remote-shell-command.ts#L171-L195",
+          "text": "/** Build the wrapped remote `/bin/sh -c` command for sandbox exec. */\nexport function buildExecRemoteCommand(params: {\n  command: string;\n  workdir?: string;\n  env: Record<string, string>;\n}): string {\n  if (Object.keys(params.env).length > 0) {\n    throw new Error(\n      \"SSH sandbox environment requires secure script staging; use prepareSshSandboxExec.\",\n    );\n  }\n  const body = params.workdir\n    ? `cd ${shellEscape(params.workdir)} && ${params.command}`\n    : params.command;\n  return buildRemoteCommand([\"/bin/sh\", \"-c\", body]);\n}\n\n/** Validate and build a remote exec command for untrusted model input. */\nexport function buildValidatedExecRemoteCommand(\n  params: Parameters<typeof buildExecRemoteCommand>[0],\n): string {\n  assertValidExecRemoteCommand(params.command);\n  return buildExecRemoteCommand(params);\n}\n"
+        }
+      ]
+    },
+    {
+      "id": "S14",
+      "path": "src/agents/sandbox/ssh.ts",
+      "sha256": "96e248799ba91d67ab9d869d3072b02c94176321cd7381e16b1d2d75cab248b6",
+      "full_module_bytes": 9021,
+      "anchors": [
+        {
+          "start": 101,
+          "end": 128,
+          "symbol": "SSH target/user/identity",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/sandbox/ssh.ts#L101-L128",
+          "text": "      const lines = [\n        \"Host openclaw-sandbox\",\n        `  HostName ${parsed.host}`,\n        `  Port ${parsed.port}`,\n        \"  BatchMode yes\",\n        \"  ConnectTimeout 5\",\n        \"  ServerAliveInterval 15\",\n        \"  ServerAliveCountMax 3\",\n        `  StrictHostKeyChecking ${settings.strictHostKeyChecking ? \"yes\" : \"no\"}`,\n        `  UpdateHostKeys ${settings.updateHostKeys ? \"yes\" : \"no\"}`,\n      ];\n      if (parsed.user) {\n        lines.push(`  User ${parsed.user}`);\n      }\n      if (knownHostsFile) {\n        lines.push(`  UserKnownHostsFile ${quoteSshConfigPath(knownHostsFile)}`);\n      } else if (!settings.strictHostKeyChecking) {\n        lines.push(\"  UserKnownHostsFile /dev/null\");\n      }\n      if (identityFile) {\n        lines.push(`  IdentityFile ${quoteSshConfigPath(identityFile)}`);\n      }\n      if (certificateFile) {\n        lines.push(`  CertificateFile ${quoteSshConfigPath(certificateFile)}`);\n      }\n      if (identityFile || certificateFile) {\n        lines.push(\"  IdentitiesOnly yes\");\n      }"
+        },
+        {
+          "start": 138,
+          "end": 152,
+          "symbol": "same SSH command boundary",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/sandbox/ssh.ts#L138-L152",
+          "text": "function commandSession(session: SshSandboxSession): RemoteShellSandboxSession {\n  return createRemoteShellSandboxSession({\n    buildCommand: ({ remoteCommand, tty }) => ({\n      argv: [\n        session.command,\n        \"-F\",\n        session.configPath,\n        ...(tty ? [\"-tt\", \"-o\", \"RequestTTY=force\"] : [\"-T\", \"-o\", \"RequestTTY=no\"]),\n        session.host,\n        remoteCommand,\n      ],\n      env: sanitizeEnvVars(process.env).allowed,\n    }),\n    assertCurrent: session.assertCurrent,\n    formatFailure: buildSshFailureMessage,"
+        }
+      ]
+    },
+    {
+      "id": "S15",
+      "path": "VISION.md",
+      "sha256": "46e253fa54a37082efa9d5df10cc77e6e156e92fe40bc3a9cf9215c68befc910",
+      "full_module_bytes": 7807,
+      "anchors": [
+        {
+          "start": 54,
+          "end": 57,
+          "symbol": "documented security/capability objective",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/VISION.md#L54-L57",
+          "text": "## Security\n\nSecurity in OpenClaw is a deliberate tradeoff: strong defaults without killing capability.\nThe goal is to stay powerful for real work while making risky paths explicit and operator-controlled."
+        },
+        {
+          "start": 71,
+          "end": 94,
+          "symbol": "documented core per-call tax and plugin surfaces",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/VISION.md#L71-L94",
+          "text": "## Plugins & Memory\n\nOpenClaw has an extensive plugin API.\nCore stays lean; optional capabilities should usually ship as plugins.\nWe are generally slimming down core while expanding what plugins can do.\nIf a useful feature cannot be built as a plugin yet, we welcome PRs and design discussions that extend the plugin API instead of adding one-off core behavior.\n\nTwo layers, two bars.\nThe core carries a per-call tax: each core tool, prompt line, and config key reaches every operator on every model request, so additions there face the strictest scrutiny.\nPlugins, skills, channels, and apps carry no such tax, and we want that surface to keep growing.\nWhen our contribution rules read as hostile to a feature, re-check the layer: usually they object to where it plugs in, not to the feature existing.\n\nRecurring demand defines interfaces.\nOnce several independent PRs or requests wire in the same kind of capability, the right response is a contract, not a queue of merges: land the seam in core or the SDK, port the bundled implementation onto it, and let the remaining candidates ship as plugins against it.\n\nThere are two broad plugin styles:\n\n- Code plugins run OpenClaw plugin code and are appropriate for deeper runtime extension.\n- Bundle-style plugins package stable external surfaces such as skills, MCP servers, and related configuration.\n\nPrefer bundle-style plugins when they can express the capability.\nThey have a smaller, more stable interface and better security boundaries.\nUse code plugins when the capability needs runtime hooks, providers, channels, tools, or other in-process extension points.\n"
+        }
+      ]
+    }
+  ],
+  "upstream_license": "MIT",
+  "license_url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/LICENSE",
+  "limitation": "Matching source explains a possible mechanism; an experiment and counterevidence are still required for causal effects and cross-dimension tradeoffs."
+}

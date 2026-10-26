@@ -69,6 +69,14 @@ class LocalRunnerTests(unittest.TestCase):
         self.assertFalse(result['studies'][0]['complete'])
         self.assertTrue(result['harness_error'])
 
+    def test_final_error_does_not_discard_an_earlier_arm_checkpoint(self):
+        import json
+        frame=dict(kind='arm-checkpoint',product='openclaw',study='SRC-02',planned_arms=8,arm=dict(block=0,valid=True))
+        final=dict(kind='exploratory-pilot',product='openclaw',studies=[],harness_error='later fixture failure')
+        result=runner.decode_report(json.dumps(frame)+'\n'+json.dumps(final))
+        self.assertEqual(len(result['studies'][0]['arms']),1)
+        self.assertTrue(result['checkpoint_recovery_used'])
+
 
 if __name__=='__main__':
     unittest.main()

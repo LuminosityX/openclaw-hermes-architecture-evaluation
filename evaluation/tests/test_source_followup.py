@@ -74,6 +74,13 @@ class SourceFollowupTests(unittest.TestCase):
         self.assertFalse(result['rejected_without_effect'])
         self.assertEqual(result['effect_count'],1)
 
+    def test_exit_observation_waits_without_killing_a_healthy_owner(self):
+        class Running:
+            def wait(self,timeout):
+                raise subprocess.TimeoutExpired('owned process',timeout)
+        self.assertIsNone(followup.observe_natural_exit(Running()))
+        self.assertEqual(followup.observe_natural_exit(SimpleNamespace(wait=lambda timeout:42)),42)
+
 
 if __name__=='__main__':
     unittest.main()

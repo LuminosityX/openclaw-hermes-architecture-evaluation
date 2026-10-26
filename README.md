@@ -2,6 +2,8 @@
 
 `main` focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
 
+The primary working result is now the [source-backed architecture review](evaluation/evidence/source-followup-20261026/README.md): observed phenomena, exact implementation owners, counterexamples, targeted interventions and cross-dimension interpretation. The coverage matrix is an inventory, not a substitute for this reasoning loop.
+
 The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, checked against GitHub stable and npm `latest` on 2026-10-26. The exact [campaign pin](evaluation/design/evaluation-matrix.json) is fixed for reproducibility. See the [current-version execution guide](evaluation/current-version.md); newer dependency installations run on disposable GitHub-hosted machines, not this local workspace.
 
 [Current-release evidence](evaluation/evidence/current-stable-20261026/README.md) now contains valid two-block pilots for all three first-wave studies on this version. The earlier local build remains harness-bootstrap evidence only.

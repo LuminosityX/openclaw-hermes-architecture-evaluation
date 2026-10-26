@@ -43,11 +43,16 @@ def decode_report(stdout):
             study['arms'].append(value['arm'])
         elif isinstance(value.get('studies'),list):
             final=value
-    if final is not None:
-        return final
     for study in checkpoints.values():
         study['complete']=len(study['arms'])==study['planned_arms']
         study['valid']=all(a.get('valid') for a in study['arms'])
+    if final is not None:
+        existing={s['study']:s for s in final['studies']}
+        for key,study in checkpoints.items():
+            if key not in existing:
+                final['studies'].append(study)
+                final['checkpoint_recovery_used']=True
+        return final
     return dict(kind='pilot-aborted',product='openclaw',studies=list(checkpoints.values()),
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 

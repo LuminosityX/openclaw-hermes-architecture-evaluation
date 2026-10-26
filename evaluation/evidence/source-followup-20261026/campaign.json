@@ -1,0 +1,77 @@
+{
+  "kind": "source-directed-investigation-evidence",
+  "target": {
+    "product": "openclaw",
+    "version": "2026.10.7",
+    "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "selection_policy": "latest-stable-at-campaign-start",
+    "release_tag": "v2026.10.7",
+    "release_url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.7",
+    "release_published_at": "2026-10-24T09:53:46Z",
+    "checked_at_utc": "2026-10-26T04:13:15.261947+00:00",
+    "npm_integrity": "sha512-iiZO+kFFBgQvxm17wn3Sc/MSC/GQu01PubAFVNA2Nn736HOHUbR0ra7a9NeW9wpjq3kDkSJ1RB7dTP+qVJFXig==",
+    "npm_tarball": "https://registry.npmjs.org/openclaw/-/openclaw-2026.10.7.tgz",
+    "node_engine": ">=24.22.1 <25 || >=26.12.1",
+    "node_version": "24.22.1",
+    "pin_policy": "Resolve GitHub stable and npm latest together before a campaign; pin version, release commit and package integrity for its duration. Historical bootstrap runs are excluded from current-release conclusions."
+  },
+  "runs": [
+    {
+      "github_run_id": 40273382910,
+      "study": "SRC-01",
+      "controller_commit": "bab6734236cf4a110fbb773cdbdc7cbe7e785f27",
+      "report": "run-40273382910.json",
+      "installation": "installation-40273382910.json",
+      "execution": "execution-40273382910.json",
+      "dependency_lock": "../current-stable-20261026/package-lock-005ded4ea9b1.json",
+      "dependency_lock_sha256": "005ded4ea9b1b00d511834d8bba98076d9777fd61cf8e7f1a53f61c11fe1a76b"
+    },
+    {
+      "github_run_id": 40273383152,
+      "study": "SRC-02",
+      "controller_commit": "bab6734236cf4a110fbb773cdbdc7cbe7e785f27",
+      "report": "run-40273383152.json",
+      "installation": "installation-40273383152.json",
+      "execution": "execution-40273383152.json",
+      "dependency_lock": "../current-stable-20261026/package-lock-005ded4ea9b1.json",
+      "dependency_lock_sha256": "005ded4ea9b1b00d511834d8bba98076d9777fd61cf8e7f1a53f61c11fe1a76b"
+    },
+    {
+      "github_run_id": 40273382988,
+      "study": "SRC-03",
+      "controller_commit": "bab6734236cf4a110fbb773cdbdc7cbe7e785f27",
+      "report": "run-40273382988.json",
+      "installation": "installation-40273382988.json",
+      "execution": "execution-40273382988.json",
+      "dependency_lock": "../current-stable-20261026/package-lock-005ded4ea9b1.json",
+      "dependency_lock_sha256": "005ded4ea9b1b00d511834d8bba98076d9777fd61cf8e7f1a53f61c11fe1a76b"
+    },
+    {
+      "github_run_id": 40273383038,
+      "study": "SRC-04",
+      "controller_commit": "bab6734236cf4a110fbb773cdbdc7cbe7e785f27",
+      "report": "run-40273383038.json",
+      "installation": "installation-40273383038.json",
+      "execution": "execution-40273383038.json",
+      "dependency_lock": "../current-stable-20261026/package-lock-005ded4ea9b1.json",
+      "dependency_lock_sha256": "005ded4ea9b1b00d511834d8bba98076d9777fd61cf8e7f1a53f61c11fe1a76b"
+    }
+  ],
+  "source_map": "source-map.json",
+  "posthoc_source_map": "posthoc-source-map.json",
+  "method": "Three observed phenomena were traced to exact implementation owners, then tested with four discriminating followups. Harness completion is not a product grade.",
+  "planned_and_observed_units": {
+    "SRC_01": 8,
+    "SRC_02": 8,
+    "SRC_03": 4,
+    "SRC_04": 4
+  },
+  "full_campaign_timeout": {
+    "github_run_id": 40271867863,
+    "whole_run_seconds_limit": 600,
+    "classification": "aggregate campaign time budget exhausted before final report; no product-failure conclusion",
+    "remediation": "Independent hosted study lanes, per-arm checkpoints, bounded one-attempt refusal probes; no individual task timeout was lengthened."
+  },
+  "local_runtime_installation": false,
+  "retention": "Compact observations, hot-stack summaries and source excerpts only; no runtime/DB/image/raw CPU profile retained."
+}

@@ -1,0 +1,165 @@
+{
+  "kind": "post-run-source-inspection",
+  "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+  "selection_basis": "Actual V8 sample stacks and redacted tool-error log observations from the source followup jobs; these lookups were selected after execution, not preregistered causal predictions. The additional MCP lifetime and policy-assembly anchors were inspected after the callback PIDs and excluded-tool controls were reviewed.",
+  "sources": [
+    {
+      "path": "src/infra/boundary-path.ts",
+      "sha256": "7d7928d5063db3c71b5a90c2ec85ad4ab4a776b100ba115f217156358e3e46c8",
+      "anchors": [
+        {
+          "start": 23,
+          "end": 41,
+          "symbol": "identity alias convergence",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/infra/boundary-path.ts#L23-L41",
+          "text": "export function resolveIdentityPathViaExistingAncestorSync(targetPath: string): string {\n  const fallback = path.resolve(targetPath);\n  const missingSegments: string[] = [];\n  let cursor = fallback;\n\n  while (true) {\n    try {\n      // Identity aliases must converge even after an intermediate realpath failure,\n      // or ownership and lock callers can split one resource into separate identities.\n      return path.join(fs.realpathSync.native(cursor), ...missingSegments.toReversed());\n    } catch {\n      const parent = path.dirname(cursor);\n      if (parent === cursor) {\n        return fallback;\n      }\n      missingSegments.push(path.basename(cursor));\n      cursor = parent;\n    }\n  }"
+        }
+      ]
+    },
+    {
+      "path": "src/infra/gateway-state-owner-directory.ts",
+      "sha256": "27f5fc37c02f63814eb858a79547ac3556ee71ae1155ce7b36ceab3c8ae43e08",
+      "anchors": [
+        {
+          "start": 82,
+          "end": 113,
+          "symbol": "canonical resource identity",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/infra/gateway-state-owner-directory.ts#L82-L113",
+          "text": "/** In-process identity is independent of the on-disk lock spelling used by older versions. */\nexport function resolveStateOwnerIdentity(databasePath: string) {\n  const canonicalPath = resolveIdentityPathViaExistingAncestorSync(databasePath);\n  return {\n    canonicalPath,\n    ownerPath: resolveCanonicalStateOwnerPath(canonicalPath),\n    key:\n      process.platform === \"win32\"\n        ? normalizeWindowsPathForComparison(canonicalPath)\n        : canonicalPath,\n  };\n}\n\nfunction resolveCanonicalStateOwnerPath(canonical: string): string {\n  const uid = process.getuid?.();\n  const directory =\n    process.platform === \"win32\"\n      ? path.join(\n          os.homedir(),\n          \"AppData\",\n          \"Local\",\n          \"OpenClaw\",\n          \"locks\",\n          uid === undefined ? \"openclaw-state-owners\" : `openclaw-state-owners-${uid}`,\n        )\n      : resolveGatewayLockDirForCanonicalStateDir(\n          resolveOpenClawStateDirForDatabasePath(canonical),\n        );\n  return path.join(\n    resolveIdentityPathViaExistingAncestorSync(directory),\n    `state.${sha256HexPrefixCore(canonical, 16)}.lock`,\n  );"
+        }
+      ]
+    },
+    {
+      "path": "src/infra/gateway-state-owner.ts",
+      "sha256": "67fa72326bd33435601d12e8d6fb9edf0fa8df675ef5d0db3f49b204bfc35ccb",
+      "anchors": [
+        {
+          "start": 637,
+          "end": 685,
+          "symbol": "fresh read-owner cache",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/infra/gateway-state-owner.ts#L637-L685",
+          "text": "export function assertStateDatabaseReadAllowed(databasePath: string): void {\n  if (owners.size === 0) {\n    assertStateDatabaseAccessAllowed(databasePath);\n    return;\n  }\n  const key = path.resolve(databasePath);\n  const now = performance.now();\n  const cached = readOwnerPaths.get(key);\n  cached?.owner.heartbeat?.inspect();\n  const projection = cached?.owner.getProjection?.();\n  if (\n    cached &&\n    now < cached.expiresAt &&\n    owners.get(cached.pathname) === cached.owner &&\n    cached.owner.accepting &&\n    hasRecentVerification(cached.owner.verifiedAt, now) &&\n    (!cached.owner.getProjection ||\n      (projection && hasRecentVerification(projection.verifiedAt, now)))\n  ) {\n    return;\n  }\n  readOwnerPaths.delete(key);\n  const identity = resolveStateOwnerIdentity(databasePath);\n  const owner = owners.get(identity.key);\n  const role = owner?.payload.role ?? \"gateway\";\n  if (\n    !owner ||\n    owner.kind !== \"process\" ||\n    !owner.accepting ||\n    (role !== \"gateway\" && role !== \"agent-embedded\")\n  ) {\n    // Maintenance/schema authority and foreign owners keep their existing fresh checks.\n    assertStateDatabaseAccessAllowed(databasePath);\n    return;\n  }\n  if (\n    !hasPhysicalOwnership(owner) ||\n    (owner.getProjection && !owner.getProjection()?.verifyStillHeld())\n  ) {\n    throw new Error(\n      `OpenClaw state ownership at ${databasePath} was lost: ${owner.lost.signal.reason ?? \"owner lock was removed or replaced\"}; restart the Gateway.`,\n    );\n  }\n  readOwnerPaths.set(key, {\n    pathname: identity.key,\n    owner,\n    expiresAt: now + READ_OWNERSHIP_MAX_AGE_MS,\n  });\n}"
+        },
+        {
+          "start": 687,
+          "end": 727,
+          "symbol": "maintenance and physical ownership checks",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/infra/gateway-state-owner.ts#L687-L727",
+          "text": "/** Ordinary SQLite access observes maintenance; it never borrows schema authority. */\nexport function assertStateDatabaseAccessAllowed(\n  databasePath: string,\n  captured?: {\n    maintenanceScope?: OpenClawDatabaseMaintenanceScope;\n    schemaLease?: Pick<StateDatabaseSchemaLease, \"assertDatabaseAccess\">;\n  },\n): void {\n  const assertMaintenance = () => {\n    const schemaLease = captured ? captured.schemaLease : getStateDatabaseSchemaLease(databasePath);\n    if (schemaLease) {\n      schemaLease.assertDatabaseAccess(databasePath);\n      return;\n    }\n    const scope = captured ? captured.maintenanceScope : getOpenClawDatabaseMaintenanceScope();\n    if (!scope) {\n      throw new Error(\n        `OpenClaw state at ${databasePath} is undergoing offline maintenance; retry when it finishes.`,\n      );\n    }\n    scope.assertDatabaseAccess(databasePath);\n  };\n  const identity = resolveStateOwnerIdentity(databasePath);\n  const local = owners.get(identity.key);\n  if (local) {\n    if (!hasPhysicalOwnership(local)) {\n      local.lost.signal.throwIfAborted();\n      const lost = `OpenClaw state ownership at ${databasePath} was lost: owner lock was removed or replaced; restart the Gateway.`;\n      throw new Error(lost);\n    }\n    const role = local.payload.role ?? \"gateway\";\n    if (!local.accepting || (role !== \"gateway\" && role !== \"agent-embedded\")) {\n      assertMaintenance();\n    }\n    return;\n  }\n  assertPersistedStateDatabaseAccessAllowed({\n    databasePath,\n    ownerPath: identity.ownerPath,\n    assertMaintenance,\n  });"
+        }
+      ]
+    },
+    {
+      "path": "src/infra/sqlite-worker-operation-admission.ts",
+      "sha256": "482500685dfd4f1a9ff5d6257eef7b13b6ad3f02bdc3d8a888dffc93cba2c7e4",
+      "anchors": [
+        {
+          "start": 330,
+          "end": 373,
+          "symbol": "worker operation authority admission",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/infra/sqlite-worker-operation-admission.ts#L330-L373",
+          "text": "      if (expired()) {\n        return false;\n      }\n      const granted = Atomics.compareExchange(decision, 0, REQUESTED, GRANTED) === REQUESTED;\n      if (granted) {\n        Atomics.notify(decision, 0);\n      }\n      return granted;\n    };\n    let source: AdmissionFailureSource = \"authority\";\n    try {\n      inOwnerContext(() => {\n        databaseAuthority?.assertRequest?.();\n        databaseAuthority?.assertAccess();\n      });\n      if (\n        request.stage === \"prepare\" &&\n        isRecord(request.facts) &&\n        request.facts.kind === \"schema-maintenance\"\n      ) {\n        const authority = databaseAuthority;\n        if (\n          !authority ||\n          typeof request.facts.databasePath !== \"string\" ||\n          resolveIdentityPathViaExistingAncestorSync(request.facts.databasePath) !==\n            authority.databasePath\n        ) {\n          throw new SqliteWorkerError(\n            \"SQLite schema maintenance target differs from its admitted database\",\n            \"closed\",\n          );\n        }\n        inOwnerContext(() => {\n          authority.lease ??= authority.acquireSchema();\n          authority.lease.assertCurrent();\n          grant();\n        });\n      } else {\n        source = \"domain\";\n        inOwnerContext(admit, request, grant);\n      }\n    } catch (error) {\n      refuse(decision, error, source);\n      return;"
+        }
+      ]
+    },
+    {
+      "path": "src/agents/agent-tool-definition-adapter.ts",
+      "sha256": "d747dd670f61e5f81042dcfad163edc3a4f3f0eecd3eae068e314bce717b94c7",
+      "anchors": [
+        {
+          "start": 104,
+          "end": 107,
+          "symbol": "redacted parameter preview",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-tool-definition-adapter.ts#L104-L107",
+          "text": "function formatToolParamPreview(label: string, serialized: string): string {\n  const redacted = redactToolDetail(serialized);\n  const preview = sanitizeForConsole(redacted, TOOL_ERROR_PARAM_PREVIEW_MAX_CHARS) ?? \"<empty>\";\n  return `${label}=${preview}`;"
+        },
+        {
+          "start": 238,
+          "end": 265,
+          "symbol": "exception to tool error result",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-tool-definition-adapter.ts#L238-L265",
+          "text": "    return normalizeToolExecutionResult({\n      toolName: params.normalizedToolName,\n      result: await params.run(),\n    });\n  } catch (err) {\n    if (params.signal?.aborted) {\n      throw err;\n    }\n    const described = describeToolExecutionError(err);\n    if (described.stack && described.stack !== described.message) {\n      logDebug(`tools: ${params.normalizedToolName} failed stack:\\n${described.stack}`);\n    }\n    const inputPreview = describeToolFailureInputs({\n      toolName: params.normalizedToolName,\n      rawParams: params.rawParams,\n      effectiveParams: params.getEffectiveParams(),\n    });\n    const operatorHint = described.operatorHint ? ` ${described.operatorHint}` : \"\";\n    // Operator-only: the hint names containment configuration and stays out of the\n    // model-visible result below.\n    logError(\n      `[tools] ${params.normalizedToolName} failed: ${described.message}${operatorHint} ${inputPreview}`,\n    );\n    const result = buildToolExecutionErrorResult({\n      toolName: params.normalizedToolName,\n      message: described.message,\n    });\n    // Error presentation must preserve private execution and content provenance."
+        }
+      ]
+    },
+    {
+      "path": "src/logging/redact.ts",
+      "sha256": "5f0d8585274a7e12deb92152f3a45c99ece17e65a9f31a383ff143e60f51b411",
+      "anchors": [
+        {
+          "start": 833,
+          "end": 845,
+          "symbol": "forced tools-mode redaction",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/logging/redact.ts#L833-L845",
+          "text": "export function redactToolDetail(detail: string): string {\n  return redactToolPayloadText(detail);\n}\n\nfunction resolveToolPayloadRedaction(\n  loggingConfig: LoggingConfig | undefined = readLoggingConfig(),\n): RedactOptions {\n  const userPatterns = loggingConfig?.redactPatterns;\n  const patterns =\n    userPatterns && userPatterns.length > 0\n      ? [...userPatterns, ...DEFAULT_REDACT_PATTERNS]\n      : undefined;\n  return { mode: \"tools\", patterns };"
+        },
+        {
+          "start": 864,
+          "end": 885,
+          "symbol": "tool payload does not inherit off mode",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/logging/redact.ts#L864-L885",
+          "text": "// Forces tools-mode so UI/tool payloads never inherit a caller-supplied \"off\"\n// mode, and merges user `logging.redactPatterns` with the built-in defaults so\n// both apply.\nexport function redactToolPayloadText(text: string): string {\n  return redactToolPayloadTextWithConfig(text, readLoggingConfig());\n}\n\nfunction redactToolPayloadTextWithPolicy(\n  text: string,\n  loggingConfig: LoggingConfig | undefined,\n  options: RedactOptions,\n): string {\n  if (!text) {\n    return text;\n  }\n  if (!isFullContextToolPayloadRedaction(loggingConfig)) {\n    return redactSensitiveText(text, options);\n  }\n  const resolved = resolveRedactOptions(options);\n  return redactText(redactRegisteredSecretValues(text, maskToken), resolved.patterns, {\n    fullContext: true,\n  });"
+        }
+      ]
+    },
+    {
+      "path": "src/logging/redact-patterns.ts",
+      "sha256": "8b2ca31369e73102309ab2e9457209e17b5c1db455a9daab6d19b13817679bee",
+      "anchors": [
+        {
+          "start": 42,
+          "end": 43,
+          "symbol": "credential-shaped JSON fields",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/logging/redact-patterns.ts#L42-L43",
+          "text": "const STRUCTURED_JSON_SECRET_REDACT_PATTERN = String.raw`\"(?:apiKey|api_key|apiToken|api_token|bearerToken|bearer_token|token|secret|password|passwd|${AWS_SECRET_ACCESS_KEY_FIELD_KEYS}|credential|authorization|proxy-authorization|cookie|set-cookie|x-api-key|x-auth-token|accessToken|access_token|refreshToken|refresh_token|idToken|id_token|authToken|auth_token|clientSecret|client_secret|privateKey|private_key|secret_value|raw_secret|secret_input|key_material)\"\\s*:\\s*\"([^\"]+)\"`;\nconst STRUCTURED_JSON_PAYMENT_REDACT_PATTERN = String.raw`\"(?:${PAYMENT_CREDENTIAL_JSON_KEYS})\"\\s*:\\s*\"([^\"]+)\"`;"
+        },
+        {
+          "start": 350,
+          "end": 355,
+          "symbol": "default field redaction patterns",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/logging/redact-patterns.ts#L350-L355",
+          "text": "const DEFAULT_REDACT_FIELD_PATTERNS: readonly RedactPattern[] = [\n  ENV_ASSIGNMENT_REDACT_PATTERN,\n  ESCAPED_ENV_ASSIGNMENT_REDACT_PATTERN,\n  STRUCTURED_JSON_SECRET_REDACT_PATTERN,\n  STRUCTURED_JSON_PAYMENT_REDACT_PATTERN,\n  AMBIGUOUS_QUOTED_SECRET_FIELD_REDACT_PATTERN,"
+        }
+      ]
+    },
+    {
+      "path": "src/agents/agent-bundle-mcp-manager.ts",
+      "sha256": "787d8e7118850e0c02cede50f0a1680f850b4c966b50e6bda00c15dfa29d7e61",
+      "anchors": [
+        {
+          "start": 205,
+          "end": 221,
+          "symbol": "static runtime acquisition keyed by session ID",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-bundle-mcp-manager.ts#L205-L221",
+          "text": "      const leases: SessionMcpRuntimeLease[] = [];\n      try {\n        const staticLease = leaseRuntime(\n          await install.getOrCreateRuntimeEntry({\n            ...params,\n            runtimeKey: params.sessionId,\n            configReloadAtAdmission,\n            excludeServerNames: new Set(requesterScopedServerNames),\n            safeServerNamesByServer,\n          }),\n          params.sessionId,\n        );\n        leases.push(staticLease);\n        if (requesterScopedServerNames.length === 0) {\n          return staticLease;\n        }\n        const parts = Object.keys(staticServers).length > 0 ? [staticLease.runtime] : [];"
+        }
+      ]
+    },
+    {
+      "path": "src/agents/agent-tools.ts",
+      "sha256": "cfa9930068b6fe1641322bc492e4e5544139876295c751eab019e24e8319d8bd",
+      "anchors": [
+        {
+          "start": 531,
+          "end": 567,
+          "symbol": "authorized tool set assembly",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-tools.ts#L531-L567",
+          "text": "  const declaredToolAllowlist = buildDeclaredToolAllowlistContext({\n    config: options?.config,\n    metadataSnapshot: options?.preparedModelRuntime?.metadataSnapshot,\n    workspaceDir: workspaceRoot,\n    toolDenylist: pluginToolDenylist,\n  });\n  // Sender identity is primarily command/action auth, with one Gateway parity exception:\n  // explicit non-owner callers never receive owner-only control-plane core tools.\n  const subagentFiltered = messageInvocationPolicy.filter(capabilityProfile, onPolicyFilter);\n  // Host-bound ring-zero tools carry their own authority checks. Agent policy\n  // must not deadlock setup, but the tools still receive schema/hook wrappers.\n  const authorizedTools = applySwarmCollectorToolContract(\n    applyDelegationCapability(\n      mergeAgentRingZeroTools(ringZeroTools, subagentFiltered),\n      options?.delegationCapability,\n    ),\n    {\n      swarmCollector: options?.swarmCollector,\n      structuredOutputTool: swarmStructuredOutputTool,\n    },\n  );\n  assertMemoryFlushPersistenceToolAvailable(authorizedTools, options?.memoryFlushTools);\n  authorizedTools.forEach(bindAssembledAgentToolActionDescriptor);\n  if (shouldInheritEffectiveToolAllowlist) {\n    // Snapshot exporter only: this copies authorizedTools for descendants and\n    // never filters the mandatory structured_output tool from this turn.\n    replaceWithEffectiveToolAllowlist(inheritedToolAllowlist, authorizedTools);\n  }\n  replaceWithEffectiveCronCreatorToolAllowlist(cronCreatorToolAllowlist, authorizedTools, (tool) =>\n    getPluginToolMeta(tool),\n  );\n  warnIfMemoryFlushFileWriterUnavailable({\n    tools: authorizedTools,\n    relativePath: memoryFlushWritePath,\n    messageProvider: options?.toolPolicyMessageProvider ?? options?.messageProvider,\n  });\n  options?.recordToolPrepStage?.(\"authorization-policy\");"
+        },
+        {
+          "start": 604,
+          "end": 614,
+          "symbol": "finalize authorized tools",
+          "url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/agent-tools.ts#L604-L614",
+          "text": "  const finalizedTools = finalizeAgentTools({\n    ...options,\n    tools: filterRequesterYieldTools(authorizedTools, executionSessionKey),\n    wrapBeforeToolCallHook: preparedTools\n      ? (tool) =>\n          options?.wrapBeforeToolCallHook !== false &&\n          !preparedTools.some((prepared) => prepared.name === tool.name)\n      : options?.wrapBeforeToolCallHook,\n    hookContext,\n    ...(options?.swarmCollector ? { approvalMode: \"deny\" as const } : {}),\n  });"
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "A frame appearing in sparse CPU samples does not establish its dominant cost or prove that removing a guard is safe.",
+    "An error preview can redact arguments without implying that all authorized native trace/export surfaces omit them."
+  ],
+  "upstream_license": "MIT",
+  "license_url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/LICENSE"
+}

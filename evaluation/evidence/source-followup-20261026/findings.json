@@ -1,0 +1,131 @@
+{
+  "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+  "findings": [
+    {
+      "id": "F01a",
+      "status": "mechanism-confirmed-for-tested-protocol",
+      "observation": "The initial fixed discovery strategy used four model requests per completed task.",
+      "source": [
+        "src/agents/tool-search-runtime.ts:81-109",
+        "src/agents/tool-search-runtime.ts:313-320"
+      ],
+      "test": "SRC-01 discover-small versus known-small",
+      "result": "32 versus 16 requests for eight tasks in each block, with correct effects retained.",
+      "interpretation": "Avoidable fixture/provider strategy overhead, not a mandatory Tool Search round-trip tax.",
+      "cross_dimensions": {
+        "performance": "No universal latency/CPU gain inferred.",
+        "resources_cost": "Request and wire-volume reduction measured; tokens/USD unknown.",
+        "reliability": "All controlled tasks retained exact receipts.",
+        "security": "Excluded registered tool produced no effect.",
+        "extensibility": "Known-name public catalog dispatch remains usable.",
+        "observability": "Native receipts and independent requests were correlated."
+      },
+      "unresolved": [
+        "Actual model ability to discover correct names and arguments without extra turns."
+      ]
+    },
+    {
+      "id": "F01b",
+      "status": "context-footprint-benefit-measured",
+      "observation": "A 64-tool catalog can keep full schemas deferred.",
+      "source": [
+        "src/agents/tool-search-config.ts:12-21",
+        "src/agents/tool-search-catalog.ts:398-421",
+        "VISION.md:71-94"
+      ],
+      "test": "SRC-01 known-large versus direct-large",
+      "result": {
+        "payload_reduction_fraction": 0.7079504594486616,
+        "schema_reduction_fraction": 0.9544829955341807,
+        "model_requests_each": 16
+      },
+      "interpretation": "A measured context/wire-footprint benefit supports the extensibility/per-call-context design. CPU and throughput changed direction between blocks, so a necessary performance sacrifice is not established.",
+      "unresolved": [
+        "Actual token charges, model quality and general CPU/latency equivalence."
+      ]
+    },
+    {
+      "id": "F02",
+      "status": "workload-dependent-concurrency-mechanism-supported",
+      "observation": "Global overlap increased while short-task goodput did not scale proportionally.",
+      "source": [
+        "src/gateway/server-lanes.ts:26-35",
+        "src/agents/embedded-agent-runner/run-orchestrator.ts:160-195",
+        "src/process/command-queue.ts:343-389"
+      ],
+      "test": "SRC-02 cap 1/4 crossed with 150/1500 ms independent effects",
+      "result": "Long-wait goodput improved about 2.52x in both paired blocks; short-wait improvements were about 1.16x/1.47x. Callback PIDs matched the Gateway inspector owner and were on its main thread.",
+      "interpretation": "The knob admits concurrent asynchronous runs; it does not create four JavaScript execution threads. The benefit grows when independent waiting can overlap.",
+      "unresolved": [
+        "Unique residual short-task bottleneck; worker CPU versus main-thread bookkeeping; same-session ordering ablation."
+      ]
+    },
+    {
+      "id": "F03",
+      "status": "fault-and-authority-boundaries-distinguished",
+      "observation": "Code plugin termination affected the Gateway while a tool-process termination did not.",
+      "source": [
+        "src/plugins/registry-registrars-tools-hooks.ts:220-267",
+        "src/plugins/plugin-instance.ts:361-415",
+        "src/agents/agent-tool-definition-adapter.ts:238-265",
+        "src/agents/agent-bundle-mcp-manager.ts:205-221",
+        "VISION.md:86-94"
+      ],
+      "test": "SRC-03 ordinary throw, explicit exit, callback identity and owned-file authority",
+      "result": "All four throw probes preserved the original Gateway owner and successful independent requests. Native plugin callbacks matched the Gateway PID/main thread; external MCP callbacks had different PIDs but the same UID and could read the same explicitly accessible canary.",
+      "interpretation": "Logical lifecycle scope and ordinary error conversion are not a process/OS permission boundary. Deep code extension and a shared termination/authority domain are structurally coupled; their overall net value is not scored.",
+      "unresolved": [
+        "One native exit fast-poll was transitional: availability failed although immediate process polling still said live. The raw field is retained. A passive settlement observation was added for future runs.",
+        "Pure IPC overhead and net extension benefit are not isolated.",
+        "Every request in this experiment used a fresh session; source MCP runtime acquisition is session-keyed, so lifecycle costs also differ."
+      ]
+    },
+    {
+      "id": "F04",
+      "status": "tested-deployment-contract-boundary-confirmed",
+      "observation": "Session scope separated the working directory.",
+      "source": [
+        "src/agents/sandbox/shared.ts:55-88",
+        "src/agents/sandbox/remote-shell-backend.ts:436-447",
+        "src/agents/sandbox/ssh.ts:101-128",
+        "src/agents/sandbox/remote-shell-command.ts:171-195"
+      ],
+      "test": "SRC-04 relative lookup versus explicit owned sibling path under one SSH principal",
+      "result": "Relative canary lookup differed by scope; the explicit sibling read returned readable=true in all four arms.",
+      "interpretation": "Workspace identity and remote OS identity are different owners. This root-SSH deployment does not become an OS jail by changing scope; this is not a claim that OpenClaw promised hostile-tenant isolation or that Docker behaves the same.",
+      "unresolved": [
+        "Independent OS-user/container backends and their isolation/resource costs."
+      ]
+    },
+    {
+      "id": "F05",
+      "status": "posthoc-source-explained-observation",
+      "observation": "Native tool-error previews replaced the synthetic token argument with ***.",
+      "source": [
+        "src/agents/agent-tool-definition-adapter.ts:104-107",
+        "src/logging/redact.ts:833-845",
+        "src/logging/redact.ts:864-885",
+        "src/logging/redact-patterns.ts:42-43"
+      ],
+      "test": "Existing SRC-03 error logs, followed by exact-source inspection; no new runtime intervention is claimed.",
+      "result": "The error adapter deliberately redacts previews; tools-mode defaults include credential-shaped JSON keys such as token.",
+      "interpretation": "Credential-protection policy intentionally limits raw argument visibility in this log surface. It can also mask a benign correlation value. This does not prove full privacy protection or missing data in every authorized trace/export surface.",
+      "unresolved": [
+        "Blind diagnosis accuracy, public trace/export accessibility and adversarial secret leakage."
+      ]
+    },
+    {
+      "id": "F06",
+      "status": "sampled-source-candidate-not-a-proven-bottleneck",
+      "observation": "Path/ownership, worker-admission and redaction functions appeared in retained V8 sample stacks.",
+      "source": [
+        "src/infra/boundary-path.ts:23-41",
+        "src/infra/gateway-state-owner.ts:637-727",
+        "src/infra/sqlite-worker-operation-admission.ts:330-373"
+      ],
+      "result": "Source guards canonicalize aliases, enforce current ownership/maintenance access, and already contain freshness/heartbeat-conditioned read caching.",
+      "interpretation": "These are real consistency/privacy responsibilities, but sparse samples do not establish dominant cost or prove that removing a guard is a valid optimization.",
+      "next_discriminating_test": "Use owned state only: compare stable-path/cache behavior with controlled alias or owner-lock replacement, preserving task correctness and recording refusals. Any guard bypass must be a separately labeled private counterfactual, not the product baseline."
+    }
+  ]
+}

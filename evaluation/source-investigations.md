@@ -2,6 +2,8 @@
 
 The unit of work is a surprising observation and its explanation, not a count of passing test groups. The [investigation registry](design/source-investigations.json) binds observations, alternative explanations, source owners, counterevidence and targeted followups to the exact campaign commit. Source hashes are checked before excerpts enter an evidence artifact. The previous three pilots are starting evidence, not the completion criterion.
 
+The [completed source review](evidence/source-followup-20261026/README.md) contains the discriminating results, corrected attributions, joint six-axis interpretation and explicitly unresolved hypotheses. The registry below preserves predictions made before that execution rather than silently rewriting them to fit the results.
+
 ## Implementation ownership map
 
 ```mermaid

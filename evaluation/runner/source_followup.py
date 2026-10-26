@@ -97,6 +97,14 @@ def compact_request(request):
     return {key:value for key,value in request.items() if key!='response_excerpt'}
 
 
+def observe_natural_exit(process,timeout=1):
+    """Wait without signalling: a fast poll can still see an owner finishing exit."""
+    try:
+        return process.wait(timeout=timeout)
+    except subprocess.TimeoutExpired:
+        return None
+
+
 def checkpoint(study,arm,planned):
     print(json.dumps(dict(kind='arm-checkpoint',product='openclaw',study=study,planned_arms=planned,arm=arm),ensure_ascii=False,separators=(',',':')),flush=True)
 
@@ -214,6 +222,7 @@ def failure_study(pilot,fixture,blocks):
                 after_throw=gateway.request(f'PILOT_PLAIN_THROW_B{block}_{route.upper()}')
                 owner_after_throw=listener_owner() if gateway.process.poll() is None else None
                 crashed=gateway.request(f'PILOT_CRASH_B{block}_{route.upper()}') if owner_after_throw else dict(accepted=False,not_run='Gateway ended after throw')
+                natural_exit=observe_natural_exit(gateway.process)
                 after_crash=gateway.request(f'PILOT_PLAIN_CRASH_B{block}_{route.upper()}') if gateway.process.poll() is None else None
                 alive=gateway.process.poll() is None
                 events=fixture.events[start:]
@@ -226,6 +235,7 @@ def failure_study(pilot,fixture,blocks):
                     throw_response=thrown,neighbor_after_throw=compact_request(after_throw),owner_after_throw=owner_after_throw,
                     crash_response=compact_request(crashed),neighbor_after_crash=compact_request(after_crash) if after_crash else None,
                     gateway_alive_after_crash=alive,gateway_exit_code=gateway.process.poll(),
+                    natural_exit_code=natural_exit,natural_settlement_window_seconds=1,
                     throw_markers=throw_events,crash_markers=crash_events,resources=gateway.sampler.summary(),
                     native_log_tail=list(gateway.log_tail)[-8:],
                     valid=bool(canary_entered) and bool(throw_events)

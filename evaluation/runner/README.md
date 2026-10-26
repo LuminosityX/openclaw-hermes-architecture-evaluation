@@ -2,6 +2,8 @@
 
 This is an actual OpenClaw Gateway adapter for the three first-wave exploratory studies, using a deterministic local provider and real native tool execution. It does not implement the complete 60-family suite or validate real-model task quality. The plan-selection tools remain offline; this runner requires an explicit runtime and output path.
 
+The [source-directed followups](../source-investigations.md) add `SRC-01` through `SRC-04`: discovery strategy/schema footprint, wait-dependent admission with main-thread diagnostics, exception/termination/UID boundaries, and relative versus explicit SSH paths. Completed arms emit small checkpoints so an outer failure can retain evidence. A valid measurement can contain a product counterexample; source followups keep control validity separate from task-contract and excluded-operation outcomes.
+
 By default the supplied installation must match the exact [current stable campaign](../current-version.md) version and release commit. A mismatched historical runtime requires `--allow-historical-bootstrap` and produces a bootstrap-only label. Use the hosted workflow when the new release would require another local installation.
 
 ## Storage and host limits

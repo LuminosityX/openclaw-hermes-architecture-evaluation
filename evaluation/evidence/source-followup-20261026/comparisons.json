@@ -1,0 +1,380 @@
+{
+  "catalog": [
+    {
+      "block": 0,
+      "requests_discovery": 32,
+      "requests_known": 16,
+      "full_payload_known_catalog_64": 292400,
+      "full_payload_direct_schema_64": 1001200,
+      "payload_reduction_fraction": 0.7079504594486616,
+      "schema_reduction_fraction": 0.9544829955341807,
+      "model_calls_known_catalog_64": 16,
+      "model_calls_direct_schema_64": 16,
+      "known_catalog_goodput": 1.4082963576718885,
+      "direct_schema_goodput": 1.6364372843723927,
+      "known_catalog_batch_cpu_user": 8.690000000000001,
+      "direct_schema_batch_cpu_user": 7.190000000000001
+    },
+    {
+      "block": 1,
+      "requests_discovery": 32,
+      "requests_known": 16,
+      "full_payload_known_catalog_64": 292400,
+      "full_payload_direct_schema_64": 1001200,
+      "payload_reduction_fraction": 0.7079504594486616,
+      "schema_reduction_fraction": 0.9544829955341807,
+      "model_calls_known_catalog_64": 16,
+      "model_calls_direct_schema_64": 16,
+      "known_catalog_goodput": 1.822850636216537,
+      "direct_schema_goodput": 1.5706772519329077,
+      "known_catalog_batch_cpu_user": 6.390000000000004,
+      "direct_schema_batch_cpu_user": 7.510000000000005
+    }
+  ],
+  "scheduling": [
+    {
+      "block": 0,
+      "condition": {
+        "label": "short-c1",
+        "cap": 1,
+        "delay": 150
+      },
+      "goodput": 1.5975092992888429,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 1,
+      "batch_cpu_user": 5.129999999999999,
+      "main_thread_idle_sample_fraction": 0.3710777626193724,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 0,
+      "condition": {
+        "label": "short-c4",
+        "cap": 4,
+        "delay": 150
+      },
+      "goodput": 1.8542096309105185,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 3,
+      "batch_cpu_user": 6.4999999999999964,
+      "main_thread_idle_sample_fraction": 0.12335475971839609,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 0,
+      "condition": {
+        "label": "long-c1",
+        "cap": 1,
+        "delay": 1500
+      },
+      "goodput": 0.501517500114955,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 1,
+      "batch_cpu_user": 6.660000000000004,
+      "main_thread_idle_sample_fraction": 0.7814079047553125,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 0,
+      "condition": {
+        "label": "long-c4",
+        "cap": 4,
+        "delay": 1500
+      },
+      "goodput": 1.265085953111856,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 4,
+      "batch_cpu_user": 6.659999999999997,
+      "main_thread_idle_sample_fraction": 0.4559653744824991,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 1,
+      "condition": {
+        "label": "long-c4",
+        "cap": 4,
+        "delay": 1500
+      },
+      "goodput": 1.2555882730155903,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 4,
+      "batch_cpu_user": 5.439999999999998,
+      "main_thread_idle_sample_fraction": 0.4840303511558144,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 1,
+      "condition": {
+        "label": "long-c1",
+        "cap": 1,
+        "delay": 1500
+      },
+      "goodput": 0.49856379170997644,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 1,
+      "batch_cpu_user": 6.7599999999999945,
+      "main_thread_idle_sample_fraction": 0.7793388429752066,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 1,
+      "condition": {
+        "label": "short-c4",
+        "cap": 4,
+        "delay": 150
+      },
+      "goodput": 2.272371985430699,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 3,
+      "batch_cpu_user": 4.890000000000001,
+      "main_thread_idle_sample_fraction": 0.10551075268817205,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    },
+    {
+      "block": 1,
+      "condition": {
+        "label": "short-c1",
+        "cap": 1,
+        "delay": 150
+      },
+      "goodput": 1.5413644580246533,
+      "accepted": 8,
+      "model_calls": 16,
+      "actual_overlap": 1,
+      "batch_cpu_user": 5.420000000000002,
+      "main_thread_idle_sample_fraction": 0.36735611510791366,
+      "callbacks_match_gateway_inspector_pid": true,
+      "callbacks_on_main_thread": true
+    }
+  ],
+  "excluded_tool_controls": [
+    {
+      "study": "SRC-01",
+      "block": 0,
+      "condition": "discover-small",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 0,
+      "condition": "known-small",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 0,
+      "condition": "known-large",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 0,
+      "condition": "direct-large",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 1,
+      "condition": "direct-large",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 1,
+      "condition": "known-large",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 1,
+      "condition": "known-small",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-01",
+      "block": 1,
+      "condition": "discover-small",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 0,
+      "condition": "short-c1",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 0,
+      "condition": "short-c4",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 0,
+      "condition": "long-c1",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 0,
+      "condition": "long-c4",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 1,
+      "condition": "long-c4",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 1,
+      "condition": "long-c1",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 1,
+      "condition": "short-c4",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    },
+    {
+      "study": "SRC-02",
+      "block": 1,
+      "condition": "short-c1",
+      "rejected_without_effect": true,
+      "effect_count": 0
+    }
+  ],
+  "fault_boundary": [
+    {
+      "block": 0,
+      "route": "plugin",
+      "gateway_owner_pid": 4,
+      "owner_after_throw": 4,
+      "neighbor_after_throw_ok": true,
+      "canary": [
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 90976941882,
+          "token": "PILOT_CANARY_B0_PLUGIN",
+          "pid": 4,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0,
+          "canary_readable": true
+        }
+      ],
+      "throw_entries": 1,
+      "crash_entries": 1,
+      "immediate_process_poll_alive": false,
+      "immediate_exit_code": 42,
+      "independent_request_after_exit_ok": false,
+      "log_preview_masks_token": true
+    },
+    {
+      "block": 0,
+      "route": "mcp",
+      "gateway_owner_pid": 107,
+      "owner_after_throw": 107,
+      "neighbor_after_throw_ok": true,
+      "canary": [
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 114815907427,
+          "token": "PILOT_CANARY_B0_MCP",
+          "pid": 216,
+          "uid": 0,
+          "is_main_thread": false,
+          "thread_id": 140345879123648,
+          "canary_readable": true
+        }
+      ],
+      "throw_entries": 1,
+      "crash_entries": 1,
+      "immediate_process_poll_alive": true,
+      "immediate_exit_code": null,
+      "independent_request_after_exit_ok": true,
+      "log_preview_masks_token": true
+    },
+    {
+      "block": 1,
+      "route": "mcp",
+      "gateway_owner_pid": 267,
+      "owner_after_throw": 267,
+      "neighbor_after_throw_ok": true,
+      "canary": [
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 140915794661,
+          "token": "PILOT_CANARY_B1_MCP",
+          "pid": 376,
+          "uid": 0,
+          "is_main_thread": false,
+          "thread_id": 139936561886912,
+          "canary_readable": true
+        }
+      ],
+      "throw_entries": 1,
+      "crash_entries": 1,
+      "immediate_process_poll_alive": true,
+      "immediate_exit_code": null,
+      "independent_request_after_exit_ok": true,
+      "log_preview_masks_token": true
+    },
+    {
+      "block": 1,
+      "route": "plugin",
+      "gateway_owner_pid": 427,
+      "owner_after_throw": 427,
+      "neighbor_after_throw_ok": true,
+      "canary": [
+        {
+          "kind": "effect-start",
+          "monotonic_ns": 167264938593,
+          "token": "PILOT_CANARY_B1_PLUGIN",
+          "pid": 427,
+          "uid": 0,
+          "is_main_thread": true,
+          "thread_id": 0,
+          "canary_readable": true
+        }
+      ],
+      "throw_entries": 1,
+      "crash_entries": 1,
+      "immediate_process_poll_alive": true,
+      "immediate_exit_code": null,
+      "independent_request_after_exit_ok": false,
+      "log_preview_masks_token": true
+    }
+  ]
+}
