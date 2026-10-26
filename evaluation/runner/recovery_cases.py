@@ -16,6 +16,13 @@ import service_path_cases as service
 SCENARIOS={f'REL-04-S{i:02}':name for i,name in enumerate(['plugin-exit','worker-exit','gateway-restart','operator-confirmation'],1)}
 
 
+def pending_admission(result,native_log,provider_seen,effect_count):
+    """Retry only an independently undispatched startup-admission rejection."""
+    return (result.get('status')==500 and not provider_seen and not effect_count
+        and 'AgentDatabaseAdmissionError' in native_log
+        and 'has not completed startup inspection and preparation' in native_log)
+
+
 def configure(root,mode):
     config=service.configure(root)
     if mode=='plugin-exit':
@@ -108,9 +115,18 @@ def run_scenario(root,scenario,unit=1):
             metadata['automatic_supervisor_configured']=False
             metadata['pre-restart-native_tail']=''.join(gateway.log_tail)[-4000:]
             gateway.stop();start=time.monotonic_ns();gateway=pilot.Gateway(root,configurer=service.reuse);gateway.ready()
-            after=token+'_RECOVERED';fixture.register(after);recovered=request(after,session=token.lower())
+            after=token+'_RECOVERED';fixture.register(after)
+            deadline=time.monotonic()+30;attempts=[]
+            while True:
+                recovered=request(after,session=token.lower())
+                attempts.append(dict(status=recovered.get('status'),accepted=recovered['accepted'],monotonic_ns=time.monotonic_ns()))
+                provider_seen=any(e.get('token')==after and 'provider' in e['kind'] for e in fixture.events)
+                if not pending_admission(recovered,''.join(gateway.log_tail),provider_seen,fixture.receipts.get(after,0)) or time.monotonic()>=deadline:break
+                time.sleep(.5)
             check('native-service-usable-after-explicit-restart',recovered['accepted'] and fixture.receipts.get(after)==1)
             metadata.update(recovery_wall_ms=(time.monotonic_ns()-start)/1e6,logical_operator_interventions=1,
+                recovery_admission_attempts=attempts,recovery_admission_deadline_seconds=30,
+                recovery_retry_scope='Evaluator retries only HTTP 500 while native logs explicitly report pending database admission and independent provider/effect ledgers show no dispatch. Early rejection remains observed; no ambiguous or executed call is replayed.',
                 interrupted_effect_count=fixture.receipts.get(token,0),
                 recovery_scope='Bare native Gateway run, no systemd/container supervisor. Explicit process restart is an operator action; subsequent session handling remains native.')
         healthy=token+'_HEALTHY';fixture.register(healthy);health=request(healthy)

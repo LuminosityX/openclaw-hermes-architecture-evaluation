@@ -116,6 +116,25 @@
       "correction": "Run native staged restore for every scenario, classify no publication / explicitly rejected partial / independently consistent complete publication, and rerun only S02-S04 after calibration.",
       "repair_run_id": "40312921492",
       "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40315477743",
+      "controller_commit": "d1ceeaaa716057bf52b43e072680b88c1ad12741",
+      "scenarios": [
+        "REL-04-S01",
+        "REL-04-S03"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "recovery-scored-before-native-database-admission",
+      "reason": "Development diagnostic run 40317554509 shows that the first recovery requests received HTTP 500 AgentDatabaseAdmissionError explicitly reporting pending background startup inspection. The evaluator immediately stopped the process, before the native background recovery could finish. This does not establish failure to recover within a bounded deadline. Early task-readiness rejections remain observed evidence.",
+      "preservation": "Original compact records and manifest are preserved under quarantined-results; hosted artifacts remain unchanged. S02 and S04 remain accepted.",
+      "correction": "Allow at most 30 seconds of evaluator polling only for independently undispatched HTTP 500 admission rejections; do not replay ambiguous or executed work. Preserve all admission attempts and native tails. Recalibrate the family and rerun only S01/S03.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
     }
   ]
 }
