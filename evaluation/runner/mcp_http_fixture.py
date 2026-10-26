@@ -21,11 +21,11 @@ def content_result(token,format='text'):
 
 
 class McpHTTPFixture:
-    def __init__(self,transport='streamable-http'):
+    def __init__(self,transport='streamable-http',port=18085):
         self.transport=transport;self.events=[];self.sessions={};self.tasks={};self.calls={};self.receipts={}
         self.lock=threading.Lock();self.stop=threading.Event();self.release=threading.Event();self.release.set()
         self.expire_on_tokens=set()
-        self.server=ThreadingHTTPServer(('127.0.0.1',18085),self.handler());self.server.daemon_threads=True
+        self.server=ThreadingHTTPServer(('127.0.0.1',port),self.handler());self.server.daemon_threads=True
         threading.Thread(target=self.server.serve_forever,daemon=True).start()
 
     def event(self,kind,**values):
