@@ -1,6 +1,7 @@
 """Owned stdio MCP fixture; same receipt effect as the in-process probe."""
 
 from concurrent.futures import ThreadPoolExecutor
+from pathlib import Path
 import json
 import os
 import sys
@@ -30,14 +31,23 @@ def respond(request):
             inputSchema=dict(type='object',properties=dict(token=dict(type='string'),action=dict(type='string')),required=['token']))])
     elif method=='tools/call':
         args=params['arguments']
-        if args.get('action') in {'block','crash'}:
+        if args.get('action')=='canary':
+            post('/fault',dict(token=args['token'],action='canary',pid=os.getpid(),uid=os.getuid()))
+        if args.get('action') in {'block','crash','throw'}:
             post('/fault',dict(token=args['token'],action=args['action'],pid=os.getpid()))
             if args['action']=='crash':
                 os._exit(42)
+            if args['action']=='throw':
+                with WRITE:
+                    print(json.dumps(dict(jsonrpc='2.0',id=request['id'],error=dict(code=-32000,message='SOURCE_FOLLOWUP_THROW'))),flush=True)
+                return
             until=time.monotonic()+.6
             while time.monotonic()<until:
                 pass
-        receipt=post('/effect',dict(token=args['token']))
+        metadata=dict(pid=os.getpid(),uid=os.getuid(),is_main_thread=threading.current_thread() is threading.main_thread(),thread_id=threading.get_ident())
+        if args.get('action')=='canary':
+            metadata['canary_readable']=Path('/scratch/source-owned-canary').read_text()=='SYNTHETIC_SOURCE_CANARY'
+        receipt=post('/effect',dict(token=args['token'],**metadata))
         result=dict(content=[dict(type='text',text=json.dumps(receipt))],isError=False)
     else:
         with WRITE:

@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "product": "openclaw",
+  "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+  "source_base_url": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/",
+  "sources": [
+    {
+      "id": "S01",
+      "path": "src/gateway/server-lanes.ts",
+      "sha256": "62e60e3952568b9944a8c56afbf36cca3e199cae95c420a9b67105d3548931af",
+      "anchors": [
+        {
+          "start": 26,
+          "end": 35,
+          "symbol": "resolveGatewayLaneConcurrency"
+        },
+        {
+          "start": 75,
+          "end": 83,
+          "symbol": "applyGatewayLaneConcurrency"
+        }
+      ]
+    },
+    {
+      "id": "S02",
+      "path": "src/agents/embedded-agent-runner/run-orchestrator.ts",
+      "sha256": "de450a9a91ab406ac33c932941edd38390b539e623dbdbfd58f480c99decd49c",
+      "anchors": [
+        {
+          "start": 160,
+          "end": 195,
+          "symbol": "session/global lane ownership"
+        },
+        {
+          "start": 210,
+          "end": 229,
+          "symbol": "global admission after session maintenance"
+        },
+        {
+          "start": 717,
+          "end": 733,
+          "symbol": "outer session admission"
+        }
+      ]
+    },
+    {
+      "id": "S03",
+      "path": "src/agents/embedded-agent-runner/run/lane-controller.ts",
+      "sha256": "618fb905f8fe5d18e6ffffa497fcfb8215af8201a0ccb4563034ef300798c4ef",
+      "anchors": [
+        {
+          "start": 275,
+          "end": 292,
+          "symbol": "enqueueCommandInLane adapter"
+        },
+        {
+          "start": 380,
+          "end": 446,
+          "symbol": "global and session admission"
+        }
+      ]
+    },
+    {
+      "id": "S04",
+      "path": "src/process/command-queue.ts",
+      "sha256": "a0649c9e0828bfca34637287601bc0f72eaa5379af195b513af0ce0deb9c97f5",
+      "anchors": [
+        {
+          "start": 343,
+          "end": 389,
+          "symbol": "async task admission and slot release"
+        }
+      ]
+    },
+    {
+      "id": "S05",
+      "path": "src/agents/tool-search-config.ts",
+      "sha256": "2d96c8239d191673a644e886480ac35490096de1c949b5d7e6a384a7a2a66369",
+      "anchors": [
+        {
+          "start": 12,
+          "end": 21,
+          "symbol": "default enabled and explicit false"
+        }
+      ]
+    },
+    {
+      "id": "S06",
+      "path": "src/agents/tool-search-runtime.ts",
+      "sha256": "c98b9c0597cfe53de9d07d4ca0b637ccb341e91aaf365726bf4084c23df69047",
+      "anchors": [
+        {
+          "start": 81,
+          "end": 109,
+          "symbol": "findEntry id-or-name"
+        },
+        {
+          "start": 313,
+          "end": 320,
+          "symbol": "call without search/describe"
+        },
+        {
+          "start": 419,
+          "end": 430,
+          "symbol": "direct executable invocation"
+        },
+        {
+          "start": 519,
+          "end": 547,
+          "symbol": "validation and result acceptance"
+        }
+      ]
+    },
+    {
+      "id": "S07",
+      "path": "src/plugins/loader-runtime-candidate.ts",
+      "sha256": "0404abbb028a2f8cbcd03c112e08a077758393f3dbbc60f328085b16ae2214e7",
+      "anchors": [
+        {
+          "start": 593,
+          "end": 625,
+          "symbol": "register on PluginInstance"
+        }
+      ]
+    },
+    {
+      "id": "S08",
+      "path": "src/plugins/plugin-instance.ts",
+      "sha256": "7892336dcf4e5f21c0012987a7544e28428a030806fafe00ec2aaa2afa86225c",
+      "anchors": [
+        {
+          "start": 161,
+          "end": 174,
+          "symbol": "run"
+        },
+        {
+          "start": 361,
+          "end": 415,
+          "symbol": "invoke"
+        },
+        {
+          "start": 419,
+          "end": 429,
+          "symbol": "async invocation scope"
+        }
+      ]
+    },
+    {
+      "id": "S09",
+      "path": "src/plugins/registry-registrars-tools-hooks.ts",
+      "sha256": "94a0fd3c81f677da510e3b451b870e1dea1cc1391624eaf24357743c7404e79c",
+      "anchors": [
+        {
+          "start": 220,
+          "end": 267,
+          "symbol": "registerTool factory"
+        }
+      ]
+    },
+    {
+      "id": "S10",
+      "path": "src/agents/agent-tools.before-tool-call.wrapper.ts",
+      "sha256": "677fe716e438278e84ef18ea3f4108b88f2b694596e97469fce93f28b98b470a",
+      "anchors": [
+        {
+          "start": 573,
+          "end": 603,
+          "symbol": "error observation and rethrow"
+        },
+        {
+          "start": 624,
+          "end": 648,
+          "symbol": "prepared execute and dispose"
+        }
+      ]
+    },
+    {
+      "id": "S11",
+      "path": "src/agents/sandbox/shared.ts",
+      "sha256": "d32fcdf0acf8bb775a6c3880bdac659e3df3b9d250cad86349a4d7dbb83a2cff",
+      "anchors": [
+        {
+          "start": 55,
+          "end": 88,
+          "symbol": "resolveSandboxScopeKey"
+        }
+      ]
+    },
+    {
+      "id": "S12",
+      "path": "src/agents/sandbox/remote-shell-backend.ts",
+      "sha256": "c229a38def6ac8470edc46c05f2b19fb148367583f7007d453ff12f59384bb09",
+      "anchors": [
+        {
+          "start": 97,
+          "end": 116,
+          "symbol": "exec command in selected workspace"
+        },
+        {
+          "start": 436,
+          "end": 447,
+          "symbol": "resolveRemoteShellRuntimePaths"
+        }
+      ]
+    },
+    {
+      "id": "S13",
+      "path": "src/agents/sandbox/remote-shell-command.ts",
+      "sha256": "d491d2305b4bfafc620525b16a6701894dc3dc4f0dccea356adc7148318fabe9",
+      "anchors": [
+        {
+          "start": 171,
+          "end": 195,
+          "symbol": "cd plus shell command"
+        }
+      ]
+    },
+    {
+      "id": "S14",
+      "path": "src/agents/sandbox/ssh.ts",
+      "sha256": "96e248799ba91d67ab9d869d3072b02c94176321cd7381e16b1d2d75cab248b6",
+      "anchors": [
+        {
+          "start": 101,
+          "end": 128,
+          "symbol": "SSH target/user/identity"
+        },
+        {
+          "start": 138,
+          "end": 152,
+          "symbol": "same SSH command boundary"
+        }
+      ]
+    },
+    {
+      "id": "S15",
+      "path": "VISION.md",
+      "sha256": "46e253fa54a37082efa9d5df10cc77e6e156e92fe40bc3a9cf9215c68befc910",
+      "anchors": [
+        {
+          "start": 54,
+          "end": 57,
+          "symbol": "documented security/capability objective"
+        },
+        {
+          "start": 71,
+          "end": 94,
+          "symbol": "documented core per-call tax and plugin surfaces"
+        }
+      ]
+    }
+  ],
+  "investigations": [
+    {
+      "id": "F01",
+      "phenomenon": "Cap 4 produced overlapping effects but no stable short-task goodput gain.",
+      "prior_study": "ARC-01",
+      "source_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06"
+      ],
+      "followups": [
+        "SRC-01",
+        "SRC-02"
+      ],
+      "source_fact": "Lane admission counts asynchronous work; catalog call resolves an exact ID or an unambiguous name without a mandatory prior search/describe.",
+      "hypotheses": [
+        "The fixture's forced discovery adds model turns that are not an architectural minimum.",
+        "Scheduling benefits depend on the balance of main-thread work and asynchronous tool waiting."
+      ],
+      "falsifiers": [
+        "Known-name invocation still requires discovery or loses effects.",
+        "Longer independent waiting never realizes concurrency, or profiles contradict the proposed CPU path."
+      ],
+      "dimensions": [
+        "reliability",
+        "security",
+        "performance",
+        "resources_cost",
+        "extensibility",
+        "observability"
+      ],
+      "status": "source-bound-followup-required"
+    },
+    {
+      "id": "F02",
+      "phenomenon": "A code plugin exit ended the Gateway, while a failed external process did not.",
+      "prior_study": "ARC-02",
+      "source_ids": [
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S15"
+      ],
+      "followups": [
+        "SRC-03"
+      ],
+      "source_fact": "PluginInstance owns logical invocation/lifecycle scope; registered executable callbacks are invoked in-process. Error wrappers handle JavaScript failures and do not create an OS process boundary.",
+      "hypotheses": [
+        "Ordinary throw is propagated as task/tool error without the same process-wide failure as exit.",
+        "IPC process separation changes termination containment but does not automatically change UID or filesystem authority."
+      ],
+      "falsifiers": [
+        "A normal throw consistently ends the Gateway through the same execution path.",
+        "The owned external process is denied an explicitly readable canary despite sharing the same grants, requiring a different authority explanation."
+      ],
+      "dimensions": [
+        "reliability",
+        "security",
+        "performance",
+        "resources_cost",
+        "extensibility",
+        "observability"
+      ],
+      "status": "source-bound-followup-required"
+    },
+    {
+      "id": "F03",
+      "phenomenon": "Agent scope reused a directory; session scope selected another directory.",
+      "prior_study": "ARC-03",
+      "source_ids": [
+        "S11",
+        "S12",
+        "S13",
+        "S14"
+      ],
+      "followups": [
+        "SRC-04"
+      ],
+      "source_fact": "Scope changes the workspace-qualified runtime key and remote path. SSH transport uses its configured target and identity; command wrapping selects a working directory.",
+      "hypotheses": [
+        "Session scope avoids accidental relative-path state reuse but is not a distinct OS principal in the tested SSH deployment."
+      ],
+      "falsifiers": [
+        "An explicit owned sibling-file read is rejected by a native boundary beyond working-directory selection."
+      ],
+      "dimensions": [
+        "reliability",
+        "security",
+        "performance",
+        "resources_cost",
+        "extensibility",
+        "observability"
+      ],
+      "status": "source-bound-followup-required"
+    }
+  ]
+}

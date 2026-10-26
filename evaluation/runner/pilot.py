@@ -27,6 +27,8 @@ TOKEN = 'synthetic-isolated-pilot-token'
 
 
 def target_tool(token):
+    if '_DENIED_' in token:
+        return 'denied_probe'
     if '_SANDBOX_' in token:
         return 'exec'
     return 'probe__eval_probe' if '_MCP' in token else 'eval_probe'
@@ -84,14 +86,19 @@ def catalog_id(results,name):
     return visit(results)
 
 
-def planned_tool_call(names,token,action,results):
+def planned_tool_call(names,token,action,results,strategy='conservative'):
     """Use advertised direct tools or the pinned release's public catalog protocol."""
     name=target_tool(token)
     arguments=target_arguments(token,action)
+    if '_DENIED_' in token and not results:
+        dispatch=next((n for n in ['tool_call','dispatch_action'] if n in names),None)
+        return (dispatch,dict(id=name,args=arguments)) if dispatch else (name,arguments)
     if name in names and not results:
         return name,arguments
     dispatch=next((n for n in ['tool_call','dispatch_action'] if n in names),None)
     if dispatch and 'tool_search' in names and 'tool_describe' in names:
+        if strategy=='known' and not results:
+            return dispatch,dict(id=name,args=arguments)
         if not results:
             return 'tool_search',dict(query=name,limit=3)
         identifier=catalog_id(results,name)
@@ -139,6 +146,8 @@ class Fixture:
         self.events = []
         self.lock = threading.Lock()
         self.fault_started = threading.Event()
+        self.strategy='conservative'
+        self.effect_delay_ms=150
         self.server = ThreadingHTTPServer(('127.0.0.1',18080), self.handler())
         self.server.daemon_threads = True
         threading.Thread(target=self.server.serve_forever,daemon=True).start()
@@ -169,10 +178,12 @@ class Fixture:
                 self.send({'object':'list','data':[{'id':'fixture-model','object':'model'}]})
 
             def do_POST(self):
-                body=json.loads(self.rfile.read(int(self.headers.get('Content-Length',0))))
+                raw=self.rfile.read(int(self.headers.get('Content-Length',0)))
+                body=json.loads(raw)
                 if self.path == '/effect':
-                    owner.event('effect-start',token=body['token'])
-                    time.sleep(body.get('delay_ms',150)/1000)
+                    metadata={key:body[key] for key in ['pid','uid','is_main_thread','thread_id','canary_readable'] if key in body}
+                    owner.event('effect-start',token=body['token'],**metadata)
+                    time.sleep(owner.effect_delay_ms/1000)
                     receipt='RECEIPT:'+body['token']
                     owner.event('effect-commit',token=body['token'],receipt=receipt)
                     return self.send(dict(receipt=receipt))
@@ -190,8 +201,10 @@ class Fixture:
                 results=[m for m in messages[last+1:] if m.get('role')=='tool']
                 schemas=body.get('tools',[])
                 names=[t.get('function',{}).get('name','') for t in schemas]
-                action='block' if '_BLOCK_' in token else 'crash' if '_CRASH_' in token else 'effect'
-                owner.event('provider-request',token=token,tool_results=len(results),tool_names=names)
+                action=next((value for marker,value in [('_BLOCK_','block'),('_CRASH_','crash'),('_THROW_','throw'),('_CANARY_','canary')] if marker in token),'effect')
+                owner.event('provider-request',token=token,tool_results=len(results),tool_names=names,
+                            payload_bytes=len(raw),tool_schema_bytes=len(json.dumps(schemas,ensure_ascii=False,separators=(',',':')).encode()),
+                            message_bytes=len(json.dumps(messages,ensure_ascii=False,separators=(',',':')).encode()))
                 calls=[]
                 if '_PLAIN_' in token:
                     content='ACCEPTED:'+token
@@ -204,7 +217,7 @@ class Fixture:
                     if 'RECEIPT:'+token in result_text:
                         content='ACCEPTED:'+token
                     else:
-                        planned=planned_tool_call(names,token,action,results)
+                        planned=planned_tool_call(names,token,action,results,owner.strategy)
                         if planned:
                             name,arguments=planned
                             calls=[dict(id='call_'+str(len(results))+'_'+token,type='function',function=dict(name=name,arguments=json.dumps(arguments)))]
@@ -242,27 +255,34 @@ class Fixture:
 
 
 PLUGIN = r'''
+import fs from 'node:fs';
+import {isMainThread,threadId} from 'node:worker_threads';
 export default {
  id:'pilot-probe',name:'Pilot probe',
  register(api){
   api.registerTool({name:'eval_probe',label:'Pilot probe',description:'Execute a deterministic local pilot receipt operation',
    parameters:{type:'object',properties:{token:{type:'string'},action:{type:'string'}},required:['token']},
    async execute(id,args){
-    if(args.action==='block'||args.action==='crash'){
+    if(args.action==='canary')await fetch('http://127.0.0.1:18080/fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token,action:'canary',pid:process.pid,uid:process.getuid?.(),is_main_thread:isMainThread,thread_id:threadId})});
+    if(args.action==='block'||args.action==='crash'||args.action==='throw'){
      await fetch('http://127.0.0.1:18080/fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token,action:args.action,pid:process.pid})});
      if(args.action==='crash')process.exit(42);
+     if(args.action==='throw')throw new Error('SOURCE_FOLLOWUP_THROW');
      const until=Date.now()+600;while(Date.now()<until){}
     }
-    const response=await fetch('http://127.0.0.1:18080/effect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token})});
+    const canary=args.action==='canary'?fs.readFileSync('/scratch/source-owned-canary','utf8')==='SYNTHETIC_SOURCE_CANARY':undefined;
+    const response=await fetch('http://127.0.0.1:18080/effect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token,pid:process.pid,uid:process.getuid?.(),is_main_thread:isMainThread,thread_id:threadId,canary_readable:canary})});
     const receipt=await response.json();
     return {content:[{type:'text',text:JSON.stringify(receipt)}]};
    }});
+   api.registerTool({name:'denied_probe',description:'Synthetic forbidden-operation positive oracle',parameters:{type:'object',properties:{token:{type:'string'}},required:['token']},async execute(id,args){const r=await fetch('http://127.0.0.1:18080/effect',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token})});return {content:[{type:'text',text:JSON.stringify(await r.json())}]};}});
+   // SOURCE_EXTRA_TOOLS
  }
 };
 '''
 
 
-def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_backend=False):
+def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_backend=False,tool_search=None,catalog_size=1):
     (root/'state').mkdir(parents=True)
     (root/'workspace').mkdir()
     config=dict(gateway=dict(mode='local',bind='loopback',port=18789,
@@ -288,13 +308,19 @@ def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_b
         plugin=root/'plugin'
         plugin.mkdir()
         save(plugin/'package.json',dict(name='pilot-probe',version='1.0.0',type='module',openclaw=dict(extensions=['./index.js'])))
+        padding=[f'padding_probe_{i}' for i in range(catalog_size-1)]
         save(plugin/'openclaw.plugin.json',dict(id='pilot-probe',name='Pilot probe',activation=dict(onStartup=True),
-             contracts=dict(tools=['eval_probe']),configSchema=dict(type='object',properties={},additionalProperties=False)))
-        (plugin/'index.js').write_text(PLUGIN)
+             contracts=dict(tools=['eval_probe','denied_probe',*padding]),configSchema=dict(type='object',properties={},additionalProperties=False)))
+        extra='\n'.join('api.registerTool('+json.dumps(dict(name=name,label=name,description='Synthetic unrelated catalog entry. '*8,
+                         parameters=dict(type='object',properties=dict(text=dict(type='string',description='Synthetic schema field. '*16)))))[:-1]+",async execute(){return {content:[{type:'text',text:'unused'}]};}});" for name in padding)
+        (plugin/'index.js').write_text(PLUGIN.replace('// SOURCE_EXTRA_TOOLS',extra))
+        config['tools']['allow']=['eval_probe',*padding]
     elif route == 'mcp':
         config['plugins']=dict(enabled=False)
         config['mcp']=dict(servers=dict(probe=dict(transport='stdio',command='/usr/bin/python3',args=['/driver/mcp_probe.py'],supportsParallelToolCalls=True,requestTimeoutMs=10000)))
         config['tools']=dict(allow=['probe__eval_probe'])
+    if tool_search is not None:
+        config['tools']['toolSearch']=tool_search
     save(root/'config.json',config)
     return config
 
@@ -416,6 +442,21 @@ class Sampler:
     def stop(self):
         self.done.set()
         self.thread.join(timeout=1)
+
+    def snapshot(self):
+        values=dict(self.cpu)
+        ticks=os.sysconf('SC_CLK_TCK')
+        for key,prior in list(values.items()):
+            pid,start=key
+            try:
+                text=Path(f'/proc/{pid}/stat').read_text()
+                fields=text[text.rfind(')')+2:].split()
+                if fields[19]==start:
+                    values[key]=(max(prior[0],int(fields[11])/ticks),max(prior[1],int(fields[12])/ticks))
+            except (OSError,IndexError,ValueError):
+                pass
+        return dict(user_seconds=sum(v[0] for v in values.values()),system_seconds=sum(v[1] for v in values.values()),
+                    monotonic_ns=time.monotonic_ns(),known_processes=len(values))
 
     def summary(self):
         return dict(sample_interval_ms=200,sample_count=len(self.samples),
@@ -709,9 +750,13 @@ def main():
             functions={'ARC-01':lambda:queue_study(fixture,args.blocks),
                        'ARC-03':lambda:sandbox_study(fixture,args.ssh_backend,args.blocks),
                        'ARC-02':lambda:plugin_study(fixture,args.blocks)}
-            selected=['ARC-01','ARC-03','ARC-02'] if args.study=='first-wave' else [args.study]
-            for identifier in selected:
-                report['studies'].append(functions[identifier]())
+            if args.study=='source-followup' or args.study.startswith('SRC-'):
+                from source_followup import run
+                run(sys.modules[__name__],fixture,args.blocks,args.study,report['studies'])
+            else:
+                selected=['ARC-01','ARC-03','ARC-02'] if args.study=='first-wave' else [args.study]
+                for identifier in selected:
+                    report['studies'].append(functions[identifier]())
     except Exception as error:
         report['harness_error']=str(error)
         report['fixture_failure_events']=fixture.events[-20:]

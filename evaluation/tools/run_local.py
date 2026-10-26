@@ -55,7 +55,7 @@ def main():
     parser.add_argument('--runtime-modules', type=Path, required=True)
     parser.add_argument('--node', type=Path, required=True)
     parser.add_argument('--output', type=Path, required=True)
-    parser.add_argument('--study', choices=['smoke', 'ARC-01', 'ARC-02', 'ARC-03', 'first-wave'], default='first-wave')
+    parser.add_argument('--study', choices=['smoke', 'ARC-01', 'ARC-02', 'ARC-03', 'first-wave','source-followup','SRC-01','SRC-02','SRC-03','SRC-04'], default='first-wave')
     parser.add_argument('--blocks', type=int, default=2)
     parser.add_argument('--tmpfs-mib', type=int, default=64)
     parser.add_argument('--memory-mib', type=int, default=1024)
@@ -88,7 +88,7 @@ def main():
     except OSError:
         parser.error('Another bounded pilot owns the host experiment lock; do not overlap measurements')
     controller_hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
-                       for p in [Path(__file__), *sorted((ROOT/'evaluation/runner').glob('*.py'))]}
+                       for p in [Path(__file__), *sorted(p for p in (ROOT/'evaluation/runner').iterdir() if p.suffix in {'.py','.mjs'})]}
     group = Path('/sys/fs/cgroup/system.slice') / ('openclaw-evaluation-' + uuid.uuid4().hex[:12] + '.scope')
     process = None
     started = time.monotonic()
@@ -130,7 +130,8 @@ def main():
                       whole_run_cgroup=dict(memory_peak_bytes=int((group/'memory.peak').read_text()),
                           memory_events=(group/'memory.events').read_text(),
                           pids_events=(group/'pids.events').read_text(),cpu_stat=(group/'cpu.stat').read_text()))
-        encoded = (json.dumps(report,ensure_ascii=False,indent=2)+'\n').encode()
+        source_run=args.study=='source-followup' or args.study.startswith('SRC-')
+        encoded = (json.dumps(report,ensure_ascii=False,indent=None if source_run else 2,separators=(',',':') if source_run else None)+'\n').encode()
         if len(encoded) > 1024**2:
             raise RuntimeError('Summary exceeds the 1 MiB evidence budget')
         args.output.mkdir(parents=True, exist_ok=False)

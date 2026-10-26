@@ -13,6 +13,11 @@ on:
           - ARC-01
           - ARC-02
           - ARC-03
+          - source-followup
+          - SRC-01
+          - SRC-02
+          - SRC-03
+          - SRC-04
 
 permissions:
   contents: read
@@ -95,6 +100,9 @@ jobs:
           (root/'execution.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],host='github-hosted-ubuntu-24.04',study=os.environ['OPENCLAW_EVAL_STUDY'],local_runtime_installation=False),indent=2)+'\n')
           assert sum(p.stat().st_size for p in root.iterdir() if p.is_file())<=2*1024**2, 'Evidence exceeds 2 MiB; do not upload runtime state'
           PY
+      - name: Bind followup results to the pinned implementation source
+        if: always() && (inputs.study == 'source-followup' || startsWith(inputs.study, 'SRC-'))
+        run: python3 evaluation/tools/source_evidence.py --output "$RUNNER_TEMP/openclaw-eval-artifact/source-map.json"
       - name: Upload compact evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
