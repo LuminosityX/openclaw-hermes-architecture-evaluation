@@ -71,7 +71,8 @@ def run_scenario(root,scenario,unit=1):
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['actual-native-MCP-and-child-dispatch','independent-synthetic-credential-verifier','native-public-results-and-process-identities']))
     def plan(item):peer.register(item);fixture.plan(item,'capability__eval_probe',dict(token=item),'RECEIPT:'+item)
-    def request(item):result=gateway.request(item);requests.append(result);return result
+    def request(item):
+        result=gateway.request(item,session_key=token.lower()+'_retained' if mode=='reused-connection' else None);requests.append(result);return result
     def child(item,label):
         fixture.child_tokens.add(item);plan(item);parent=token+'_'+label
         fixture.plan(parent,'sessions_spawn',dict(task='Execute the deterministic operation for '+item,mode='run',cleanup='keep',label='owned-credential-child'),'childSessionKey')
@@ -108,6 +109,8 @@ def run_scenario(root,scenario,unit=1):
         check('no-original-or-child-effect-after-revocation',not any(e['kind'] in {'mcp-effect-commit','credential-effect-commit'} for e in peer.events[boundary:]))
         check('credential-is-not-exposed-in-model-input-or-tool-output',credential not in json.dumps(fixture.native_inputs) and credential not in json.dumps(fixture.tool_returns))
         if mode=='reused-connection':
+            metadata['native_retained_conversation_key']='agent:main:pilot:'+token.lower()+'_retained'
+            exports.append(privacy_cases.history(root,metadata['native_retained_conversation_key']))
             granted=[e for e in peer.events[:boundary] if e['kind']=='credential-authorization-check' and e.get('token')==control and e.get('mcp_generation')]
             check('post-revocation-probe-uses-previously-granted-MCP-session',bool(granted) and any(e.get('mcp_generation')==granted[-1]['mcp_generation'] for e in rejected))
         if mode=='plugin-restart':

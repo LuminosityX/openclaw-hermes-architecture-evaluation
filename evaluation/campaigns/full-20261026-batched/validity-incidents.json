@@ -193,6 +193,21 @@
       "preservation": "Original normalized records and manifests preserved under quarantined-results; immutable raw hosted evidence is unchanged.",
       "correction": "Recalibrate native OBS-04/OBS-06 and rerun only these three scenarios.",
       "architecture_interpretation": "deferred"
+    },
+    {
+      "scenarios": [
+        "SEC-02-S02"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "distinct-native-conversations-prevented-intended-connection-reuse",
+      "reason": "The reused-connection adapter sent each token to a different native conversation because Gateway.request defaulted its session key to the token. It never established cross-turn MCP reuse. Fix only this scenario to use one retained native conversation and verify the actual service-side MCP session generation before and after revocation. Original records do not establish a reused-connection revocation defect.",
+      "preservation": "Original compact records and manifest remain under quarantined-results; immutable raw hosted evidence is unchanged.",
+      "correction": "Use a fixed native conversation for the reused-connection case and rerun only this scenario after full native family calibration.",
+      "architecture_interpretation": "deferred"
     }
   ]
 }

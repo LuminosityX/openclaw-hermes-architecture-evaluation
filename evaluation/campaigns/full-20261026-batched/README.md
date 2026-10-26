@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **251/257 scenarios completed**, with **963 independent observations**. 221 scenarios pass and 30 retain failure observations. Another 2 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Unified architecture analysis remains locked until the complete execution audit passes.
+The [active frozen plan](plan.json) has **250/257 scenarios completed**, with **960 independent observations**. 221 scenarios pass and 29 retain failure observations. Another 3 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Unified architecture analysis remains locked until the complete execution audit passes.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -22,7 +22,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | REL-14 Model streaming and reasoning payloads | 4 | 12 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | REL-15 Provider outages, timeouts and bounded retries | 5 | 15 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | SEC-01 Execution-surface authority | 5 | 15 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568), [40309312751](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40309312751) |
-| SEC-02 Credential propagation and revocation | 4 | 12 | [40363698208](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40363698208) |
+| SEC-02 Credential propagation and revocation | 3 | 9 | [40363698208](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40363698208) |
 | SEC-03 Isolation setup and path races | 4 | 12 | [40308702865](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40308702865) |
 | SEC-04 Cross-session authority separation | 4 | 12 | [40361165262](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40361165262) |
 | SEC-05 Policy resolution across entry points | 4 | 12 | [40324442544](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40324442544) |
@@ -75,13 +75,13 @@ Verified nonapplicability requires an actual native capability probe and pinned 
 | Required dimension | Measured scenarios | Verified native nonapplicability | Incomplete | Planned |
 | --- | ---: | ---: | ---: | ---: |
 | reliability | 58 | 0 | 0 | 58 |
-| security | 54 | 0 | 0 | 54 |
+| security | 53 | 0 | 1 | 54 |
 | performance | 41 | 0 | 0 | 41 |
 | resources_cost | 29 | 4 | 0 | 33 |
 | extensibility | 39 | 0 | 0 | 39 |
 | observability | 30 | 0 | 2 | 32 |
 
-Scenarios retaining failed acceptance observations: REL-05-S01, REL-05-S02, REL-06-S01, REL-06-S04, REL-08-S01, SEC-02-S02, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-03-S03, OBS-03-S04, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03. These are execution results. Unified architecture analysis remains locked until the complete execution audit passes.
+Scenarios retaining failed acceptance observations: REL-05-S01, REL-05-S02, REL-06-S01, REL-06-S04, REL-08-S01, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-03-S03, OBS-03-S04, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03. These are execution results. Unified architecture analysis remains locked until the complete execution audit passes.
 
 Passing conditions apply only to the declared fixtures, workload sizes, deadlines and hardware bounds. In particular, PERF-09 uses five synthetic task types with six variants each; it does not establish general task-solving ability.
 
