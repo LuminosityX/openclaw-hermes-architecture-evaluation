@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **180/257 scenarios completed**, with **720 independent observations**. 166 scenarios pass and 14 retain failure observations. Another 77 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **185/257 scenarios completed**, with **735 independent observations**. 171 scenarios pass and 14 retain failure observations. Another 72 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -24,6 +24,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | SEC-09 Indirect prompt injection and data exfiltration | 5 | 15 | [40325062987](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40325062987) |
 | SEC-10 Network egress, SSRF and redirect boundaries | 5 | 15 | [40323668721](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323668721) |
 | SEC-11 Gateway and control-plane authentication | 5 | 15 | [40296866652](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40296866652) |
+| SEC-12 Untrusted extension installation and update | 5 | 15 | [40350423941](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40350423941) |
 | PERF-01 Request preparation on the service path | 3 | 18 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
 | PERF-02 CPU work versus asynchronous waiting | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
 | PERF-03 Tool scheduling and connection locks | 4 | 24 | [40323072237](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323072237) |
@@ -51,7 +52,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
 | reliability | 40 / 58 |
-| security | 37 / 54 |
+| security | 42 / 54 |
 | performance | 37 / 41 |
 | resources_cost | 23 / 33 |
 | extensibility | 23 / 39 |
