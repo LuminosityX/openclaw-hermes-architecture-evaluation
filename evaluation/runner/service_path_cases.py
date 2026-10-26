@@ -28,6 +28,14 @@ FAMILIES = {
 SCENARIOS = {f'{family}-S{i:02}': mode for family, modes in FAMILIES.items() for i, mode in enumerate(modes, 1)}
 
 
+def active_abort_acknowledged(cancellation,boundary):
+    result=json.loads(cancellation['stdout'])
+    # Public sessionAbortResult permits null abortedRunId even when an active
+    # execution was stopped. The explicit status and independent liveness gate
+    # establish the matched intervention, not an undocumented identifier promise.
+    return cancellation['returncode']==0 and result.get('ok') is True and result.get('status')=='aborted' and boundary['request_pending_before_rpc']
+
+
 class InstrumentedFixture(mechanism.MechanismFixture):
     """Observe native provider input without modifying the request or transcript."""
     def handler(self):
@@ -242,8 +250,7 @@ def run_scenario(root, scenario, unit=1):
             check('short-tasks-finish-during-slow-work',all(r['accepted'] for r in results))
             if mode=='cancel-slow':
                 check('native-cancellation-accepted',cancellation['returncode']==0)
-                native_abort=json.loads(cancellation['stdout'])
-                check('cancellation-targeted-an-actually-active-run',metadata['cancel_boundary']['request_pending_before_rpc'] and isinstance(native_abort.get('abortedRunId'),str))
+                check('cancellation-targeted-an-actually-active-run',active_abort_acknowledged(cancellation,metadata['cancel_boundary']))
                 check('cancelled-task-not-falsely-completed',not slow_result['accepted'])
                 metadata['effect_after_abort']='The uncooperative external service may still commit; its receipt is recorded independently.'
             else:check('slow-task-completes',slow_result['accepted'])

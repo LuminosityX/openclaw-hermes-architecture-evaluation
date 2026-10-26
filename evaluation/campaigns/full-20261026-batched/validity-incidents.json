@@ -16,7 +16,7 @@
       "reason": "The public sessions.usage response explicitly declared computing=true and cacheStatus.status=refreshing. The harness compared temporary zero aggregate totals as if final, although chat.history already contained the expected 82 input and 14 output tokens. These three observations must not count as product failures or accepted formal coverage.",
       "preservation": "Original hosted results and native summaries remain unchanged. Retention manifests record explicit validity exclusions with original record and artifact hashes.",
       "correction": "Poll the documented pending/computing state for at most twenty seconds; preserve refresh observations and the final response. Calibrate the entire family, then rerun only the three pending OBS-07-S04 units. Other valid scenarios are not repeated.",
-      "repair_run_id": null,
+      "repair_run_id": "40308089179",
       "architecture_interpretation": "deferred"
     },
     {
@@ -37,6 +37,27 @@
       "reason": "The 800 ms external operation completed before the native CLI reached cancellation. Every original RPC explicitly returned status=no-active-run and abortedRunId=null. A successful cancellation of an active run was therefore never exercised; these observations cannot count as product failures or accepted coverage.",
       "preservation": "Original hosted native summaries and no-active-run RPC results remain unchanged; compact manifests retain explicit exclusions and hashes.",
       "correction": "Gate the external operation at its independently observed effect-start until the native cancellation RPC returns. Record request liveness and monotonic RPC/gate timestamps. Calibrate the whole family, then rerun only the six pending PERF-04-S04 units.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40308284917",
+      "controller_commit": "6430a72",
+      "scenarios": [
+        "PERF-04-S04"
+      ],
+      "units": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "classification": "undocumented-nonnull-abort-id-assumption",
+      "reason": "The gated active cancellation succeeded (status=aborted, pending HTTP request stopped without task completion), but the revised oracle additionally required a nonnull abortedRunId. The pinned public sessionAbortResult contract permits a null ID with status=aborted. These six scored failures are invalid and quarantined.",
+      "preservation": "Normalized original rows and the original manifest are retained under quarantined-results; hosted raw evidence stays unchanged.",
+      "correction": "Score explicit native status=aborted together with independent pre-RPC liveness and the external gate, accepting nullable IDs. Add a regression test for all pending/status combinations, recalibrate, then rerun only the six pending units.",
       "repair_run_id": null,
       "architecture_interpretation": "deferred"
     }

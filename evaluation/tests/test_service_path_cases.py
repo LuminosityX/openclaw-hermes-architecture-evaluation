@@ -12,6 +12,12 @@ import trace_access_cases as trace
 
 
 class ServicePathOracleTests(unittest.TestCase):
+    def test_abort_contract_uses_status_and_liveness_not_a_nonnull_run_id(self):
+        import itertools
+        for pending,status in itertools.product([False,True],['aborted','no-active-run']):
+            cancellation=dict(returncode=0,stdout=json.dumps(dict(ok=True,status=status,abortedRunId=None)))
+            self.assertEqual(service.active_abort_acknowledged(cancellation,dict(request_pending_before_rpc=pending)),pending and status=='aborted')
+
     def test_new_families_match_every_frozen_scenario(self):
         plan=json.loads((Path(__file__).resolve().parents[1]/'campaigns/full-20261026-batched/plan.json').read_text())
         selected=[*service.FAMILIES,'OBS-07']
