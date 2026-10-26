@@ -89,7 +89,7 @@ def run_scenario(root,scenario,unit=1):
     session='agent:main:pilot:'+token.lower();row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['actual-native-stop-ACK-and-policy-state','independent-live-work-queue-or-checkpoint-gates','actual-descendant-processes-effects-and-MCP-cancel-notifications']))
     def operator():
-        spec=root/'cancel-operator.json';pilot.save(spec,dict(shared_token=pilot.TOKEN,session_key=session))
+        spec=root/'cancel-operator.json';pilot.save(spec,dict(shared_token=pilot.TOKEN,session_key=session,clear_queued=mode=='queued'))
         child=subprocess.Popen([pilot.NODE,'/driver/cancellation_control.mjs',str(spec)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
         first=child.stdout.readline()
         if not first.strip() or not json.loads(first).get('ready'):child.kill();child.communicate(timeout=5);raise RuntimeError('Pre-connected native cancellation operator failed')

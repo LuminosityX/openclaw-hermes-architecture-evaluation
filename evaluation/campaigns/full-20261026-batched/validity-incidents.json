@@ -208,6 +208,21 @@
       "preservation": "Original compact records and manifest remain under quarantined-results; immutable raw hosted evidence is unchanged.",
       "correction": "Use a fixed native conversation for the reused-connection case and rerun only this scenario after full native family calibration.",
       "architecture_interpretation": "deferred"
+    },
+    {
+      "scenarios": [
+        "REL-05-S01"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "queue-discard-option-missing-from-caller",
+      "reason": "The queued-cancellation observer sent sessions.abort with key only while the native API separately requires explicit clearQueued for followup/lane queue discard. The prior failed no-dispatch assertion did not exercise that queue-cleanup request. Preserve it as an invalid caller/oracle record and rerun only REL-05-S01 with clearQueued:true; synchronous-tool, child and checkpointed cases remain accepted.",
+      "preservation": "Original compact records and manifest preserved under quarantined-results; hosted raw bytes remain unchanged.",
+      "correction": "Send documented clearQueued:true only for the queued scenario, record the exact request and rerun this scenario after family calibration.",
+      "architecture_interpretation": "deferred"
     }
   ]
 }

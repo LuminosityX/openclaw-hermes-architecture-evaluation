@@ -17,13 +17,14 @@ try{
    if(command==='finish'){finish();continue;}
    if(command!=='abort')continue;
    try{
-    const started=Number(process.hrtime.bigint());const pending=owner.rpc('sessions.abort',{key:spec.session_key},20000);
+    const params={key:spec.session_key,...(spec.clear_queued?{clearQueued:true}:{})};
+    const started=Number(process.hrtime.bigint());const pending=owner.rpc('sessions.abort',params,20000);
     let written;
     for(let i=0;i<100&&!written;i++){
      written=client.events.find(e=>e.kind==='rpc-request-written'&&e.method==='sessions.abort'&&e.monotonic_ns>=started);
      if(!written)await new Promise(resolve=>setTimeout(resolve,5));
     }
-    if(written)report.requests.push({id:written.request_id,method:'sessions.abort',params:{key:spec.session_key}});
+    if(written)report.requests.push({id:written.request_id,method:'sessions.abort',params});
     await observe('actual-stop-request-written',{written});
     const result=await pending;const received=Number(process.hrtime.bigint());report.responses.push(result);
     await observe('actual-stop-response',{native_response:result,response_received_monotonic_ns:received});
