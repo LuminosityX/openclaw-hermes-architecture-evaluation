@@ -3,6 +3,11 @@ name: Remaining mechanism experiments
 on:
   workflow_dispatch:
     inputs:
+      mode:
+        description: Formal execution or development-only diagnostic calibration
+        type: choice
+        options: [formal, calibration]
+        default: formal
       families:
         description: JSON array of new unmeasured families; existing accepted units are rejected
         default: '["PERF-01","PERF-02","PERF-04","COST-02","COST-04","OBS-07"]'
@@ -31,6 +36,7 @@ jobs:
     timeout-minutes: 60
     env:
       EVAL_FAMILY: ${{ matrix.family }}
+      EVAL_MODE: ${{ inputs.mode }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
       EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || 64 }}
     steps:
@@ -51,7 +57,8 @@ jobs:
           case=next(c for c in load_plan()['cases'] if c['id']==family)
           selected=json.loads(os.environ['EVAL_SCENARIOS']) or [s['id'] for s in case['scenarios']]
           assert len(selected)==len(set(selected)) and set(selected)<={s['id'] for s in case['scenarios']}
-          assert not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units already exist; select only pending work'
+          if os.environ['EVAL_MODE']=='formal':
+              assert not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units already exist; select only pending work'
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
@@ -88,6 +95,7 @@ jobs:
           sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" \
             "$RUNNER_TEMP/openclaw-campaign-proofs/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"
       - name: Execute all prescribed independent units only after matching calibration
+        if: inputs.mode == 'formal'
         run: |
           python3 - <<'PY'
           import json,os,shutil,subprocess
@@ -124,7 +132,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: campaign-${{ matrix.family }}
+          name: ${{ inputs.mode == 'formal' && format('campaign-{0}', matrix.family) || format('native-adapter-validation-{0}', matrix.family) }}
           path: ${{ runner.temp }}/openclaw-campaign-result/
           retention-days: 30
           if-no-files-found: error

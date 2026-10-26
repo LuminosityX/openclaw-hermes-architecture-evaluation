@@ -40,7 +40,9 @@ def run_scenario(root,scenario,unit=1):
     row=dict(scenario_id=scenario,unit=unit,fixture_validated=False,native_invoked=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['native-process-and-approval-records','independent-events','independent-effect-ledger']))
     def request(item,session=None):
-        result=gateway.request(item,session_key=session);requests.append({k:v for k,v in result.items() if k!='response_excerpt'});return result
+        result=gateway.request(item,session_key=session)
+        requests.append({k:v for k,v in result.items() if k!='response_excerpt' or not result['accepted']})
+        return result
     try:
         gateway=pilot.Gateway(root,configurer=lambda p:configure(p,mode));gateway.ready()
         control=token+'_CONTROL';fixture.register(control);positive=request(control)
@@ -104,6 +106,7 @@ def run_scenario(root,scenario,unit=1):
             check('interrupted-http-task-not-falsely-completed',not result['accepted'])
             time.sleep(1);metadata['bare_owner_exit_code']=gateway.process.poll()
             metadata['automatic_supervisor_configured']=False
+            metadata['pre-restart-native_tail']=''.join(gateway.log_tail)[-4000:]
             gateway.stop();start=time.monotonic_ns();gateway=pilot.Gateway(root,configurer=service.reuse);gateway.ready()
             after=token+'_RECOVERED';fixture.register(after);recovered=request(after,session=token.lower())
             check('native-service-usable-after-explicit-restart',recovered['accepted'] and fixture.receipts.get(after)==1)
@@ -119,7 +122,9 @@ def run_scenario(root,scenario,unit=1):
     finally:
         fixture.release.set()
         if approver and approver.poll() is None:approver.kill();approver.communicate(timeout=5)
-        if gateway:gateway.stop()
+        if gateway:
+            gateway.stop()
+            row['native_gateway_tail']=''.join(gateway.log_tail)[-6000:]
         fixture.close();shutil.rmtree(root,ignore_errors=True)
         row['owned_state_retained']=root.exists()
     return row

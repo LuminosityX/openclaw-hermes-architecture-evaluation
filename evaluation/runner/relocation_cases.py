@@ -145,7 +145,9 @@ def run_scenario(root,scenario,unit=1):
             paid_model_calls=0)
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:3000],metadata=metadata)
     finally:
-        if gateway:gateway.stop()
+        if gateway:
+            gateway.stop()
+            row['native_gateway_tail']=''.join(gateway.log_tail)[-6000:]
         fixture.close()
         if uid_change:
             for path in [root,pilot.BASE/'home',pilot.BASE/'cache',pilot.BASE/'tmp']:owned_chown(path,0)
