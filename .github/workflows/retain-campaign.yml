@@ -1,6 +1,9 @@
 name: Retain formal campaign evidence in GitHub
 
 on:
+  workflow_run:
+    workflows: [Remaining mechanism experiments]
+    types: [completed]
   workflow_dispatch:
     inputs:
       runs:
@@ -18,6 +21,7 @@ concurrency:
 
 jobs:
   retain:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.head_branch == 'main' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
@@ -28,13 +32,20 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           EVAL_RETENTION_RUNS: ${{ inputs.runs }}
+          EVAL_COMPLETED_RUN: ${{ github.event.workflow_run.id }}
         run: |
           python3 - <<'PY'
           import json,os,subprocess
-          runs=json.loads(os.environ['EVAL_RETENTION_RUNS'])
+          from pathlib import Path
+          runs=json.loads(os.environ['EVAL_RETENTION_RUNS']) if os.environ.get('EVAL_RETENTION_RUNS') else [dict(run_id=int(os.environ['EVAL_COMPLETED_RUN']))]
           assert isinstance(runs,list) and 1<=len(runs)<=20
           for item in runs:
               assert type(item['run_id']) is int and item['run_id']>0
+              prefix='repos/'+os.environ['GITHUB_REPOSITORY']+'/'
+              artifacts=json.loads(subprocess.check_output(['gh','api',prefix+'actions/runs/'+str(item['run_id'])+'/artifacts?per_page=100']))['artifacts']
+              if not any(a['name'].startswith('campaign-') for a in artifacts):
+                  print('No formal artifacts; development calibration does not count.',item['run_id'])
+                  continue
               command=['python3','evaluation/tools/retain_campaign_results.py','--run-id',str(item['run_id'])]
               excluded=item.get('exclude_scenarios',[])
               assert isinstance(excluded,list) and all(isinstance(s,str) for s in excluded)
