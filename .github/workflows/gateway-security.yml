@@ -1,0 +1,69 @@
+name: Gateway security experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Calibrate first; formal execution requires matching native proof
+        type: choice
+        options: [calibration, formal]
+        default: calibration
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openclaw-gateway-security-${{ inputs.mode }}
+  cancel-in-progress: false
+
+jobs:
+  security:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the shared disposable runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Calibrate five public Gateway authentication scenarios
+        if: inputs.mode == 'calibration'
+        run: |
+          sudo python3 evaluation/tools/run_local.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --node "$(command -v node)" --adapter-validation SEC-11 --hosted-profile --ssh-backend \
+            --memory-mib 3072 --timeout 600 --output "$RUNNER_TEMP/openclaw-campaign-result/native-validation"
+      - name: Execute prescribed formal security units
+        if: inputs.mode == 'formal'
+        run: |
+          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_campaign_family.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
+            --node "$(command -v node)" --case SEC-11 --output "$RUNNER_TEMP/openclaw-campaign-result"
+      - name: Retain bounded synthetic provenance and records
+        if: always()
+        run: |
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-result'
+          (root/'workflow-provenance.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],scope='SEC-11',provider_calls=0,credentials='synthetic-only'),indent=2)+'\n')
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())<=8*1024**2
+          PY
+      - name: Upload Gateway security evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ${{ inputs.mode == 'formal' && 'campaign-SEC-11' || 'native-adapter-validation-SEC-11' }}
+          path: ${{ runner.temp }}/openclaw-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove this job's runtime, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-campaign-result"

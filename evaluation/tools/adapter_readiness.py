@@ -21,6 +21,8 @@ SOURCES={
 for _family in ['PERF-05','PERF-06','COST-01','COST-06','EXT-09']:
     SOURCES[_family]=['evaluation/runner/mechanism_cases.py','evaluation/runner/mechanism_validation.py',
                       'evaluation/runner/pilot.py','evaluation/runner/hook_cases.py','evaluation/tools/run_local.py']
+SOURCES['SEC-11']=['evaluation/runner/gateway_auth_cases.py','evaluation/runner/gateway_auth_probe.mjs',
+                   'evaluation/runner/mechanism_cases.py','evaluation/runner/hook_cases.py','evaluation/runner/pilot.py','evaluation/tools/run_local.py']
 
 
 def native_validation(plan,proofs):

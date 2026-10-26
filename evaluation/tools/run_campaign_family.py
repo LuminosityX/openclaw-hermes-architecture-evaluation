@@ -14,7 +14,7 @@ from provider_plugin import verify as verify_plugin
 from suite import ROOT, require
 from target import verify_installation
 
-NATIVE_FAMILIES = ['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09']
+NATIVE_FAMILIES = ['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11']
 
 
 def bind_unit(plan, family, unit, native, run_id, controller_commit, native_reference, native_sha256):

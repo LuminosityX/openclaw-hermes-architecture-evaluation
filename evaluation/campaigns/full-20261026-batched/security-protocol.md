@@ -1,0 +1,17 @@
+# SEC-11 public Gateway authentication protocol
+
+This family uses the pinned OpenClaw Gateway, token authentication, the published WebSocket wire version 4 and nonce-bound Ed25519 v3 device proofs. Each scenario has a fresh Gateway, synthetic shared secret, new device identities, a native owner/health positive control and an independently receipted tool task. All traffic stays inside the existing isolated loopback namespace. The job binds no real provider key and makes no real model requests.
+
+| Scenario | Registered condition and independent acceptance |
+| --- | --- |
+| SEC-11-S01 | Missing and invalid HTTP credentials return 401 before provider/effect invocation; a correctly signed WebSocket connect carrying the wrong shared secret is rejected. A valid credential completes a receipted native task. |
+| SEC-11-S02 | Expired-session admission is operationalized as reconnecting an existing paired device using a correctly signed proof timestamped ten minutes before the fresh server challenge. Fresh proof connects; the expired proof returns `DEVICE_AUTH_SIGNATURE_EXPIRED`. This condition measures device-proof expiry on reconnection, rather than a bearer-token TTL or idle-socket lifetime. |
+| SEC-11-S03 | The explicit allowed Control UI origin is `http://127.0.0.1:18789`. A device-authenticated positive connect succeeds there; the synthetic untrusted origin is rejected. Device authentication stays enabled. |
+| SEC-11-S04 | Pair a read-scoped device, positively reconnect using its native device token, revoke that token through the owner's public `device.token.revoke` RPC, then replay only the revoked token with a new nonce/signature. The new connect is rejected. |
+| SEC-11-S05 | A read-scoped device token completes `health` but receives `FORBIDDEN` for `config.patch`; the native config file hash stays unchanged. The owner then applies the same mutation and the config file independently contains the changed logging level. |
+
+An exact pending pairing request may be approved through the owner's public RPC before retrying. Raw shared/device tokens, private keys, signatures and challenge nonces are excluded from probe output. Scope sets, structured error codes, config hashes, event times and independent effects remain available. The fixture's signature self-check verifies a valid signature and rejects a changed nonce before native probing.
+
+Fixtures use the pinned public contracts: [authentication](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/gateway/protocol/auth.md), [wire transport](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/gateway/protocol/transport.md), [device proof](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/packages/gateway-client/src/device-auth.ts), [device RPC schemas](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/packages/gateway-protocol/src/schema/devices.ts) and [configuration RPC schemas](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/packages/gateway-protocol/src/schema/config.ts).
+
+Calibration remains excluded from coverage. A matching current native preparation proof is required before the three formal independent units. Existing formal observations remain bound to their recorded controller commits when unrelated future adapter work changes a shared wrapper; stale preparation proofs cannot authorize a new execution. No architecture conclusion is produced here.
