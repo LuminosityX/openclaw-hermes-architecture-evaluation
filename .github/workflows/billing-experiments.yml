@@ -1,0 +1,65 @@
+name: Real-model billing reconciliation experiments
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [formal, calibration]
+        default: formal
+        description: Calibrate real native accounting before prescribed formal units
+permissions:
+  contents: read
+concurrency:
+  group: openclaw-cost07-real-accounting
+  cancel-in-progress: false
+jobs:
+  execute:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Reject already accepted accounting scenarios
+        run: |
+          python3 - <<'PY'
+          import sys
+          sys.path.insert(0,'evaluation/tools')
+          from campaign import DEFAULT_PLAN,records_from
+          assert not any(r['scenario_id'].startswith('COST-07-') and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results'))
+          PY
+      - name: Prepare one disposable pinned runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Calibrate and execute native real-provider accounting serially
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          EVAL_MODE: ${{ inputs.mode }}
+        run: |
+          sudo --preserve-env=DEEPSEEK_API_KEY,GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_billing_family.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
+            --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-campaign-result" --mode "$EVAL_MODE"
+      - name: Retain bounded accounting and installation provenance
+        if: always()
+        run: |
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-result'
+          assert sum(f.stat().st_size for f in p.rglob('*') if f.is_file())<=8*1024**2
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: campaign-COST-07
+          path: ${{ runner.temp }}/openclaw-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove owned runtime, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-campaign-result"

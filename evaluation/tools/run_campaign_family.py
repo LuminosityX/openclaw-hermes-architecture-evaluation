@@ -14,7 +14,7 @@ from provider_plugin import verify as verify_plugin
 from suite import ROOT, require
 from target import verify_installation
 
-NATIVE_FAMILIES = [family for family in SOURCES if family not in {'PERF-09','SEC-09','PERF-10','COST-03','REL-08','PERF-07'}]
+NATIVE_FAMILIES = [family for family in SOURCES if family not in {'PERF-09','SEC-09','PERF-10','COST-03','REL-08','PERF-07','COST-07'}]
 
 
 def bind_unit(plan, family, unit, native, run_id, controller_commit, native_reference, native_sha256, selected_scenarios=None):
@@ -89,7 +89,7 @@ def main():
             execution=subprocess.run([sys.executable,str(ROOT/'evaluation/tools/run_local.py'),
                 '--runtime-modules',str(args.runtime_modules),'--node',str(args.node),'--output',str(directory),
                 '--native-case',args.case,'--campaign-unit',str(unit),'--hosted-profile','--ssh-backend',
-                '--memory-mib','3072','--timeout','600','--tmpfs-mib','384' if args.case=='REL-10' else '128' if args.case in {'OBS-02','OBS-04','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05','REL-03','REL-11'} else '64',
+                '--memory-mib','3072','--timeout','600','--tmpfs-mib','384' if args.case in {'REL-10','REL-11'} else '128' if args.case in {'OBS-02','OBS-04','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05','REL-03','REL-11'} else '64',
                 *[value for sid in (args.scenarios or []) for value in ['--native-scenario',sid]]],timeout=640,check=False)
             require(execution.returncode==0,'Native unit controller did not finish successfully')
             path=directory/'summary.json'

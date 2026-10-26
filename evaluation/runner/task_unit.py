@@ -32,7 +32,10 @@ def main():
         report['fixture_selfcheck']=check_fixture(task)
         fixture=fixture_class(root,task)
         server=bridge()
-        if task.get('reuse'):
+        if task.get('billing'):
+            from billing_cases import execute
+            execute(root,task,report)
+        elif task.get('reuse'):
             from reuse_cases import execute
             execute(root,task,spec['thinking']=='enabled',report,fixture)
         elif task.get('conversation'):
@@ -61,7 +64,7 @@ def main():
         report['harness_error']=type(error).__name__+': '+str(error)[:2000]
     finally:
         if gateway: gateway.stop()
-        if not task.get('reuse'):
+        if not task.get('reuse') and not task.get('billing'):
             report['input_integrity']={name:(root/'workspace'/name).is_file() and not (root/'workspace'/name).is_symlink() and (root/'workspace'/name).read_text()==content
                 for name,content in task['files'].items() if name!=task['artifact']}
             path=root/'workspace'/task['artifact']

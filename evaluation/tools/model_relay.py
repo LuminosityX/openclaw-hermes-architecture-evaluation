@@ -98,12 +98,13 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
     daemon_threads=True
     block_on_close=False
 
-    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled',maximum_requests=None,scripted_fixture=False,request_observer=None):
+    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled',maximum_requests=None,scripted_fixture=False,request_observer=None,response_interceptor=None):
         if not key: raise ValueError('DeepSeek key is required')
         self.key=key
         if scripted_fixture and open_request is None: raise ValueError('Scripted fixture requires an explicitly local transport')
         self.scripted_fixture=scripted_fixture
         self.request_observer=request_observer
+        self.response_interceptor=response_interceptor
         self.max_output_tokens=max_output_tokens
         self.thinking=thinking
         if maximum_requests is not None and (type(maximum_requests) is not int or not 1<=maximum_requests<=128):
@@ -171,17 +172,36 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
                     with owner.open_request(request,timeout=120) as response:
                         record['upstream_status']=response.status
                         record['upstream_request_id']=response.headers.get('x-request-id','')[:200] or None
-                        self.send_response(response.status)
-                        self.send_header('Content-Type','text/event-stream' if metadata.stream else 'application/json')
-                        self.end_headers()
-                        headers_sent=True
-                        while True:
-                            chunk=response.read1(8192)
-                            if not chunk: break
-                            metadata.consume(chunk)
-                            self.wfile.write(chunk)
-                            self.wfile.flush()
-                        metadata.finish()
+                        if owner.response_interceptor is not None:
+                            # Explicit accounting experiment: preserve complete
+                            # real upstream usage before an owned lost-reply fault.
+                            buffered=bytearray()
+                            while True:
+                                chunk=response.read1(8192)
+                                if not chunk:break
+                                metadata.consume(chunk);buffered.extend(chunk)
+                            metadata.finish()
+                            action=owner.response_interceptor(record,metadata)
+                            record['owned_response_intervention']=action
+                            if action=='discard-paid-reply-with-503':
+                                headers_sent=True
+                                return self.error(503,'Owned experiment lost a completed upstream reply')
+                            self.send_response(response.status)
+                            self.send_header('Content-Type','text/event-stream' if metadata.stream else 'application/json')
+                            self.end_headers();headers_sent=True
+                            self.wfile.write(buffered);self.wfile.flush()
+                        else:
+                            self.send_response(response.status)
+                            self.send_header('Content-Type','text/event-stream' if metadata.stream else 'application/json')
+                            self.end_headers()
+                            headers_sent=True
+                            while True:
+                                chunk=response.read1(8192)
+                                if not chunk: break
+                                metadata.consume(chunk)
+                                self.wfile.write(chunk)
+                                self.wfile.flush()
+                            metadata.finish()
                 except urllib.error.HTTPError as error:
                     record['upstream_status']=error.code
                     record['error_type']='upstream-http-error'
