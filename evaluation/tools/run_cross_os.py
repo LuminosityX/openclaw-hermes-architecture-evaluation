@@ -90,6 +90,7 @@ def run_local_semantics(root,node,modules,unit):
         perform('LOWER_WRITE','write',dict(path=str(lower),content='lower_case_artifact'))
         checks.append(assertion('case-distinct-source-artifacts-remain-independent',upper.is_file() and lower.is_file() and upper.read_text(encoding='utf8')=='UPPER_CASE_ARTIFACT' and lower.read_text(encoding='utf8')=='lower_case_artifact'))
         cases['REL-08-S01']=dict(assertions=checks,native_unicode_path=relative,native_artifact_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path.is_file() else None,
+            case_pair_artifact_sha256={p.name:hashlib.sha256(p.read_bytes()).hexdigest() if p.is_file() else None for p in [upper,lower]},
             case_scope='Actual filesystem case distinction is tested, not assumed portable or classified as a security defect.')
         script=root/'workspace/owned-process.py';heartbeat=root/'workspace/heartbeat';pidfile=root/'workspace/worker-pid'
         script.write_text('import os,sys,time\nfrom pathlib import Path\np=Path(sys.argv[1]);p.write_text(str(os.getpid()))\nh=Path(sys.argv[2])\n'
@@ -142,6 +143,15 @@ def native_command(root,node,modules,*arguments,env=None,timeout=90):
 
 def source_unit(root,node,modules,unit,output):
     result=run_local_semantics(root,node,modules,unit);archive=output/('source-'+str(unit)+'.tar.gz')
+    collision=output/('case-collision-'+str(unit)+'.tar.gz')
+    collision_probe=native_command(root,node,modules,'backup','create','--output',collision,'--verify','--json')
+    result['cases']['REL-08-S01']['native_collision_backup_probe']=collision_probe
+    collision_rejected=collision_probe['returncode']!=0 and 'portable path collision' in collision_probe['stdout']+collision_probe['stderr']
+    result['cases']['REL-08-S01']['assertions'].append(assertion('native-Linux-backup-does-not-silently-export-case-colliding-artifacts',collision_rejected))
+    # The file-semantics and import scenarios are distinct. Preserve the real
+    # collision probe, then remove only those two owned probe files so state
+    # import receives a genuinely verified portable source archive.
+    for name in ['CaseProbe.txt','caseprobe.txt']:(root/'workspace'/name).unlink(missing_ok=True)
     created=native_command(root,node,modules,'backup','create','--output',archive,'--verify','--json')
     require(created['returncode']==0 and archive.is_file(),'Actual Linux native backup positive control failed: '+json.dumps(created)[-2000:])
     manifest=archive_manifest(archive);inventory=archive_inventory(archive,root/'independent-archive-inspection')
