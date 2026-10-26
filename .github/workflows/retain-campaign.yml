@@ -46,6 +46,10 @@ jobs:
               if not any(a['name'].startswith('campaign-') for a in artifacts):
                   print('No formal artifacts; development calibration does not count.',item['run_id'])
                   continue
+              assert type(item.get('mirror_only',False)) is bool
+              if item.get('mirror_only'):
+                  subprocess.run(['python3','evaluation/tools/mirror_campaign_artifacts.py','--run-id',str(item['run_id'])],check=True)
+                  continue
               command=['python3','evaluation/tools/retain_campaign_results.py','--run-id',str(item['run_id'])]
               excluded=item.get('exclude_scenarios',[])
               assert isinstance(excluded,list) and all(isinstance(s,str) for s in excluded)

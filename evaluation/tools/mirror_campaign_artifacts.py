@@ -17,6 +17,11 @@ TAG='evidence-full-20261026'
 REGISTRY=DEFAULT_PLAN.parent/'permanent-evidence.json'
 
 
+def release_assets(release_id):
+    pages=json.loads(subprocess.check_output(['gh','api','--paginate','--slurp','repos/'+REPOSITORY+'/releases/'+str(release_id)+'/assets?per_page=100'],timeout=90))
+    return [asset for page in pages for asset in page]
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--run-id',required=True,type=int)
@@ -48,13 +53,13 @@ def main():
                     subprocess.run(['gh','release','create',TAG,'--repo',REPOSITORY,'--target',metadata['head_sha'],'--title','OpenClaw full campaign: raw evidence','--notes-file',str(notes)],check=True,timeout=60)
                 release=json.loads(api('releases/tags/'+TAG))
             else:release=json.loads(lookup.stdout)
-        assets=json.loads(api('releases/'+str(release['id'])+'/assets?per_page=100'))
+        assets=release_assets(release['id'])
         existing=next((asset for asset in assets if asset['name']==name),None)
         if existing is None:
             with tempfile.TemporaryDirectory(prefix='owned-evidence-zip-') as directory:
                 path=Path(directory)/name;path.write_bytes(payload)
                 subprocess.run(['gh','release','upload',TAG,str(path),'--repo',REPOSITORY],check=True,timeout=120)
-            assets=json.loads(api('releases/'+str(release['id'])+'/assets?per_page=100'))
+            assets=release_assets(release['id'])
             existing=next((asset for asset in assets if asset['name']==name),None)
         require(existing and existing['state']=='uploaded' and existing['size']==len(payload),'Persistent asset upload has no matching completed receipt')
         # Verify actual stored bytes, including idempotent runs; names alone are not integrity proof.
