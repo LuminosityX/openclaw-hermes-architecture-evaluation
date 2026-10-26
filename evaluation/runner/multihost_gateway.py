@@ -85,7 +85,10 @@ def main():
         report['exact_device_pairing_and_inventory']=dict(pairing=pair_records[-8:],inventory=inventory)
         # A fresh native session is dispatched in full. A second HTTP server or
         # system.run shell forwarding never substitutes for this placement.
-        remote='agent:main:multi:remote:'+str(spec['unit']);prepare(remote)
+        remote='agent:main:multi:remote:'+str(spec['unit'])
+        creation=rpc('sessions.create',dict(key=remote,permissionMode='full',worktree=True,worktreeSource='empty',worktreeName='eval-multi-u'+str(spec['unit']),label='owned-multihost-session-u'+str(spec['unit'])))
+        if not creation.get('ok'):raise RuntimeError('Actual native session-owned workspace creation failed: '+json.dumps(creation)[-5000:])
+        report['native_session_owned_empty_workspace_creation']=creation
         dispatch=rpc('sessions.dispatch',dict(key=remote,deviceId=device),240000)
         if not dispatch.get('ok') or dispatch.get('payload',{}).get('placement',{}).get('state')!='active':raise RuntimeError('Actual native full worker-session dispatch failed: '+json.dumps(dispatch)[-6000:])
         remote_item=token(2);local_key='agent:main:multi:concurrent:'+str(spec['unit']);prepare(local_key)
@@ -96,10 +99,10 @@ def main():
         # Managed placement may use a session-owned Gateway workspace; retain
         # actual paths rather than assuming it writes the default agent root.
         if commit is None:
-            matches=list((root/'state').rglob('multihost-'+remote_item+'.json'))
+            matches=list(pilot.BASE.rglob('multihost-'+remote_item+'.json'))
             if len(matches)==1:commit=json.loads(matches[0].read_text())
         if not remote_result['accepted']:raise RuntimeError('Dispatched native tool positive control did not execute on the worker: '+json.dumps(after)[-4500:])
-        add(2,[('full-native-device-placement-runs-real-work',remote_result['accepted']),('Gateway-local-work-and-remote-work-both-complete',local_result['accepted']),('result-is-committed-to-Gateway-owned-native-history','RECEIPT:'+remote_item in json.dumps(after))],dict(dispatch=dispatch,remote_response=remote_result,concurrent_local_response=local_result,native_remote_history=after,reconciled_workspace_receipt=commit,loop_placement='Native sealed OpenClaw worker runs on host B; default inference HTTP proxy and canonical state owner remain on host A. Independent host-B kernel lineage and placement receipts are joined by the outer controller.',resource_comparison='Each execution host is capped separately at 3 GiB and two CPU cores. The two-host arm adds a second host; it is not equal-total-resources scaling.'))
+        add(2,[('full-native-device-placement-runs-real-work',remote_result['accepted']),('Gateway-local-work-and-remote-work-both-complete',local_result['accepted']),('result-is-committed-to-Gateway-owned-native-history','RECEIPT:'+remote_item in json.dumps(after)),('worker-written-file-reconciles-to-the-Gateway-owned-workspace',commit is not None)],dict(dispatch=dispatch,remote_response=remote_result,concurrent_local_response=local_result,native_remote_history=after,reconciled_workspace_receipt=commit,loop_placement='Native sealed OpenClaw worker runs on host B; default inference HTTP proxy and canonical state owner remain on host A. Independent host-B kernel lineage and placement receipts are joined by the outer controller.',resource_comparison='Each execution host is capped separately at 3 GiB and two CPU cores. The two-host arm adds a second host; it is not equal-total-resources scaling.'))
         # Restore the partition before the destructive execution-host-loss arm.
         part_item=token(4);part_result=request(part_item,remote);part_history=history(remote)
         add(4,[('native-turn-completes-after-real-transport-partition-restores',part_result['accepted']),('same-device-placement-persists-after-partition',device in json.dumps(part_history))],dict(response=part_result,native_history=part_history,fault_scope='Worker root observer drops actual UID-scoped native TLS output for a bounded interval and requires kernel packet-drop counters. Native session hosting and worker files stay alive.'))
