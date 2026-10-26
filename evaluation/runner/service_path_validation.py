@@ -32,11 +32,12 @@ import authorization_observation_cases
 import context_contract_cases
 import session_authority_cases
 import harness_contract_cases
+import credential_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02'],required=True)
+    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02'],required=True)
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     parser.add_argument('--scenario',action='append',help='Explicit selected pending scenario; formal units only')
     args=parser.parse_args()
@@ -68,6 +69,7 @@ def main():
     if args.case=='EXT-04':module=context_contract_cases
     if args.case=='SEC-04':module=session_authority_cases
     if args.case=='EXT-02':module=harness_contract_cases
+    if args.case=='SEC-02':module=credential_cases
     selected=[sid for sid in module.SCENARIOS if sid.startswith(args.case+'-') and (not args.scenario or sid in args.scenario)]
     if args.scenario and (len(args.scenario)!=len(set(args.scenario)) or set(args.scenario)!=set(selected)):
         parser.error('Selected scenarios must be distinct members of the selected family')
