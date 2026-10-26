@@ -21,6 +21,7 @@ import service_path_cases as service
 SCENARIOS={f'OBS-02-S{i:02}':name for i,name in enumerate(['brief','long','restart','overflow'],1)}
 EVENT=re.compile(r'EVAL_OBS_EVENT_PILOT_[A-Z0-9_]+_N\d{5}')
 ADDON_TEMPLATE=Path('/official-addon.json')
+ADDON_STATE=Path('/official-addon-state.sqlite')
 ADDON=Path(json.loads(ADDON_TEMPLATE.read_text())['package_root']) if ADDON_TEMPLATE.is_file() else Path('/runtime/node_modules/@openclaw/diagnostics-otel')
 
 
@@ -98,10 +99,10 @@ def configure(root,count,target):
     if package['version']!='2026.10.7':raise RuntimeError('Official diagnostics addon version differs from campaign')
     config=service.configure(root)
     template=json.loads(ADDON_TEMPLATE.read_text())
-    snapshot=Path('/official-addon-state.sqlite')
+    snapshot=ADDON_STATE
     if hashlib.sha256(snapshot.read_bytes()).hexdigest()!=template['native_state_snapshot_sha256']:raise RuntimeError('Native addon install-state snapshot digest mismatch')
     directory=root/'state/state';directory.mkdir(mode=0o700)
-    source=sqlite3.connect('file:'+str(snapshot)+'?mode=ro',uri=True);target=sqlite3.connect(str(directory/'openclaw.sqlite'));source.backup(target);target.close();source.close()
+    database_source=sqlite3.connect('file:'+str(snapshot)+'?mode=ro',uri=True);database_target=sqlite3.connect(str(directory/'openclaw.sqlite'));database_source.backup(database_target);database_target.close();database_source.close()
     (directory/'openclaw.sqlite').chmod(0o600)
     config['plugins']['allow'].append('diagnostics-otel');config['plugins']['load']['paths'].append(str(ADDON));config['plugins']['entries']['diagnostics-otel']=template['entry_configuration']
     config['diagnostics']=dict(enabled=True,otel=dict(enabled=True,endpoint='http://127.0.0.1:18088',protocol='http/protobuf',
