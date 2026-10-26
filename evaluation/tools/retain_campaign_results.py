@@ -78,18 +78,28 @@ def main():
     metadata=json.loads(api('actions/runs/'+str(args.run_id)))
     require(metadata['status']=='completed','Wait for the hosted run to finish and retain its artifacts')
     artifacts=json.loads(api('actions/runs/'+str(args.run_id)+'/artifacts?per_page=100'))['artifacts']
-    pending={};excluded=set()
+    pending={};excluded=set();skipped=[]
     for artifact in artifacts:
         if not artifact['name'].startswith('campaign-'):
             continue
         require(not artifact['expired'] and artifact['size_in_bytes']<=ARTIFACT_LIMIT,'Hosted evidence expired or exceeded its bound')
-        rows,manifest=compact_results(plan,metadata,artifact,api('actions/artifacts/'+str(artifact['id'])+'/zip'),args.exclude_scenarios,args.exclusion_reason)
+        payload=api('actions/artifacts/'+str(artifact['id'])+'/zip')
+        files=bounded_archive(payload)
+        if 'results.json' not in files and 'execution.json' not in files and any('adapter-validation-' in name for name in files):
+            skipped.append(dict(artifact_id=artifact['id'],artifact_name=artifact['name'],
+                reason='Native calibration stopped before formal execution; no accepted campaign records',
+                artifact_zip_sha256=hashlib.sha256(payload).hexdigest()))
+            continue
+        rows,manifest=compact_results(plan,metadata,artifact,payload,args.exclude_scenarios,args.exclusion_reason)
         excluded.update(row['scenario_id'] for row in manifest.get('validity_exclusions',[]))
         suffix=str(args.run_id)+'-'+artifact['name']+'.json'
         pending[DEFAULT_PLAN.parent/'results'/suffix]=json.dumps(rows,ensure_ascii=False,separators=(',',':'))+'\n'
         pending[DEFAULT_PLAN.parent/'hosted-evidence'/suffix]=json.dumps(manifest,ensure_ascii=False,separators=(',',':'))+'\n'
-    require(pending,'No formal campaign artifacts found')
+    require(pending or skipped,'No formal campaign artifacts found')
     require(excluded==set(args.exclude_scenarios),'Requested validity exclusion did not match actual hosted records')
+    if not pending:
+        print(json.dumps(dict(run_id=args.run_id,new_formal_records=0,skipped_calibration_artifacts=skipped)))
+        return
     existing=records_from(DEFAULT_PLAN.parent/'results')
     new=[]
     for path,data in pending.items():
@@ -107,7 +117,8 @@ def main():
             path.write_text(data)
     print(json.dumps(dict(run_id=args.run_id,new_formal_records=len(new),measured_scenarios=report['measured_scenarios'],
         accepted_observations=report['accepted_observation_count'],remaining_scenarios=len(report['missing_or_invalid_scenarios']),
-        analysis_allowed=report['analysis_allowed'],total_local_campaign_bytes=retained+additional)))
+        analysis_allowed=report['analysis_allowed'],total_local_campaign_bytes=retained+additional,
+        skipped_calibration_artifacts=skipped)))
 
 
 if __name__=='__main__':
