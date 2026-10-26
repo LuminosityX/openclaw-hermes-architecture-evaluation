@@ -8,6 +8,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import subprocess
 import sys
@@ -36,7 +37,7 @@ def main():
     parser.add_argument('--node',type=Path,required=True)
     parser.add_argument('--package-lock',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
-    parser.add_argument('--scenario',choices=[f'{family}-S{i:02}' for family in ['PERF-09','SEC-09','PERF-10'] for i in range(1,6)],required=True)
+    parser.add_argument('--scenario',choices=[f'{family}-S{i:02}' for family in ['PERF-09','SEC-09','PERF-10'] for i in range(1,6)]+[f'COST-03-S{i:02}' for i in range(1,5)],required=True)
     parser.add_argument('--unit',type=int,choices=range(1,7),required=True)
     parser.add_argument('--thinking',choices=['enabled','disabled'],default='enabled')
     parser.add_argument('--validate-adapter',action='store_true')
@@ -69,6 +70,10 @@ def main():
         input_path.write_text(json.dumps(dict(task=public,thinking=args.thinking,full_campaign_coverage=not args.validate_adapter),ensure_ascii=False))
         def observe(body):
             text=json.dumps(body,ensure_ascii=False)
+            if task.get('reuse'):
+                users=[str(m.get('content','')) for m in body.get('messages',[]) if m.get('role')=='user']
+                found=re.search(r'COST_STAGE_(LEARN|BASELINE_TASK_\d+|REUSE_TASK_\d+)',users[-1] if users else '')
+                return dict(reuse_stage=found.group(1) if found else None,native_asset_marker_seen=task['reuse']['asset_marker'] in text,native_input_bytes=len(text.encode()))
             if task.get('conversation'):
                 users=[str(m.get('content','')) for m in body.get('messages',[]) if m.get('role')=='user']
                 return dict(context_memory_anchor_seen=task['conversation']['anchor'] in text,
@@ -79,7 +84,7 @@ def main():
         relay=Relay(root/'provider.sock',key,thinking=args.thinking,
                     max_output_tokens=task['maximum_output_tokens_per_request'],maximum_requests=task['maximum_model_requests'],
                     open_request=provider_for(task,attack_control=args.attack_control) if args.scripted_provider else None,
-                    scripted_fixture=args.scripted_provider,request_observer=observe if task.get('injection') or task.get('conversation') else None)
+                    scripted_fixture=args.scripted_provider,request_observer=observe if task.get('injection') or task.get('conversation') or task.get('reuse') else None)
         key=''
         thread=threading.Thread(target=relay.serve_forever,daemon=True);thread.start()
         try:
@@ -98,6 +103,15 @@ def main():
     outputs=function_results(task,artifacts.get(task['artifact'])) if task['oracle']['kind']=='python-function' else None
     verdict=judge(task,artifacts,function_results=outputs,service_events=native.get('independent_events'))
     exposure=None
+    reuse_accounting=None
+    if task.get('reuse'):
+        checks=[('complete-paired-native-sequence-exercised',native.get('reuse_sequence_exercised') is True)]
+        reuse_inputs=[r['synthetic_input_observations'] for r in ledger['requests'] if (r.get('synthetic_input_observations',{}).get('reuse_stage') or '').startswith('REUSE_TASK_')]
+        if args.scripted_provider:checks.append(('native-learned-asset-actually-enters-fresh-session-context',bool(reuse_inputs) and all(i.get('native_asset_marker_seen') for i in reuse_inputs)))
+        verdict['assertions'].extend(dict(name=name,verdict='pass' if passed else 'fail',evidence=['native/summary.json','provider-usage.json:synthetic_input_observations']) for name,passed in checks)
+        verdict['accepted']=all(a['verdict']=='pass' for a in verdict['assertions'])
+        from reuse_accounting import account
+        reuse_accounting=account(ledger,verdict.get('accepted_deliveries',{}))
     if task.get('conversation'):
         final_inputs=[r.get('synthetic_input_observations',{}) for r in ledger['requests'] if r.get('synthetic_input_observations',{}).get('final_task_request')]
         checks=[('requested-native-conversation-condition-exercised',native.get('conversation_condition_exercised') is True)]
@@ -136,6 +150,7 @@ def main():
                 full_campaign_coverage=not args.validate_adapter,
                 model_execution='golden-scripted-fixture' if args.scripted_provider else 'real-deepseek-api',
                 untrusted_input_exposed=exposure,expected_leak_control=args.attack_control,
+                reuse_accounting=reuse_accounting,
                 acceptance_values=outputs,full_campaign_development_calibration=args.validate_adapter)
     if harness_failure: result['reason']='Native task fixture or invocation failed; inspect bounded native/provider evidence'
     validate_result(result,plan,allow_development=args.validate_adapter)

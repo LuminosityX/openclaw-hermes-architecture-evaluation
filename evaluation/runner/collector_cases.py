@@ -106,7 +106,8 @@ def configure(root,count,target):
     (directory/'openclaw.sqlite').chmod(0o600)
     config['plugins']['allow'].append('diagnostics-otel');config['plugins']['load']['paths'].append(str(ADDON));config['plugins']['entries']['diagnostics-otel']=template['entry_configuration']
     config['diagnostics']=dict(enabled=True,otel=dict(enabled=True,endpoint='http://127.0.0.1:18088',protocol='http/protobuf',
-        serviceName='owned-openclaw-evaluation',traces=False,metrics=False,logs=True,logsExporter='otlp',flushIntervalMs=1000,captureContent=True))
+        serviceName='owned-openclaw-evaluation',traces=False,metrics=False,logs=True,logsExporter='both',flushIntervalMs=1000,captureContent=True))
+    config['logging']['consoleLevel']='info'
     plugin=root/'composition-a/index.js';source=plugin.read_text().replace('  await announce(\'entered\');',
         "  await announce('entered');\n  for(let index=0;index<(args.token==="+json.dumps(target)+"?"+str(count)+":8);index++)api.logger.info('EVAL_OBS_EVENT_'+args.token+'_N'+String(index).padStart(5,'0')); ")
     plugin.write_text(source);pilot.save(root/'config.json',config);return config
@@ -164,6 +165,7 @@ def run_scenario(root,scenario,unit=1):
         if not result['accepted'] or fixture.receipts.get(recovered)!=1:raise RuntimeError('Post-outage task control failed')
         if not wait_delivered(collector,'EVAL_OBS_EVENT_'+recovered+'_N'):raise RuntimeError('Post-outage OTLP publication control failed')
         time.sleep(3)
+        gateway.stop();time.sleep(.25)
         native=(root/'gateway-native.log').read_text(errors='replace')
         expected=set(k for k in EVENT.findall(native) if k.startswith(prefix))
         if len(expected)!=count:raise RuntimeError('Native local log did not retain all offered unique target event IDs')
@@ -195,6 +197,13 @@ def run_scenario(root,scenario,unit=1):
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2500],metadata=metadata)
     finally:
         collector.fail=False
+        row['collector_diagnostics']=dict(request_count=len(collector.attempts),successful_unique_event_ids=len(collector.deliveries),
+            recent_attempts=[{**{k:v for k,v in a.items() if k!='ids'},'event_count':len(a.get('ids',[]))} for a in collector.attempts[-8:]])
+        native_log=root/'gateway-native.log'
+        if native_log.is_file():
+            text=native_log.read_text(errors='replace')
+            row['native_event_log_diagnostics']=dict(target_event_count=len([m for m in EVENT.findall(text) if m.startswith(prefix)]),
+                total_matching_event_count=len(EVENT.findall(text)),tail=text[-12000:])
         usage=shutil.disk_usage(pilot.BASE)
         row['owned_tmpfs_at_cleanup']=dict(total_bytes=usage.total,used_bytes=usage.used,free_bytes=usage.free)
         if gateway:gateway.stop();row['native_gateway_tail']=''.join(gateway.log_tail)[-4000:]

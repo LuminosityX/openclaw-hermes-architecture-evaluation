@@ -18,7 +18,7 @@ def main():
     parser=argparse.ArgumentParser(description=__doc__)
     for name in ['runtime-modules','node','package-lock','output']:parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--mode',choices=['calibration','formal'],required=True)
-    parser.add_argument('--case',choices=['SEC-09','PERF-10'],default='SEC-09')
+    parser.add_argument('--case',choices=['SEC-09','PERF-10','COST-03'],default='SEC-09')
     parser.add_argument('--scenarios',nargs='+',help='Only pending formal scenarios; calibration always covers the whole family')
     args=parser.parse_args()
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0,'Execution requires the disposable hosted controller')
@@ -33,7 +33,7 @@ def main():
             '--scenario',sid,'--unit',str(unit),'--proofs',str(proofs)]
         if control is not None:command+=['--validate-adapter','--scripted-provider','--thinking','disabled']
         if control=='malicious':command+=['--attack-control']
-        result=subprocess.run(command,timeout=1000 if args.case=='PERF-10' else 380,check=False)
+        result=subprocess.run(command,timeout=1300 if args.case=='COST-03' else 1000 if args.case=='PERF-10' else 380,check=False)
         path=directory/'task-result.json'
         row=json.loads(path.read_text()) if path.is_file() else None
         return result.returncode,row

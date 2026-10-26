@@ -35,6 +35,8 @@ def main():
     diagnostic=dict(native_install_returncode=installed.returncode,native_install_stdout=installed.stdout[-12000:],native_install_stderr=installed.stderr[-6000:])
     (args.metadata/'observability-addon-setup.json').write_text(json.dumps(diagnostic)+'\n')
     require(installed.returncode==0,'Native official-addon installation failed: '+installed.stderr[-1800:])
+    enabled=subprocess.run([str(args.node),str(cli),'plugins','enable','diagnostics-otel','--accept-capabilities'],env=env,capture_output=True,text=True,timeout=90)
+    require(enabled.returncode==0,'Native official-addon enablement failed: '+enabled.stderr[-1800:])
     exported=subprocess.run([str(args.node),str(cli),'plugins','inspect','diagnostics-otel','--json'],env=env,capture_output=True,text=True,timeout=60)
     try:inspection=json.loads(exported.stdout) if exported.returncode==0 else None
     except ValueError:inspection=None
@@ -53,8 +55,10 @@ def main():
     source=sqlite3.connect('file:'+str(database)+'?mode=ro',uri=True);target=sqlite3.connect(str(snapshot));source.backup(target);target.close();source.close()
     require(snapshot.stat().st_size<=4*1024**2,'Owned native installer database exceeds its 4 MiB snapshot bound')
     native_config=json.loads((profile/'config.json').read_text())
+    entry_configuration=native_config.get('plugins',{}).get('entries',{}).get('diagnostics-otel',dict(enabled=True))
+    require(entry_configuration.get('enabled') is not False,'Native diagnostics addon remains explicitly disabled')
     template=dict(kind='native-official-addon-install-template',installs=records,package_root=str(package_root),project_root=str(project),
-        entry_configuration=native_config.get('plugins',{}).get('entries',{}).get('diagnostics-otel',dict(enabled=True)),
+        entry_configuration=entry_configuration,native_inspection_status=inspection.get('plugin',{}).get('status'),
         native_state_snapshot_sha256=hashlib.sha256(snapshot.read_bytes()).hexdigest(),native_state_snapshot_bytes=snapshot.stat().st_size,
         package_sha256=hashlib.sha256((package_root/'package.json').read_bytes()).hexdigest(),
         native_install_command=['openclaw','plugins','install','@openclaw/diagnostics-otel@2026.10.7','--accept-capabilities'],

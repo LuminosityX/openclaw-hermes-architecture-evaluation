@@ -31,7 +31,10 @@ def main():
         report['fixture_selfcheck']=check_fixture(task)
         fixture=fixture_class(root,task)
         server=bridge()
-        if task.get('conversation'):
+        if task.get('reuse'):
+            from reuse_cases import execute
+            execute(root,task,spec['thinking']=='enabled',report,fixture)
+        elif task.get('conversation'):
             from conversation_cases import execute
             gateway=execute(root,task,spec['thinking']=='enabled',report,server,fixture)
         else:
@@ -57,12 +60,13 @@ def main():
         report['harness_error']=type(error).__name__+': '+str(error)[:2000]
     finally:
         if gateway: gateway.stop()
-        report['input_integrity']={name:(root/'workspace'/name).is_file() and not (root/'workspace'/name).is_symlink() and (root/'workspace'/name).read_text()==content
-            for name,content in task['files'].items() if name!=task['artifact']}
-        path=root/'workspace'/task['artifact']
-        if path.is_file() and not path.is_symlink():
-            if path.stat().st_size<=128*1024: report['artifacts'][task['artifact']]=path.read_text()
-            else: report['artifact_size_limit_exceeded']=True
+        if not task.get('reuse'):
+            report['input_integrity']={name:(root/'workspace'/name).is_file() and not (root/'workspace'/name).is_symlink() and (root/'workspace'/name).read_text()==content
+                for name,content in task['files'].items() if name!=task['artifact']}
+            path=root/'workspace'/task['artifact']
+            if path.is_file() and not path.is_symlink():
+                if path.stat().st_size<=128*1024: report['artifacts'][task['artifact']]=path.read_text()
+                else: report['artifact_size_limit_exceeded']=True
         if fixture:
             report['independent_events']=fixture.task_events
             fixture.close()

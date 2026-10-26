@@ -30,7 +30,7 @@ def update():
     if usage_path.exists():
         usage=json.loads(usage_path.read_text());sums=usage['known_provider_usage_sums']
         paragraph=('The [provider accounting totals](provider-usage-totals.json) retain '
-            f'{usage["formal_task_units"]} real-provider task attempts and {usage["real_provider_requests"]} requests, '
+            f'{usage["formal_task_units"]} real-provider experiment units and {usage["real_provider_requests"]} requests, '
             f'with {sums["prompt_tokens"]:,} known inclusive input tokens and {sums["completion_tokens"]:,} known output tokens. '
             f'Known cache-hit input is {sums["prompt_cache_hit_tokens"]:,} and cache-miss input is {sums["prompt_cache_miss_tokens"]:,}; '
             'these partition input rather than add to it. Missing counters remain explicit in the accounting record. '
