@@ -4,12 +4,39 @@
     {
       "run_id": "40306085535",
       "controller_commit": "f7880a7bab97cf28ae0da17d4a5ed8d45abf5b29",
-      "scenarios": ["OBS-07-S04"],
-      "units": [1, 2, 3],
+      "scenarios": [
+        "OBS-07-S04"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
       "classification": "invalid-immediate-usage-oracle",
       "reason": "The public sessions.usage response explicitly declared computing=true and cacheStatus.status=refreshing. The harness compared temporary zero aggregate totals as if final, although chat.history already contained the expected 82 input and 14 output tokens. These three observations must not count as product failures or accepted formal coverage.",
       "preservation": "Original hosted results and native summaries remain unchanged. Retention manifests record explicit validity exclusions with original record and artifact hashes.",
       "correction": "Poll the documented pending/computing state for at most twenty seconds; preserve refresh observations and the final response. Calibrate the entire family, then rerun only the three pending OBS-07-S04 units. Other valid scenarios are not repeated.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40306085535",
+      "controller_commit": "f7880a7bab97cf28ae0da17d4a5ed8d45abf5b29",
+      "scenarios": [
+        "PERF-04-S04"
+      ],
+      "units": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "classification": "missed-active-cancellation-boundary",
+      "reason": "The 800 ms external operation completed before the native CLI reached cancellation. Every original RPC explicitly returned status=no-active-run and abortedRunId=null. A successful cancellation of an active run was therefore never exercised; these observations cannot count as product failures or accepted coverage.",
+      "preservation": "Original hosted native summaries and no-active-run RPC results remain unchanged; compact manifests retain explicit exclusions and hashes.",
+      "correction": "Gate the external operation at its independently observed effect-start until the native cancellation RPC returns. Record request liveness and monotonic RPC/gate timestamps. Calibrate the whole family, then rerun only the six pending PERF-04-S04 units.",
       "repair_run_id": null,
       "architecture_interpretation": "deferred"
     }

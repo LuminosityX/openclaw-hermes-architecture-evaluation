@@ -220,7 +220,8 @@ def run_scenario(root, scenario, unit=1):
                 arm(mode,items,parallel=mode=='independent-sessions',session=token.lower() if mode=='one-session' else None)
                 metadata['session_condition']='Six ordered turns in one session' if mode=='one-session' else 'Six simultaneously offered independent sessions'
         elif family=='PERF-04':
-            slow=register('SLOW',delay=.8); short=[register('SHORT'+str(i)) for i in range(8 if mode=='short-burst' else 2)]
+            slow=register('SLOW',delay=.8,gate=mode=='cancel-slow'); short=[register('SHORT'+str(i)) for i in range(8 if mode=='short-burst' else 2)]
+            if mode=='cancel-slow':fixture.release.clear()
             begin=len(fixture.events); monitor=Responsiveness(gateway.process.pid)
             with concurrent.futures.ThreadPoolExecutor(max_workers=10) as pool:
                 pending=pool.submit(request,slow)
@@ -228,7 +229,12 @@ def run_scenario(root, scenario, unit=1):
                 if not reached: raise RuntimeError('Slow task failed to reach matched intervention boundary')
                 cancellation=None
                 if mode=='cancel-slow':
+                    metadata['cancel_boundary']=dict(request_pending_before_rpc=not pending.done(),
+                        rpc_started_monotonic_ns=time.monotonic_ns())
                     cancellation=hook_cases.rpc(gateway,'sessions.abort',dict(key='agent:main:pilot:'+slow.lower()))
+                    metadata['cancel_boundary']['rpc_returned_monotonic_ns']=time.monotonic_ns()
+                    fixture.release.set()
+                    metadata['cancel_boundary']['external_gate_released_monotonic_ns']=time.monotonic_ns()
                 results=list(pool.map(request,short)); slow_result=pending.result(timeout=40)
             progress=monitor.stop(); monitor=None
             arms.append(dict(label=mode,requests=[{k:v for k,v in r.items() if k!='response_excerpt'} for r in [slow_result,*results]],
@@ -236,6 +242,8 @@ def run_scenario(root, scenario, unit=1):
             check('short-tasks-finish-during-slow-work',all(r['accepted'] for r in results))
             if mode=='cancel-slow':
                 check('native-cancellation-accepted',cancellation['returncode']==0)
+                native_abort=json.loads(cancellation['stdout'])
+                check('cancellation-targeted-an-actually-active-run',metadata['cancel_boundary']['request_pending_before_rpc'] and isinstance(native_abort.get('abortedRunId'),str))
                 check('cancelled-task-not-falsely-completed',not slow_result['accepted'])
                 metadata['effect_after_abort']='The uncooperative external service may still commit; its receipt is recorded independently.'
             else:check('slow-task-completes',slow_result['accepted'])
@@ -290,6 +298,7 @@ def run_scenario(root, scenario, unit=1):
     except Exception as error:
         observation.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2500],arms=arms)
     finally:
+        fixture.release.set()
         if monitor:monitor.stop()
         if gateway:gateway.stop()
         fixture.close(); shutil.rmtree(root,ignore_errors=True)
