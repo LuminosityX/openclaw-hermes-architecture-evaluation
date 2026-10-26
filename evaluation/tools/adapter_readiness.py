@@ -70,6 +70,8 @@ SOURCES['EXT-04']=[*SOURCES['SEC-08'],'evaluation/runner/context_contract_cases.
 
 SOURCES['SEC-04']=[*SOURCES['OBS-01'],'evaluation/runner/session_authority_cases.py','evaluation/runner/mcp_http_fixture.py']
 
+SOURCES['EXT-02']=[*SOURCES['SEC-08'],'evaluation/runner/harness_contract_cases.py','evaluation/runner/harness_reference.mjs','evaluation/runner/external_harness_worker.py','evaluation/runner/effect_recovery_cases.py']
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""
