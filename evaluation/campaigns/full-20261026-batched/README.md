@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **162/257 scenarios completed**, with **654 independent observations**. 152 scenarios pass and 10 retain failure observations. Another 95 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **168/257 scenarios completed**, with **672 independent observations**. 155 scenarios pass and 13 retain failure observations. Another 89 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -42,6 +42,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | EXT-09 Plugin composition and public architecture boundaries | 5 | 15 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | OBS-04 Retention, export, and tamper boundaries | 4 | 12 | [40344112988](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40344112988) |
 | OBS-05 Diagnosis and operational burden | 4 | 12 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
+| OBS-06 Open task trajectories and causal linkage | 6 | 18 | [40345210655](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40345210655) |
 | OBS-07 Practical trace access, export and defect diagnosis | 6 | 18 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535), [40308089179](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40308089179) |
 
 | Required dimension | Formal scenarios completed / planned |
@@ -51,9 +52,9 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | performance | 37 / 41 |
 | resources_cost | 19 / 33 |
 | extensibility | 23 / 39 |
-| observability | 14 / 32 |
+| observability | 20 / 32 |
 
-Scenarios retaining failed acceptance observations: REL-06-S01, REL-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, EXT-05-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04. These are execution results; source-backed architectural diagnosis remains deferred.
+Scenarios retaining failed acceptance observations: REL-06-S01, REL-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, EXT-05-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results; source-backed architectural diagnosis remains deferred.
 
 Passing conditions apply only to the declared fixtures, workload sizes, deadlines and hardware bounds. In particular, PERF-09 uses five synthetic task types with six variants each; it does not establish general task-solving ability.
 
