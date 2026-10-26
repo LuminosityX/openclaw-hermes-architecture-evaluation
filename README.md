@@ -2,7 +2,7 @@
 
 `main` focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
 
-**Status:** 60 planned experiment families and 257 scenario labels, not completed product tests. The repository provides design validation, plan selection and token-cost calculation. OpenClaw runtime adapters and acceptance fixtures still need implementation before product execution; no new product result is claimed.
+**Status:** 60 experiment families and 257 scenario labels remain the full-suite plan. A [bounded native pilot runner](evaluation/runner/README.md) now executes the three first-wave architecture studies using an existing OpenClaw installation and a local deterministic provider. These pilots do not complete the suite or establish real-model task quality. Offline design validation, plan selection and token-cost calculation remain available.
 
 | Dimension | Focus | Planned families |
 | --- | --- | --- |
@@ -42,6 +42,8 @@ The default plan contains deterministic mechanism tests. Actual task capability,
 Start with the [evaluation guide](evaluation/README.md), [experiment catalogue](evaluation/experiment-catalogue.md), [measurement contract](evaluation/measurement-contract.md) and [methodology](docs/methodology.md). The [matrix](evaluation/design/evaluation-matrix.json) defines the current six dimensions and required metrics. The [reproduction guide](docs/reproduction.md) explains validation, selection and execution prerequisites.
 
 To explain architecture rather than collect isolated scores, follow the [architecture tradeoff studies](evaluation/architecture-studies.md). Seven studies compose the existing cases around mechanisms; the first wave covers session concurrency, sandbox ownership and plugin authority/failure. Each explicitly records benefit/cost hypotheses, six-axis observations, confounders and inference limits.
+
+The [first-wave execution record](evaluation/evidence/README.md) contains native exploratory results for all three studies on an existing `2026.9.2` installation. Runtime state was ephemeral and bounded; only a small synthetic JSON evidence record is retained. These results do not complete the full suite or establish general product grades.
 
 Measure actual task outcomes and independently observed effects. Keep failed, cancelled and incomplete attempts in denominators; missing counters or prices remain unknown. A passing CI check validates repository tooling, not OpenClaw reliability, safety or task quality.
 

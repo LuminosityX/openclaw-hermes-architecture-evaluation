@@ -1,6 +1,6 @@
 # Current evaluation reproduction
 
-Current work targets OpenClaw only. The executable commands below validate and select plans or calculate token estimates; they do not execute product workloads. Historical two-product reconstruction instructions are preserved in the [V6 reproduction guide](history/v6-reproduction.md).
+Current work targets OpenClaw only. The offline commands below validate/select plans and calculate token estimates. Actual first-wave exploratory execution uses the separately invoked [bounded pilot runner](../evaluation/runner/README.md), with an existing installation, 64 MiB tmpfs by default, zero swap and a report capped at 1 MiB. Historical two-product reconstruction instructions are preserved in the [V6 reproduction guide](history/v6-reproduction.md).
 
 ## Offline checks and selection
 
@@ -16,7 +16,7 @@ python3 evaluation/tools/suite.py plan --case EXT-08
 python3 evaluation/tools/suite.py plan --dimension performance --phase real-model
 ```
 
-No third-party Python packages, OpenClaw installation, network access or model credentials are needed. Plans always report execution disabled. There is no current `run` command; the V6 scripts are historical and must not be used as an implicit runner for these cases.
+No third-party Python packages, OpenClaw installation, network access or model credentials are needed for these offline commands. Plans always report execution disabled. The explicit `evaluation/tools/run_local.py` pilot command has its own host/runtime requirements; the V6 scripts must not be used as an implicit runner for current cases.
 
 ## Preparing a product run
 

@@ -1,0 +1,57 @@
+"""Cheap checks for the pilot's host-storage and namespace contract."""
+
+import importlib.util
+from pathlib import Path
+import sys
+import unittest
+
+TOOLS=Path(__file__).resolve().parents[1]/'tools'
+spec=importlib.util.spec_from_file_location('local_runner',TOOLS/'run_local.py')
+runner=importlib.util.module_from_spec(spec)
+spec.loader.exec_module(runner)
+
+
+class LocalRunnerTests(unittest.TestCase):
+    def command(self):
+        return runner.sandbox_command(Path('/existing/modules'),Path('/existing/node'),64,['--study','ARC-01','--blocks','2'])
+
+    def test_scratch_has_kernel_size_limit_and_no_writable_host_bind(self):
+        command=self.command()
+        index=command.index('--tmpfs')
+        self.assertEqual(command[index-2:index+2],['--size',str(64*1024**2),'--tmpfs','/scratch'])
+        self.assertNotIn('--bind',command)
+        self.assertEqual(command.count('--tmpfs'),1)
+
+    def test_runtime_and_driver_are_read_only(self):
+        command=self.command()
+        readonly=[command[i+1:i+3] for i,arg in enumerate(command) if arg=='--ro-bind']
+        self.assertIn(['/existing/modules','/runtime/node_modules'],readonly)
+        self.assertIn(['/existing/node','/toolchain/node'],readonly)
+        self.assertTrue(any(pair[1]=='/driver' for pair in readonly))
+
+    def test_network_and_process_namespaces_are_separate(self):
+        command=self.command()
+        self.assertIn('--unshare-all',command)
+        self.assertNotIn('--share-net',command)
+        self.assertIn('--die-with-parent',command)
+        self.assertIn('--cap-drop',command)
+
+    def test_state_temp_and_cache_stay_in_scratch(self):
+        command=self.command()
+        self.assertIn('scratch/tmp',command)
+        self.assertIn('scratch/home',command)
+        self.assertIn('/scratch/cache',command)
+        self.assertIn('NODE_DISABLE_COMPILE_CACHE',command)
+
+    def test_owned_ssh_retains_only_required_daemon_capabilities(self):
+        command=runner.sandbox_command(Path('/existing/modules'),Path('/existing/node'),64,[],ssh_backend=True)
+        self.assertIn('--unshare-net',command)
+        self.assertIn('--unshare-pid',command)
+        self.assertNotIn('--share-net',command)
+        capabilities=[command[i+1] for i,arg in enumerate(command) if arg=='--cap-add']
+        self.assertEqual(set(capabilities),{'CAP_SETUID','CAP_SETGID','CAP_SYS_CHROOT'})
+        self.assertNotIn('CAP_SYS_ADMIN',capabilities)
+
+
+if __name__=='__main__':
+    unittest.main()

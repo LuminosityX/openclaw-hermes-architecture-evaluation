@@ -1,6 +1,6 @@
 # OpenClaw evaluation
 
-This directory is the current, unversioned design for evaluating OpenClaw task execution on `main`. It contains exactly six dimensions and 60 planned experiment families with 257 scenario labels. Hermes is excluded. No OpenClaw adapter or product execution is supplied by this design; all families remain planned.
+This directory evaluates OpenClaw task execution on `main` across exactly six dimensions and a 60-family, 257-scenario coverage plan. Hermes is excluded. The [bounded pilot runner](runner/README.md) implements actual native Gateway pilots for the first three architecture studies. Full case-family coverage and real-model workloads remain planned; a pilot result is not full-family completion.
 
 ## Entry points
 
@@ -10,6 +10,7 @@ This directory is the current, unversioned design for evaluating OpenClaw task e
 4. [Methodology](../docs/methodology.md): how task ability, mechanism tests and causal claims differ.
 5. [Historical review](../docs/history/v6-evidence-review.md): limits of the previous evidence; its grades are not current results.
 6. [Architecture tradeoff studies](architecture-studies.md): seven cross-dimensional studies, a three-study first wave, and preregistration requirements for explaining benefits, costs and design intent.
+7. [First-wave pilot evidence](evidence/README.md): actual bounded execution on the installed OpenClaw build, retained observations and inference limits.
 
 ## Tooling
 
@@ -35,7 +36,7 @@ python3 evaluation/tools/check_design.py
 
 ## Implementation sequence
 
-First implement an OpenClaw adapter with verified revision/configuration reporting, isolated task state, an independent effect ledger and fixture self-checks. Validate deterministic fault, authority, protocol and telemetry cases before collecting product evidence. Declare supported capabilities for the pinned runtime; unsupported hook points, transports, OS targets or deployment topologies remain explicit outcomes.
+The first-wave [native pilot adapter](runner/README.md) now provides isolated task state, build/configuration reporting, local provider/tool fixtures, independent receipt events, native-state inspection and resource sampling. Extend it toward the remaining deterministic authority, protocol and telemetry cases with independent fixture validation. Declare supported capabilities for the pinned runtime; unsupported hook points, transports, OS targets or deployment topologies remain explicit outcomes.
 
 Then implement independently accepted task workloads and a separately budgeted real-model phase for task quality, prompt-injection susceptibility, long context and actual billing. Record provider/model settings to distinguish model behavior from framework behavior. The [measurement contract](measurement-contract.md) defines the accounting rules; `costs.py` calculates estimates from explicitly supplied usage and dated prices.
 

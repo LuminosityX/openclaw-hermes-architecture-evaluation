@@ -1,6 +1,6 @@
 # Architecture tradeoff studies
 
-The six dimensions remain the reporting axes. The 60 case families remain the coverage inventory. Seven architecture studies now compose those cases around a design mechanism, so the same workload can expose both benefits and costs. They are not seven additional dimensions or seven completed product experiments. The [study specification](design/architecture-studies.json) is authoritative; all studies are planned and execution is disabled.
+The six dimensions remain the reporting axes. The 60 case families remain the coverage inventory. Seven architecture studies compose those cases around a design mechanism, so the same workload can expose both benefits and costs. They are not additional dimensions. The [study specification](design/architecture-studies.json) remains the confirmatory plan; its selector does not enable execution. An explicitly invoked [bounded native runner](runner/README.md) now implements first-wave exploratory pilots. Pilot execution does not complete every scenario or certify a tradeoff.
 
 ## Questions and first wave
 
@@ -48,7 +48,7 @@ The generated template is intentionally incomplete and fails readiness checks. P
 
 Attach absolute paths and SHA-256 hashes for `runtime_identity`, `source_binding`, both effective configs, fixture/collector self-tests, owned resource manifest and analysis plan. Runtime identity is JSON containing `product`, `version`, and `source_commit` matching the preregistration. The source-binding JSON contains `product`, `study_id`, `source_commit`, `mechanism_supported: true`, and nonempty `source_locations` at that revision; native config studies also bind `config_key`. Review that evidence independently. A supported mechanism does not prove a hypothesized design goal.
 
-The checker verifies metadata completeness, single-field declarations, target consistency and artifact bytes. It does not prove that artifacts truthfully describe a runtime, that a fixture or statistical method is valid, or that execution is authorized. Even a valid record returns `execution_enabled: false` and `product_results_verified: false`. No command starts OpenClaw, injects faults or contacts a model provider.
+The checker verifies metadata completeness, single-field declarations, target consistency and artifact bytes. It does not prove that artifacts truthfully describe a runtime, that a fixture or statistical method is valid, or that execution is authorized. Even a valid record returns `execution_enabled: false` and `product_results_verified: false`. The plan/preregistration commands do not start OpenClaw, inject faults or contact a model provider; actual exploratory execution uses the separately invoked bounded runner.
 
 ## Reporting a conclusion
 

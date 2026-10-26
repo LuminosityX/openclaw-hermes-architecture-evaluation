@@ -1,0 +1,133 @@
+#!/usr/bin/env python3
+"""Run bounded OpenClaw pilots using an existing read-only installation on Linux."""
+
+import argparse
+import hashlib
+import json
+import os
+from pathlib import Path
+import shutil
+import signal
+import socket
+import subprocess
+import sys
+import time
+import uuid
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False):
+    namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
+    capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
+    command = ['bwrap', *namespaces, '--die-with-parent', '--new-session', '--cap-drop', 'ALL', *capabilities,
+               '--ro-bind', '/usr', '/usr', '--symlink', 'usr/bin', '/bin',
+               '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/lib64', '/lib64',
+               '--proc', '/proc', '--dev', '/dev', '--size', str(tmpfs_mib * 1024**2), '--tmpfs', '/scratch',
+               '--symlink', 'scratch/tmp', '/tmp', '--symlink', 'scratch/home', '/root',
+               '--symlink', 'scratch/run', '/run',
+               '--ro-bind', str(runtime_modules), '/runtime/node_modules',
+               '--ro-bind', str(node), '/toolchain/node', '--symlink', '/toolchain/node', '/toolchain/nodejs',
+               '--ro-bind', str(ROOT / 'evaluation/runner'), '/driver',
+               '--chdir', '/scratch', '--setenv', 'PATH', '/toolchain:/usr/bin:/bin',
+               '--setenv', 'HOME', '/root', '--setenv', 'TMPDIR', '/tmp',
+               '--setenv', 'XDG_CACHE_HOME', '/scratch/cache', '--setenv', 'PYTHONDONTWRITEBYTECODE', '1',
+               '--setenv', 'NODE_DISABLE_COMPILE_CACHE', '1', '--setenv', 'JITI_CACHE_DIR', '/scratch/cache/jiti']
+    for name in ['/etc/passwd', '/etc/group', '/etc/localtime', '/etc/ssl/certs']:
+        if Path(name).exists():
+            command += ['--ro-bind', name, name]
+    return command + ['--', '/usr/bin/python3', '/driver/pilot.py', *driver_args]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--runtime-modules', type=Path, required=True)
+    parser.add_argument('--node', type=Path, required=True)
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--study', choices=['smoke', 'ARC-01', 'ARC-02', 'ARC-03', 'first-wave'], default='first-wave')
+    parser.add_argument('--blocks', type=int, default=2)
+    parser.add_argument('--tmpfs-mib', type=int, default=64)
+    parser.add_argument('--memory-mib', type=int, default=1024)
+    parser.add_argument('--timeout', type=int, default=600)
+    parser.add_argument('--ssh-backend', action='store_true', help='Use an owned ephemeral loopback SSH backend; no Docker images')
+    args = parser.parse_args()
+    if not 16 <= args.tmpfs_mib <= 128 or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
+        parser.error('Bounded pilot limits: 16..128 MiB tmpfs, 1..4 blocks, 1..1200 seconds')
+    if not 512 <= args.memory_mib <= 1536:
+        parser.error('Pilot memory budget must be 512..1536 MiB')
+    modules = args.runtime_modules.resolve()
+    node = args.node.resolve()
+    build_path = modules / 'openclaw/dist/build-info.json'
+    if not build_path.is_file() or not node.is_file() or not shutil.which('bwrap'):
+        parser.error('Existing built OpenClaw installation, compatible Node and bwrap are required; no auto-install')
+    if args.output.exists():
+        parser.error('Output path already exists; preserve it and select a new path')
+    build = json.loads(build_path.read_text())
+    lock=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
+    try:
+        lock.bind('\0openclaw-architecture-pilot-'+str(os.getuid()))
+    except OSError:
+        parser.error('Another bounded pilot owns the host experiment lock; do not overlap measurements')
+    controller_hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
+                       for p in [Path(__file__), *sorted((ROOT/'evaluation/runner').glob('*.py'))]}
+    group = Path('/sys/fs/cgroup/system.slice') / ('openclaw-evaluation-' + uuid.uuid4().hex[:12] + '.scope')
+    process = None
+    started = time.monotonic()
+    try:
+        group.mkdir()
+        for field, value in {'memory.max':args.memory_mib*1024**2, 'memory.swap.max':0,
+                             'pids.max':128, 'cpu.max':'200000 100000', 'memory.oom.group':1}.items():
+            (group / field).write_text(str(value))
+        command = sandbox_command(modules, node, args.tmpfs_mib,
+                                  ['--study', args.study, '--blocks', str(args.blocks), *(['--ssh-backend'] if args.ssh_backend else [])],args.ssh_backend)
+        def enter_group():
+            (group / 'cgroup.procs').write_text(str(os.getpid()))
+        process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   text=True, start_new_session=True, preexec_fn=enter_group)
+        try:
+            stdout, stderr = process.communicate(timeout=args.timeout)
+        except subprocess.TimeoutExpired:
+            (group / 'cgroup.kill').write_text('1')
+            stdout, stderr = process.communicate(timeout=10)
+            raise RuntimeError('Pilot exceeded its whole-run timeout; its cgroup was killed')
+        if len(stdout.encode()) > 1024**2 or len(stderr.encode()) > 128*1024:
+            raise RuntimeError('Pilot exceeded its persisted evidence budget; no raw output retained')
+        try:
+            report = json.loads(stdout)
+        except ValueError:
+            raise RuntimeError('Pilot failed before JSON report: ' + stderr[-2000:] + stdout[-2000:]) from None
+        report.update(runtime_identity=build, runtime_build_info_sha256=hashlib.sha256(build_path.read_bytes()).hexdigest(),
+                      controller_sha256=controller_hashes,
+                      wrapper_exit_code=process.returncode, whole_run_seconds=round(time.monotonic()-started,3),
+                      storage_policy=dict(shared_installation_copied=False, downloads=0,
+                          tmpfs_limit_bytes=args.tmpfs_mib*1024**2, swap_limit_bytes=0,
+                          persisted_report_limit_bytes=1024**2, runtime_state_retained=False),
+                      whole_run_cgroup=dict(memory_peak_bytes=int((group/'memory.peak').read_text()),
+                          memory_events=(group/'memory.events').read_text(),cpu_stat=(group/'cpu.stat').read_text()))
+        encoded = (json.dumps(report,ensure_ascii=False,indent=2)+'\n').encode()
+        if len(encoded) > 1024**2:
+            raise RuntimeError('Summary exceeds the 1 MiB evidence budget')
+        args.output.mkdir(parents=True, exist_ok=False)
+        (args.output/'summary.json').write_bytes(encoded)
+        print(json.dumps(dict(report=str(args.output/'summary.json'), bytes=len(encoded),
+                              exit_code=process.returncode, studies=[dict(study=s.get('study'),status=s.get('status'),valid=s.get('valid')) for s in report.get('studies',[])],
+                              storage_policy=report['storage_policy']),ensure_ascii=False))
+        if process.returncode:
+            raise RuntimeError('Pilot reported a harness/validity failure; inspect the bounded summary')
+    except (OSError, ValueError, RuntimeError, subprocess.SubprocessError) as error:
+        parser.exit(1, f'FAIL: {error}\n')
+    finally:
+        lock.close()
+        if group.exists():
+            if (group/'cgroup.procs').read_text().strip():
+                (group/'cgroup.kill').write_text('1')
+            for _ in range(30):
+                try:
+                    group.rmdir()
+                    break
+                except OSError:
+                    time.sleep(.05)
+
+
+if __name__ == '__main__':
+    main()
