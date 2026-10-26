@@ -48,6 +48,10 @@ def respond(request):
         if args.get('action')=='canary':
             metadata['canary_readable']=Path('/scratch/source-owned-canary').read_text()=='SYNTHETIC_SOURCE_CANARY'
         receipt=post('/effect',dict(token=args['token'],**metadata))
+        if args.get('action')=='late':
+            # Commit precedes the delayed response, so a deadline cannot be
+            # interpreted as proof that the external effect did not happen.
+            time.sleep(2)
         result=dict(content=[dict(type='text',text=json.dumps(receipt))],isError=False)
     else:
         with WRITE:

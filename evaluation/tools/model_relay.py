@@ -125,12 +125,12 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
                 self.wfile.write(payload)
 
             def do_POST(self):
-                if self.path!='/v1/chat/completions': return self.error(404,'Only the fixed completion endpoint is exposed')
                 try:
                     size=int(self.headers.get('Content-Length','0'))
                     if not 0<size<=MAX_BODY: raise ValueError('Finite request byte limit exceeded')
                     raw=self.rfile.read(size)
                     if len(raw)!=size: raise ValueError('Incomplete local request')
+                    if self.path!='/v1/chat/completions': return self.error(404,'Only the fixed completion endpoint is exposed')
                     body=request_body(json.loads(raw),owner.max_output_tokens)
                 except (ValueError,TypeError): return self.error(400,'Invalid bounded completion request')
                 raw=json.dumps(body,ensure_ascii=False,separators=(',',':')).encode()

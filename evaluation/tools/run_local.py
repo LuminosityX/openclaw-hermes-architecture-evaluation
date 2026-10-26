@@ -31,6 +31,7 @@ def runtime_role(build,target,allow_historical=False):
 def decode_report(stdout):
     final=None
     checkpoints={}
+    adapter_observations={}
     for line in stdout.splitlines():
         try:
             value=json.loads(line)
@@ -38,7 +39,10 @@ def decode_report(stdout):
             continue
         if value.get('product')!='openclaw':
             continue
-        if value.get('kind')=='arm-checkpoint':
+        if value.get('kind')=='adapter-validation-checkpoint':
+            record=value['observation']
+            adapter_observations[(record['scenario_id'],record['unit'])]=record
+        elif value.get('kind')=='arm-checkpoint':
             study=checkpoints.setdefault(value['study'],dict(study=value['study'],status='recovered-checkpoints',planned_arms=value['planned_arms'],arms=[]))
             study['arms'].append(value['arm'])
         elif isinstance(value.get('studies'),list):
@@ -52,8 +56,11 @@ def decode_report(stdout):
             if key not in existing:
                 final['studies'].append(study)
                 final['checkpoint_recovery_used']=True
+        if adapter_observations:
+            existing={(r['scenario_id'],r['unit']) for r in final.get('observations',[])}
+            final.setdefault('observations',[]).extend(r for key,r in adapter_observations.items() if key not in existing)
         return final
-    return dict(kind='pilot-aborted',product='openclaw',studies=list(checkpoints.values()),
+    return dict(kind='pilot-aborted',product='openclaw',studies=list(checkpoints.values()),observations=list(adapter_observations.values()),
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
@@ -96,9 +103,12 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
+    parser.add_argument('--adapter-validation',choices=['REL-14','REL-15'],help='Validate candidate adapters; contributes no full-campaign coverage')
     args = parser.parse_args()
     if args.model_validation and (not args.hosted_profile or not args.relay_socket or not args.relay_socket.is_socket()):
         parser.error('Real-model plumbing validation requires the hosted profile and an existing Unix relay socket')
+    if args.model_validation and args.adapter_validation:
+        parser.error('Choose a single validation driver')
     if not 16 <= args.tmpfs_mib <= 128 or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
         parser.error('Bounded pilot limits: 16..128 MiB tmpfs, 1..4 blocks, 1..1200 seconds')
     maximum_memory=4096 if args.hosted_profile else 1536
@@ -133,9 +143,9 @@ def main():
         for field, value in {'memory.max':args.memory_mib*1024**2, 'memory.swap.max':0,
                              'pids.max':128, 'cpu.max':'200000 100000', 'memory.oom.group':1}.items():
             (group / field).write_text(str(value))
-        command = sandbox_command(modules, node, args.tmpfs_mib,
-                                  [] if args.model_validation else ['--study', args.study, '--blocks', str(args.blocks), *(['--ssh-backend'] if args.ssh_backend else [])],
-                                  args.ssh_backend,driver='model_validation.py' if args.model_validation else 'pilot.py',relay_socket=args.relay_socket)
+        driver='model_validation.py' if args.model_validation else 'adapter_validation.py' if args.adapter_validation else 'pilot.py'
+        driver_args=[] if args.model_validation else ['--case',args.adapter_validation] if args.adapter_validation else ['--study',args.study,'--blocks',str(args.blocks),*(['--ssh-backend'] if args.ssh_backend else [])]
+        command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket)
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,

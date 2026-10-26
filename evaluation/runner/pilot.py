@@ -390,7 +390,8 @@ class Gateway:
             data=json.loads(response.read())
             content=''.join(str(c.get('message',{}).get('content','')) for c in data.get('choices',[]))
             return dict(token=token,status=response.status,accepted='ACCEPTED:'+token in content,
-                        latency_ms=(time.monotonic_ns()-begin)/1e6,response_excerpt=json.dumps(data)[:1800])
+                        latency_ms=(time.monotonic_ns()-begin)/1e6,response_excerpt=json.dumps(data)[:1800],
+                        native_http_usage=data.get('usage'))
         except (OSError,ValueError,http.client.HTTPException) as error:
             return dict(token=token,status=None,accepted=False,latency_ms=(time.monotonic_ns()-begin)/1e6,error=type(error).__name__)
         finally:

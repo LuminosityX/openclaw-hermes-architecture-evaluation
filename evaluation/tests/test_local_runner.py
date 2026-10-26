@@ -77,6 +77,13 @@ class LocalRunnerTests(unittest.TestCase):
         self.assertEqual(len(result['studies'][0]['arms']),1)
         self.assertTrue(result['checkpoint_recovery_used'])
 
+    def test_adapter_timeout_preserves_observation_without_awarding_full_coverage(self):
+        import json
+        observation=dict(scenario_id='REL-14-S01',unit=1,state='pass')
+        result=runner.decode_report(json.dumps(dict(kind='adapter-validation-checkpoint',product='openclaw',observation=observation)))
+        self.assertEqual(result['observations'],[observation])
+        self.assertTrue(result['harness_error'])
+
 
 if __name__=='__main__':
     unittest.main()
