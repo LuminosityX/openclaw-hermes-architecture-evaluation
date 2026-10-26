@@ -9,11 +9,12 @@ import sys
 
 import pilot
 import protocol_cases
+import hook_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=['REL-14','REL-15'],required=True)
+    parser.add_argument('--case',choices=['REL-14','REL-15','EXT-08'],required=True)
     args=parser.parse_args()
     resource.setrlimit(resource.RLIMIT_CORE,(0,0))
     resource.setrlimit(resource.RLIMIT_FSIZE,(16*1024**2,16*1024**2))
@@ -23,26 +24,31 @@ def main():
     fixture=None
     try:
         report['storage_guard_check']=pilot.storage_guard_check()
+        module=hook_cases if args.case=='EXT-08' else protocol_cases
         report['fixture_selfcheck']=protocol_cases.selfcheck()
-        fixture=protocol_cases.ProtocolFixture()
-        for sid in protocol_cases.SCENARIOS:
+        fixture=hook_cases.HookFixture() if args.case=='EXT-08' else protocol_cases.ProtocolFixture()
+        for sid in module.SCENARIOS:
             if not sid.startswith(args.case+'-'): continue
             root=pilot.BASE/sid.lower()
-            token='PILOT_PROTOCOL_'+sid.replace('-','_')+'_π'
-            fixture.activate(sid,token)
+            token='PILOT_ADAPTER_'+sid.replace('-','_')+('_π' if sid=='REL-14-S01' else '')
+            if hasattr(fixture,'activate'): fixture.activate(sid,token)
             begin=len(fixture.events)
             gateway=None
             observation=dict(scenario_id=sid,unit=1,fixture_validated=True,native_invoked=False)
             try:
-                gateway=pilot.Gateway(root,configurer=lambda root:protocol_cases.configure(root,sid))
+                gateway=pilot.Gateway(root,configurer=lambda root:module.configure(root,sid))
                 gateway.ready()
-                request=gateway.request(token)
+                if args.case=='EXT-08':
+                    requests,metadata,gateway=hook_cases.run_requests(gateway,fixture,sid,token)
+                else: requests,metadata=[gateway.request(token,session_key='adapter-'+hashlib.sha256(token.encode()).hexdigest()[:24])],{}
+                request=requests[-1]
                 events=fixture.events[begin:]
-                assertions=protocol_cases.acceptance(sid,request,events)
-                invoked=any(e['kind']=='scripted-provider-request' for e in events)
+                assertions=module.acceptance(sid,requests,events,metadata) if args.case=='EXT-08' else module.acceptance(sid,request,events)
+                invoked=any(e['kind'] in {'scripted-provider-request','provider-request'} for e in events)
                 native=pilot.native_evidence(root,[token])
                 observation.update(native_invoked=invoked,state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',
                     request={k:v for k,v in request.items() if k!='response_excerpt'},
+                    requests=[{k:v for k,v in r.items() if k!='response_excerpt'} for r in requests],metadata=metadata,
                     response_excerpt_sha256=hashlib.sha256(request.get('response_excerpt','').encode()).hexdigest(),
                     assertions=assertions,events=events,
                     native_records=dict(tokens=native['tokens'],native_log_sha256=native['native_log_sha256'],native_log_bytes=native['native_log_bytes']),
@@ -56,7 +62,7 @@ def main():
                 shutil.rmtree(root,ignore_errors=True)
             report['observations'].append(observation)
             print(json.dumps(dict(kind='adapter-validation-checkpoint',product='openclaw',observation=observation)),flush=True)
-        report['validation_complete']=len(report['observations'])==sum(s.startswith(args.case+'-') for s in protocol_cases.SCENARIOS)
+        report['validation_complete']=len(report['observations'])==sum(s.startswith(args.case+'-') for s in module.SCENARIOS)
         report['fixture_and_invocation_valid']=all(r['state']!='harness-error' for r in report['observations'])
         if not report['validation_complete'] or not report['fixture_and_invocation_valid']:
             report['harness_error']='Candidate adapters include incomplete/native-entry failures; no full coverage awarded'

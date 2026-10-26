@@ -298,7 +298,7 @@ export default {
 '''
 
 
-def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_backend=False,tool_search=None,catalog_size=1):
+def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_backend=False,tool_search=None,catalog_size=1,plugin_registration=''):
     (root/'state').mkdir(parents=True)
     (root/'workspace').mkdir()
     config=dict(gateway=dict(mode='local',bind='loopback',port=18789,
@@ -329,6 +329,7 @@ def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_b
              contracts=dict(tools=['eval_probe','denied_probe',*padding]),configSchema=dict(type='object',properties={},additionalProperties=False)))
         extra='\n'.join('api.registerTool('+json.dumps(dict(name=name,label=name,description='Synthetic unrelated catalog entry. '*8,
                          parameters=dict(type='object',properties=dict(text=dict(type='string',description='Synthetic schema field. '*16)))))[:-1]+",async execute(){return {content:[{type:'text',text:'unused'}]};}});" for name in padding)
+        extra+='\n'+plugin_registration
         (plugin/'index.js').write_text(PLUGIN.replace('// SOURCE_EXTRA_TOOLS',extra))
         config['tools']['allow']=['eval_probe',*padding]
     elif route == 'mcp':

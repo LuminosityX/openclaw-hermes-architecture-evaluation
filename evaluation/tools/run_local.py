@@ -103,7 +103,7 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
-    parser.add_argument('--adapter-validation',choices=['REL-14','REL-15'],help='Validate candidate adapters; contributes no full-campaign coverage')
+    parser.add_argument('--adapter-validation',choices=['REL-14','REL-15','EXT-08'],help='Validate candidate adapters; contributes no full-campaign coverage')
     args = parser.parse_args()
     if args.model_validation and (not args.hosted_profile or not args.relay_socket or not args.relay_socket.is_socket()):
         parser.error('Real-model plumbing validation requires the hosted profile and an existing Unix relay socket')

@@ -1,5 +1,6 @@
 """Native provider/MCP fault adapters. Only scripted endpoints are faulted."""
 import http.client
+import hashlib
 import json
 import socket
 import threading
@@ -46,7 +47,8 @@ def scripted_response(scenario,token,attempt,body):
 
 def completion_frames(script,token):
     """SSE objects; argument fragments concatenate to the exact JSON input."""
-    common=dict(id='protocol-'+token,object='chat.completion.chunk',created=1760000000,model='fixture-model')
+    identifier=hashlib.sha256(token.encode()).hexdigest()[:24]
+    common=dict(id='protocol-'+identifier,object='chat.completion.chunk',created=1760000000,model='fixture-model')
     frames=[]
     def frame(delta,finish=None):
         frames.append(dict(**common,choices=[dict(index=0,delta=delta,finish_reason=finish)]))
@@ -57,7 +59,7 @@ def completion_frames(script,token):
             call=dict(index=0,function=dict(arguments=arguments[start:end]))
             delta={}
             if index==0:
-                call.update(id='call_'+token,type='function')
+                call.update(id='call_'+identifier,type='function')
                 call['function']['name']=script['tool_name']
                 delta['role']='assistant'
                 if script.get('reasoning'): delta['reasoning_content']=script['reasoning']
@@ -109,6 +111,10 @@ class ProtocolFixture(pilot.Fixture):
                     owner.attempt+=1
                     attempt=owner.attempt
                 script=scripted_response(owner.scenario,owner.token,attempt,body)
+                names=[t.get('function',{}).get('name') for t in body.get('tools',[])]
+                if script.get('tool_name') and script['tool_name'] not in names and 'tool_call' in names:
+                    script['arguments']=json.dumps(dict(id=script['tool_name'],args=json.loads(script['arguments'])),ensure_ascii=False)
+                    script['tool_name']='tool_call'
                 reasoning='SYNTHETIC_OPAQUE_REASONING_'+owner.token
                 assistant_reasoning=[m.get('reasoning_content') for m in body.get('messages',[]) if m.get('role')=='assistant']
                 event=owner.event('scripted-provider-request',scenario=owner.scenario,token=owner.token,attempt=attempt,
@@ -133,7 +139,7 @@ class ProtocolFixture(pilot.Fixture):
                 if not body.get('stream'):
                     message=dict(role='assistant',content=script.get('content'))
                     if script.get('tool_name'):
-                        message['tool_calls']=[dict(id='call_'+owner.token,type='function',function=dict(name=script['tool_name'],arguments=script['arguments']))]
+                        message['tool_calls']=[dict(id='call_'+hashlib.sha256(owner.token.encode()).hexdigest()[:24],type='function',function=dict(name=script['tool_name'],arguments=script['arguments']))]
                     if script.get('reasoning'): message['reasoning_content']=script['reasoning']
                     data=dict(id='protocol-'+owner.token,object='chat.completion',model='fixture-model',choices=[dict(index=0,message=message,finish_reason=script['finish'])])
                     if include_usage: data['usage']=usage
