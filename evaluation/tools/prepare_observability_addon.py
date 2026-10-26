@@ -58,7 +58,7 @@ def main():
     entry_configuration=native_config.get('plugins',{}).get('entries',{}).get('diagnostics-otel',dict(enabled=True))
     require(entry_configuration.get('enabled') is not False,'Native diagnostics addon remains explicitly disabled')
     template=dict(kind='native-official-addon-install-template',installs=records,package_root=str(package_root),project_root=str(project),
-        entry_configuration=entry_configuration,native_inspection_status=inspection.get('plugin',{}).get('status'),
+        core_cli=str(cli.resolve()),entry_configuration=entry_configuration,native_inspection_status=inspection.get('plugin',{}).get('status'),
         native_state_snapshot_sha256=hashlib.sha256(snapshot.read_bytes()).hexdigest(),native_state_snapshot_bytes=snapshot.stat().st_size,
         package_sha256=hashlib.sha256((package_root/'package.json').read_bytes()).hexdigest(),
         native_install_command=['openclaw','plugins','install','@openclaw/diagnostics-otel@2026.10.7','--accept-capabilities'],

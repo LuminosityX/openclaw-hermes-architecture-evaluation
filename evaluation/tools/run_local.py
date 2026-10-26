@@ -107,6 +107,7 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         template_path=runtime_modules.parent/'official-addon-template.json'
         template=json.loads(template_path.read_text());project=Path(template['project_root']).resolve()
         if not project.is_relative_to(runtime_modules.parent.resolve()) or not project.is_dir():raise ValueError('Official addon must remain within the owned hosted runtime prefix')
+        if Path(template.get('core_cli',str(runtime_modules/'openclaw/openclaw.mjs'))).resolve()!=(runtime_modules/'openclaw/openclaw.mjs').resolve():raise ValueError('Native addon peer CLI escaped the verified shared installation')
         if template.get('kind')!='native-official-addon-install-template' or not Path(template['package_root']).resolve().is_relative_to(project):raise ValueError('Invalid native addon install template')
         snapshot=runtime_modules.parent/'official-addon-state.sqlite'
         if not snapshot.is_file() or snapshot.stat().st_size>4*1024**2:raise ValueError('Native addon machine-state snapshot is missing or exceeds 4 MiB')

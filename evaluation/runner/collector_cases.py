@@ -26,6 +26,15 @@ ADDON_STATE=Path('/official-addon-state.sqlite')
 ADDON=Path(json.loads(ADDON_TEMPLATE.read_text())['package_root']) if ADDON_TEMPLATE.is_file() else Path('/runtime/node_modules/@openclaw/diagnostics-otel')
 
 
+def environment_selfcheck():
+    template=json.loads(ADDON_TEMPLATE.read_text());cli=Path(template['core_cli'])
+    package=json.loads((cli.parent/'package.json').read_text())
+    if not cli.is_file() or package.get('name')!='openclaw' or package.get('version')!='2026.10.7':raise RuntimeError('Original native installer core CLI identity does not match the campaign')
+    pilot.CLI=str(cli)
+    return dict(core_cli=str(cli),core_cli_sha256=hashlib.sha256(cli.read_bytes()).hexdigest(),
+        scope='Same verified installation, original absolute path matching the native peer-link audit; read-only alias, no copies or changed symlinks')
+
+
 def fields(data):
     """Bounded independent protobuf framing, without importing runtime internals."""
     if len(data)>4*1024**2:raise ValueError('Owned protobuf bound')
