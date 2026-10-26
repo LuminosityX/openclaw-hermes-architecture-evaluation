@@ -21,16 +21,19 @@ function summary(result){
  return {ok:result?.ok===true,error_code:result?.error?.code,detail_code:result?.error?.details?.code,
   missing_scope:result?.error?.details?.missingScope,error_message:result?.error?.message?.slice(0,300)};
 }
-async function connect({identity=makeIdentity(),token=spec.shared_token,scopes=['operator.read'],origin,ui=false,stale=false,pairable=false,buildId,version='evaluation-fixture-1'}={}){
+async function connect({identity=makeIdentity(),token=spec.shared_token,scopes=['operator.read'],origin,ui=false,stale=false,pairable=false,buildId,version='evaluation-fixture-1',port=18789}={}){
+ if(![18789,18790].includes(port))throw new Error('Only the owned loopback Gateway or admission proxy is permitted');
  const client={id:ui?'openclaw-control-ui':pairable?'test':'gateway-client',mode:ui?'ui':pairable?'test':'backend',version,platform:ui?'web':'linux',...(buildId?{buildId}:{})};
- const socket=new WebSocket('ws://127.0.0.1:18789',origin?{headers:{Origin:origin}}:{});
+ const socket=new WebSocket('ws://127.0.0.1:'+port,origin?{headers:{Origin:origin}}:{});
  sockets.push(socket);const pending=new Map();let connectResult;
  const rpc=(method,params={},timeout=15000)=>new Promise(resolve=>{
   const id=randomUUID();const started=performance.now();
   const timer=setTimeout(()=>{pending.delete(id);resolve({ok:false,error:{code:'FIXTURE_TIMEOUT'}});},timeout);
   pending.set(id,result=>{clearTimeout(timer);event('rpc-response',{method,latency_ms:performance.now()-started,...summary(result)});resolve(result);});
   if(socket.readyState!==WebSocket.OPEN){clearTimeout(timer);pending.delete(id);resolve({ok:false,error:{code:'SOCKET_CLOSED'}});return;}
-  socket.send(JSON.stringify({type:'req',id,method,params}));
+  socket.send(JSON.stringify({type:'req',id,method,params}),error=>{
+   if(!error)event('rpc-request-written',{method,request_id:id});
+  });
  });
  const result=await new Promise(resolve=>{
   let settled=false;

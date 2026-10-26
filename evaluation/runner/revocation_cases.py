@@ -40,6 +40,7 @@ class RevocationFixture(AuthorizationFixture):
     def __init__(self):
         self.hook_entered=threading.Event();self.hook_release=threading.Event();self.hook_release.set()
         self.decision_returned=threading.Event();self.observations=[];self.file_gate=None
+        self.revocation_written=threading.Event();self.revocation_returned=threading.Event()
         super().__init__()
     def handler(self):
         base=super().handler();owner=self
@@ -54,6 +55,8 @@ class RevocationFixture(AuthorizationFixture):
                     if not owner.hook_release.wait(timeout=15):owner.event('revocation-hook-gate-timeout');return self.send(dict(error='gate-timeout'),504)
                 elif body.get('kind')=='arm-before-native-decision':owner.file_gate.arm()
                 elif body.get('kind')=='actual-native-decision-returned':owner.decision_returned.set()
+                elif body.get('kind')=='actual-revocation-request-written':owner.revocation_written.set()
+                elif body.get('kind')=='actual-revocation-response':owner.revocation_returned.set()
                 return self.send(dict(observed=True))
         return Handler
 
@@ -77,7 +80,14 @@ def run_scenario(root,scenario,unit=1):
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def patch(selected,value):
         result=privacy_cases.wire(root,[dict(method='sessions.patch',params=dict(key=selected,permissionMode=value)),dict(method='sessions.get',params=dict(key=selected))]);records.append(result)
-        if not result['responses'][0]['result'].get('ok'):raise RuntimeError('Native live permission change failed: '+json.dumps(result)[:1200])
+        response=result['responses'][0]['result']
+        if not response.get('ok'):
+            error=response.get('error',{})
+            if error.get('code')!='UNAVAILABLE' or 'Permissions were saved' not in error.get('message',''):
+                raise RuntimeError('Native permission intervention failed without a saved-policy outcome: '+json.dumps(result)[:1200])
+            saved=privacy_cases.history(root,selected);records.append(saved)
+            if value not in reconstruct(saved)['permission_modes_by_session'].get(selected,[]):raise RuntimeError('Native saved-but-unavailable response has no independently confirmed persisted target mode')
+            check('native-live-policy-update-is-acknowledged',False)
         return result
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['actual-native-grant-and-revocation-records','independent-inode-hook-or-queue-boundary','independent-owned-effects']))
     def plan(item):fixture.plan(item,'exec',dict(command=str(script)+' '+item,yieldMs=10000),'RECEIPT:'+item)
@@ -98,7 +108,7 @@ def run_scenario(root,scenario,unit=1):
         target=token+'_ACTION';plan(target);row.update(native_invoked=True,fixture_validated=True)
         if mode=='single-use':
             patch(session,'guarded');gate=OwnedOpenGate(script,gateway.process.pid);fixture.file_gate=gate
-            spec=root/'revocation-observer.json';pilot.save(spec,dict(shared_token=pilot.TOKEN,command_marker=str(script)))
+            spec=root/'revocation-observer.json';pilot.save(spec,dict(shared_token=pilot.TOKEN,command_marker=str(script),session_key=session))
             observer=subprocess.Popen([pilot.NODE,'/driver/revocation_observer.mjs',str(spec)],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
             if not json.loads(observer.stdout.readline()).get('ready'):raise RuntimeError('Native single-use approval observer failed to initialize')
             with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
@@ -106,10 +116,18 @@ def run_scenario(root,scenario,unit=1):
                 if not gate.entered.wait(timeout=14):raise RuntimeError('No actual post-approval Gateway file open reached the pre-launch permission gate')
                 if not fixture.decision_returned.wait(timeout=3):raise RuntimeError('The native allow-once decision was not confirmed while the exact Gateway opener was held')
                 decisions=[r for r in fixture.observations if r.get('kind')=='actual-native-decision-returned']
-                if not decisions or not decisions[-1].get('resolution',{}).get('ok') or reconstruct([decisions[-1].get('terminal'),decisions[-1].get('execProjection')])['authority_choice']!='single-use':
+                if not decisions or not decisions[-1].get('resolution',{}).get('ok'):
                     raise RuntimeError('The real native terminal approval does not prove an allow-once grant before revocation')
-                metadata['pending_before_revocation']=not pending.done();metadata['revocation']=patch(session,'read-only')
-                metadata['revocation_ack_monotonic_ns']=time.monotonic_ns();gate.release();result=pending.result(timeout=40)
+                metadata['pending_before_revocation']=not pending.done();observer.stdin.write('revoke\n');observer.stdin.flush()
+                if not fixture.revocation_written.wait(timeout=2):raise RuntimeError('Pre-connected native operator did not write the revocation request while the Gateway opener was held')
+                writes=[r for r in fixture.observations if r.get('kind')=='actual-revocation-request-written']
+                if not writes[-1].get('written'):raise RuntimeError('Native operator request lacks actual socket-write evidence')
+                applied_before_release=fixture.revocation_returned.wait(timeout=.5)
+                metadata.update(revocation_response_before_file_gate_release=applied_before_release,operator_response_probe_seconds=.5)
+                check('pre-launch-revocation-request-is-serviceable-while-binding-read-is-held',applied_before_release)
+                metadata['file_gate_release_monotonic_ns']=time.monotonic_ns();gate.release();result=pending.result(timeout=40)
+                if not fixture.revocation_returned.wait(timeout=5):raise RuntimeError('Native revocation never returned after releasing the actual pre-launch read')
+                records.append(privacy_cases.history(root,session))
             check('single-use-grant-and-pre-launch-Gateway-open-were-observed',metadata['pending_before_revocation'] and fixture.decision_returned.is_set())
         elif mode=='session':
             fixture.hook_release.clear()
