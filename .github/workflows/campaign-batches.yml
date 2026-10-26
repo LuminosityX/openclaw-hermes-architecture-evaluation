@@ -1,0 +1,136 @@
+name: OpenClaw campaign batches
+
+on:
+  workflow_dispatch:
+    inputs:
+      category:
+        description: Execute formal prescribed units of calibrated families
+        type: choice
+        options: [mechanisms, tasks, both]
+        default: mechanisms
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openclaw-formal-campaign-${{ inputs.category }}
+  cancel-in-progress: false
+
+jobs:
+  mechanisms:
+    if: inputs.category != 'tasks'
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [REL-14, REL-15, EXT-08, PERF-05, PERF-06, COST-01, COST-06, EXT-09]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 65
+    env:
+      OPENCLAW_EVAL_CASE: ${{ matrix.case }}
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the shared disposable runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Execute all prescribed independent units after family readiness checks
+        run: |
+          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_campaign_family.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
+            --node "$(command -v node)" --case "$OPENCLAW_EVAL_CASE" \
+            --output "$RUNNER_TEMP/openclaw-campaign-result"
+      - name: Bound original native records and retain installation provenance
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-result'
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())<=8*1024**2
+          PY
+      - name: Upload formal synthetic experiment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: campaign-${{ matrix.case }}
+          path: ${{ runner.temp }}/openclaw-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove this job's runtime, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-campaign-result"
+
+  tasks:
+    if: inputs.category != 'mechanisms'
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        scenario: [PERF-09-S01, PERF-09-S02, PERF-09-S03, PERF-09-S04, PERF-09-S05]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      OPENCLAW_EVAL_SCENARIO: ${{ matrix.scenario }}
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare the shared disposable runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Execute six real DeepSeek tasks with independent acceptance
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          python3 - <<'PY'
+          import os,shutil,subprocess,sys
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          failures=[]
+          for unit in range(1,7):
+              result=subprocess.run(['sudo','--preserve-env=DEEPSEEK_API_KEY,GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA',
+                  sys.executable,'evaluation/tools/run_task_unit.py',
+                  '--runtime-modules',str(root/'openclaw-campaign-runtime/node_modules'),
+                  '--package-lock',str(root/'openclaw-campaign-runtime/package-lock.json'),
+                  '--node',shutil.which('node'),'--scenario',os.environ['OPENCLAW_EVAL_SCENARIO'],'--unit',str(unit),
+                  '--output',str(root/'openclaw-campaign-result'/('unit-'+str(unit)))],check=False)
+              if result.returncode:failures.append(unit)
+          if failures:raise SystemExit('Native task harness failures in units '+str(failures))
+          PY
+      - name: Bound task, usage and acceptance evidence
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          python3 - <<'PY'
+          import json,os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-result'
+          rows=[]
+          for path in sorted(root.glob('unit-*/task-result.json')):
+              row=json.loads(path.read_text())
+              row['evidence']=[path.parent.name+'/'+reference for reference in row['evidence']]
+              rows.append(row)
+          (root/'results.json').write_text(json.dumps(rows,ensure_ascii=False,separators=(',',':'))+'\n')
+          (root/'execution.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],scenario_id=os.environ['OPENCLAW_EVAL_SCENARIO'],full_campaign_coverage=True,model_execution='real-deepseek-api'),indent=2)+'\n')
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())<=8*1024**2
+          PY
+      - name: Upload real-model experiment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: campaign-${{ matrix.scenario }}
+          path: ${{ runner.temp }}/openclaw-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove this job's runtime, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-campaign-result"

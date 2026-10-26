@@ -1,0 +1,47 @@
+name: Pinned disposable OpenClaw runtime
+description: Install one verified runtime per hosted shard; caller always removes owned files.
+runs:
+  using: composite
+  steps:
+    - name: Resolve the pinned runtime configuration
+      shell: bash
+      run: |
+        python3 evaluation/tools/target.py check-current
+        python3 - <<'PY'
+        import json,os
+        from pathlib import Path
+        target=json.loads(Path('evaluation/design/evaluation-matrix.json').read_text())['target']
+        with open(os.environ['GITHUB_ENV'],'a') as output:
+            output.write('OPENCLAW_EVAL_VERSION='+target['version']+'\n')
+            output.write('OPENCLAW_EVAL_NODE='+target['node_version']+'\n')
+        PY
+    - name: Set up pinned compatible Node
+      uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+      with:
+        node-version: ${{ env.OPENCLAW_EVAL_NODE }}
+    - name: Check hosted prerequisites
+      shell: bash
+      run: |
+        command -v bwrap || { sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends bubblewrap; }
+        test -d /sys/fs/cgroup/system.slice
+        node --version
+    - name: Install a shared exact runtime on this disposable host
+      shell: bash
+      env:
+        npm_config_cache: ${{ runner.temp }}/openclaw-campaign-cache
+        npm_config_update_notifier: 'false'
+        npm_config_fund: 'false'
+        npm_config_audit: 'false'
+      run: |
+        npm install --prefix "$RUNNER_TEMP/openclaw-campaign-runtime" --save-exact "openclaw@$OPENCLAW_EVAL_VERSION" '@openclaw/deepseek-provider@2026.10.7'
+        test "$(du -sm "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" | awk '{s+=$1} END {print s}')" -le 4096
+        mkdir -p "$RUNNER_TEMP/openclaw-campaign-metadata"
+        python3 evaluation/tools/target.py verify-installation --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" > "$RUNNER_TEMP/openclaw-campaign-metadata/installation.json"
+        python3 evaluation/tools/provider_plugin.py --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" > "$RUNNER_TEMP/openclaw-campaign-metadata/provider-plugin.json"
+        python3 - <<'PY'
+        import json,os
+        from pathlib import Path
+        root=Path(os.environ['RUNNER_TEMP'])
+        lock=json.loads((root/'openclaw-campaign-runtime/package-lock.json').read_text())
+        (root/'openclaw-campaign-metadata/package-lock.json').write_text(json.dumps(lock,separators=(',',':'))+'\n')
+        PY

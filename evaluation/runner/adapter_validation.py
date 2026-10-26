@@ -15,12 +15,14 @@ import hook_cases
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument('--case',choices=['REL-14','REL-15','EXT-08'],required=True)
+    parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     args=parser.parse_args()
+    unit=args.campaign_unit or 1
     resource.setrlimit(resource.RLIMIT_CORE,(0,0))
     resource.setrlimit(resource.RLIMIT_FSIZE,(16*1024**2,16*1024**2))
     for name in ['tmp','home','cache','run']: (pilot.BASE/name).mkdir(exist_ok=True)
-    report=dict(kind='native-adapter-validation',product='openclaw',studies=[],case_id=args.case,
-                full_campaign_coverage=False,observations=[],paid_model_calls=0)
+    report=dict(kind='native-campaign-family-unit' if args.campaign_unit else 'native-adapter-validation',product='openclaw',studies=[],case_id=args.case,
+                full_campaign_coverage=bool(args.campaign_unit),observations=[],paid_model_calls=0)
     fixture=None
     try:
         report['storage_guard_check']=pilot.storage_guard_check()
@@ -30,11 +32,11 @@ def main():
         for sid in module.SCENARIOS:
             if not sid.startswith(args.case+'-'): continue
             root=pilot.BASE/sid.lower()
-            token='PILOT_ADAPTER_'+sid.replace('-','_')+('_π' if sid=='REL-14-S01' else '')
+            token='PILOT_ADAPTER_'+sid.replace('-','_')+'_U'+str(unit)+('_π' if sid=='REL-14-S01' else '')
             if hasattr(fixture,'activate'): fixture.activate(sid,token)
             begin=len(fixture.events)
             gateway=None
-            observation=dict(scenario_id=sid,unit=1,fixture_validated=True,native_invoked=False)
+            observation=dict(scenario_id=sid,unit=unit,fixture_validated=True,native_invoked=False)
             try:
                 gateway=pilot.Gateway(root,configurer=lambda root:module.configure(root,sid))
                 gateway.ready()

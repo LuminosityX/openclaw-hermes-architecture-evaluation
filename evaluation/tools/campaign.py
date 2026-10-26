@@ -10,7 +10,7 @@ from pathlib import Path
 
 from suite import MATRIX, ROOT, load_matrix, require, unique_object
 
-DEFAULT_PLAN=ROOT/'evaluation/campaigns/full-20261026/plan.json'
+DEFAULT_PLAN=ROOT/'evaluation/campaigns/full-20261026-batched/plan.json'
 RESULT_STATES={'pass','fail','unsupported','blocked','harness-error'}
 
 

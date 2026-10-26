@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Execute an independently accepted native PERF-09 task on a disposable host.
 
-Full-campaign execution is gated on all adapters. --validate-adapter permits
+Full execution requires current native validation under the active plan. --validate-adapter permits
 development calibration, explicitly excluded from the frozen campaign results.
 """
 import argparse
@@ -14,7 +14,7 @@ import sys
 import tempfile
 import threading
 
-from adapter_readiness import readiness, load_proofs
+from adapter_readiness import require_execution_ready, load_proofs, proof_directory
 from campaign import DEFAULT_PLAN, load_plan, validate_result
 from model_relay import Relay
 from provider_plugin import verify as verify_plugin
@@ -40,8 +40,7 @@ def main():
     if args.scripted_provider and not args.validate_adapter: parser.error('Golden fixture transcripts are never full campaign task-quality evidence')
     plan=load_plan()
     if not args.validate_adapter:
-        require(readiness(plan,load_proofs(DEFAULT_PLAN.parent/'preparation'))['ready_for_full_execution'],
-                'Full scope has unimplemented or unvalidated adapters; no paid campaign execution started')
+        require_execution_ready(plan,'PERF-09',load_proofs(proof_directory(plan)))
     require(os.geteuid()==0,'Hosted task controller requires root for owned cgroups/namespaces')
     installation=verify_installation(plan['target'],args.runtime_modules,args.package_lock)
     plugin=verify_plugin(args.runtime_modules,args.package_lock)

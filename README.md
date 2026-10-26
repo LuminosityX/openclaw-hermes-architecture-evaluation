@@ -2,7 +2,7 @@
 
 `main` focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
 
-The current work is the [full experiment campaign](evaluation/full-campaign.md): finish the frozen 60-family, 257-scenario scope first, audit its completion, then write one unified source-backed architecture analysis. Earlier pilots and the [exploratory source review](evaluation/evidence/source-followup-20261026/README.md) remain historical exploratory evidence; they do not complete this campaign.
+The current work is the [full experiment campaign](evaluation/full-campaign.md): finish the frozen 60-family, 257-scenario scope, audit its completion, then write one unified source-backed architecture analysis. Calibrated families execute their formal repetitions in batches while remaining adapters are implemented. Earlier pilots and the [exploratory source review](evaluation/evidence/source-followup-20261026/README.md) remain historical exploratory evidence; they do not complete this campaign.
 
 The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, checked against GitHub stable and npm `latest` on 2026-10-26. The exact [campaign pin](evaluation/design/evaluation-matrix.json) is fixed for reproducibility. See the [current-version execution guide](evaluation/current-version.md); newer dependency installations run on disposable GitHub-hosted machines, not this local workspace.
 

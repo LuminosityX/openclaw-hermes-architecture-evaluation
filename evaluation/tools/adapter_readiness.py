@@ -36,8 +36,15 @@ def native_validation(plan,proofs):
         hashes=proof.get('controller_sha256',{})
         if not all(hashes.get(p)==hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in SOURCES[case]): continue
         if proof.get('harness_error') or not proof.get('validation_complete') or not proof.get('fixture_and_invocation_valid'): continue
-        for observation in proof.get('observations',[]):
-            if observation.get('native_invoked') is True and observation.get('fixture_validated') is True and observation.get('state') in {'pass','fail'}:
+        observations=proof.get('observations',[])
+        expected={sid for sid,(family,_) in scenario_index(plan).items() if family['id']==case}
+        actual=[row.get('scenario_id') for row in observations]
+        if len(actual)!=len(expected) or set(actual)!=expected: continue
+        for observation in observations:
+            assertions=observation.get('assertions',[])
+            valid_assertions=bool(assertions) and all(a.get('verdict') in {'pass','fail'} and a.get('evidence') for a in assertions)
+            consistent=valid_assertions and (observation.get('state')=='pass')==all(a['verdict']=='pass' for a in assertions)
+            if observation.get('native_invoked') is True and observation.get('fixture_validated') is True and observation.get('state') in {'pass','fail'} and consistent:
                 verified[observation['scenario_id']]=observation
     return verified
 
@@ -64,6 +71,21 @@ def load_proofs(directory):
             if re.fullmatch(r'adapter-validation-\d+-(?:REL|SEC|PERF|COST|EXT|OBS)-\d{2}\.json',path.name)]
 
 
+def proof_directory(plan,plan_path=DEFAULT_PLAN):
+    return ROOT/plan['preparation_evidence_directory'] if plan.get('preparation_evidence_directory') else Path(plan_path).parent/'preparation'
+
+
+def require_execution_ready(plan,case_id,proofs):
+    report=readiness(plan,proofs)
+    if plan['workflow'].get('execution_readiness')=='per-family':
+        rows=[row for row in report['scenario_status'] if row['case_id']==case_id]
+        require(rows and all(row['preparation_state']=='native-validated-candidate' for row in rows),
+                'Selected family has missing or stale native validation; no full experiment started')
+    else:
+        require(report['ready_for_full_execution'],'Full scope has missing or unvalidated adapters; no full experiment started')
+    return report
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--plan',type=Path,default=DEFAULT_PLAN)
@@ -72,7 +94,7 @@ def main():
     parser.add_argument('--require-complete',action='store_true')
     args=parser.parse_args()
     plan=load_plan(args.plan)
-    report=readiness(plan,load_proofs(args.proofs or args.plan.parent/'preparation'))
+    report=readiness(plan,load_proofs(args.proofs or proof_directory(plan,args.plan)))
     if not args.details: report={k:v for k,v in report.items() if k not in {'scenario_status','scenarios_requiring_implementation_or_validation'}}
     print(json.dumps(report,ensure_ascii=False,indent=2))
     if args.require_complete and not report['ready_for_full_execution']: parser.exit(1,'Full scope still has missing or unvalidated adapters; do not start a partial run as the full campaign\n')

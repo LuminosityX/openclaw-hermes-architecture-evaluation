@@ -1,6 +1,6 @@
 # Full-campaign preparation evidence
 
-These records validate configuration, native adapter wiring and independent acceptance. They are **not full-campaign observations**. The frozen campaign still requires all 257 scenarios and its prescribed independent units before unified architecture analysis.
+These records validate configuration, native adapter wiring and independent acceptance. They are **not full-campaign observations**. The active [batched plan](../../full-20261026-batched/plan.json) reuses this preparation directory and still requires all 257 scenarios and their prescribed independent units before unified architecture analysis. The original plan remains unchanged as a scheduling snapshot.
 
 | Check | Evidence | Meaning |
 | --- | --- | --- |
