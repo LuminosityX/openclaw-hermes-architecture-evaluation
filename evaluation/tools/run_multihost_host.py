@@ -90,7 +90,7 @@ class Effects:
     def members(self):return [int(p) for p in (self.group/'cgroup.procs').read_text().split()]
     def record(self,kind,**data):
         with self.lock:
-            self.events.append(dict(kind=kind,utc_ns=time.time_ns(),monotonic_ns=time.monotonic_ns(),host_boot_id=self.boot,**data));save(self.output/'host-events.json',self.events)
+            self.events.append(dict(kind=kind,utc_ns=time.time_ns(),monotonic_ns=time.monotonic_ns(),**dict({'host_boot_id':self.boot},**data)));save(self.output/'host-events.json',self.events)
     def identity(self,data):
         matches=[]
         for pid in self.members():
