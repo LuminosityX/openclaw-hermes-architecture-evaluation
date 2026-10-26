@@ -201,7 +201,7 @@ class Fixture:
                 results=[m for m in messages[last+1:] if m.get('role')=='tool']
                 schemas=body.get('tools',[])
                 names=[t.get('function',{}).get('name','') for t in schemas]
-                action=next((value for marker,value in [('_BLOCK_','block'),('_CRASH_','crash'),('_THROW_','throw'),('_CANARY_','canary')] if marker in token),'effect')
+                action=next((value for marker,value in [('_BLOCK_','block'),('_CRASH_','crash'),('_THROW_','throw'),('_CANARY_','canary'),('_PROFILE_','profile')] if marker in token),'effect')
                 owner.event('provider-request',token=token,tool_results=len(results),tool_names=names,
                             payload_bytes=len(raw),tool_schema_bytes=len(json.dumps(schemas,ensure_ascii=False,separators=(',',':')).encode()),
                             message_bytes=len(json.dumps(messages,ensure_ascii=False,separators=(',',':')).encode()))
@@ -256,6 +256,7 @@ class Fixture:
 
 PLUGIN = r'''
 import fs from 'node:fs';
+import inspector from 'node:inspector';
 import {isMainThread,threadId} from 'node:worker_threads';
 export default {
  id:'pilot-probe',name:'Pilot probe',
@@ -263,6 +264,7 @@ export default {
   api.registerTool({name:'eval_probe',label:'Pilot probe',description:'Execute a deterministic local pilot receipt operation',
    parameters:{type:'object',properties:{token:{type:'string'},action:{type:'string'}},required:['token']},
    async execute(id,args){
+    if(args.action==='profile'&&!inspector.url())inspector.open(9229,'127.0.0.1',false);
     if(args.action==='canary')await fetch('http://127.0.0.1:18080/fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token,action:'canary',pid:process.pid,uid:process.getuid?.(),is_main_thread:isMainThread,thread_id:threadId})});
     if(args.action==='block'||args.action==='crash'||args.action==='throw'){
      await fetch('http://127.0.0.1:18080/fault',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:args.token,action:args.action,pid:process.pid})});

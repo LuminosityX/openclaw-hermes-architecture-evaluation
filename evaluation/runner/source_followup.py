@@ -32,13 +32,14 @@ def listener_owner(port=18789):
 
 
 class MainThreadProfiler:
-    def __init__(self,pilot):
+    def __init__(self,pilot,gateway,label):
         self.process=None
         self.error=None
         self.owner_pid=listener_owner()
         try:
-            os.kill(self.owner_pid,signal.SIGUSR1)
-            time.sleep(.15)
+            opened=gateway.request('PILOT_PROFILE_'+label.upper().replace('-','_'))
+            if not opened['accepted'] or listener_owner()!=self.owner_pid:
+                raise RuntimeError('Inspector activation did not preserve the owned Gateway')
             self.process=subprocess.Popen([pilot.NODE,'/driver/profile.mjs'],stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,text=True)
             if not select.select([self.process.stdout],[],[],5)[0]:
                 raise RuntimeError('Inspector client readiness timeout')
@@ -96,7 +97,7 @@ def compact_request(request):
 
 
 def batch(pilot,fixture,gateway,label,profile=False):
-    profiler=MainThreadProfiler(pilot) if profile else None
+    profiler=MainThreadProfiler(pilot,gateway,label) if profile else None
     start_profile=profiler.command('start') if profiler else None
     tokens=['PILOT_SRC_'+label.upper().replace('-','_')+'_T'+str(i) for i in range(8)]
     barrier=threading.Barrier(8)
