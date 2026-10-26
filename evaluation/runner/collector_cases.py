@@ -2,6 +2,7 @@
 from collections import Counter
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 import hashlib
+import http.client
 import json
 import os
 from pathlib import Path
@@ -121,6 +122,8 @@ class Collector:
         owner=self
         class Handler(BaseHTTPRequestHandler):
             def log_message(self,*args):pass
+            def do_GET(self):
+                self.send_response(200 if self.path=='/health' else 404);self.send_header('Content-Length','0');self.end_headers()
             def do_POST(self):
                 raw=b''
                 try:
@@ -161,7 +164,7 @@ def configure(root,count,target):
     config['logging']['consoleLevel']='info'
     if SDK_ENTRY is None:raise RuntimeError('Public diagnostic producer SDK was not resolved through the pinned package exports')
     plugin=root/'composition-a/index.js';source=plugin.read_text().replace('  await announce(\'entered\');',
-        "  await announce('entered');\n  for(let index=0;index<(args.token==="+json.dumps(target)+"?"+str(count)+":8);index++){const suffix=args.token+'_N'+String(index).padStart(5,'0');api.logger.info('EVAL_LOCAL_OFFERED_'+suffix);emitDiagnosticEvent({type:'log.record',level:'INFO',message:'EVAL_OBS_EVENT_'+suffix});} ")
+        "  await announce('entered');\n  for(let index=0;index<(args.token==="+json.dumps(target)+"?"+str(count)+":8);index++){const suffix=args.token+'_N'+String(index).padStart(5,'0');api.logger.info('EVAL_LOCAL_OFFERED_'+suffix);emitDiagnosticEvent({type:'log.record',level:'INFO',message:'EVAL_OBS_EVENT_'+suffix});} await announce('work',{collector_offered_count:(args.token==="+json.dumps(target)+"?"+str(count)+":8)}); ")
     source="import {emitDiagnosticEvent} from "+json.dumps(SDK_ENTRY.as_uri())+";\n"+source
     plugin.write_text(source);pilot.save(root/'config.json',config);return config
 
@@ -172,6 +175,13 @@ def wait_delivered(collector,prefix,seconds=12):
         if any(k.startswith(prefix) for k in collector.deliveries):return True
         time.sleep(.1)
     return False
+
+
+def collector_health():
+    connection=http.client.HTTPConnection('127.0.0.1',18088,timeout=3)
+    try:
+        connection.request('GET','/health');response=connection.getresponse();response.read();return response.status==200
+    finally:connection.close()
 
 
 def run_scenario(root,scenario,unit=1):
@@ -194,6 +204,7 @@ def run_scenario(root,scenario,unit=1):
                 if b'maxQueueSize' in data and b'2048' in data and b'maxExportBatchSize' in data and b'512' in data:sources.append(dict(path=str(source),sha256=hashlib.sha256(data).hexdigest(),version=json.loads((sdk/'package.json').read_text())['version']))
         if not sources:raise RuntimeError('Installed official log SDK does not expose the registered default queue/batch limits')
         metadata['sdk_queue_contract_sources']=sources
+        if not collector_health():raise RuntimeError('Owned collector health control failed before native startup')
         gateway=pilot.Gateway(root,configurer=lambda p:configure(p,count,token));gateway.ready()
         inspect_env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
         inspection=subprocess.run([pilot.NODE,pilot.CLI,'plugins','inspect','diagnostics-otel','--json'],env=inspect_env,capture_output=True,text=True,timeout=45)
@@ -210,31 +221,42 @@ def run_scenario(root,scenario,unit=1):
         collector.fail=True;boundary=time.monotonic_ns();fixture.register(token)
         result=gateway.request(token);requests.append(result)
         deadline=time.monotonic()+8
-        while time.monotonic()<deadline and not any(a.get('status')==503 and any(k.startswith(prefix) for k in a['ids']) for a in collector.attempts):time.sleep(.1)
-        failures=[a for a in collector.attempts if a.get('status')==503 and any(k.startswith(prefix) for k in a['ids'])]
+        while time.monotonic()<deadline and not any(a.get('status')==503 and any(k.startswith(prefix) for k in a.get('ids',[])) for a in collector.attempts):time.sleep(.1)
+        failures=[a for a in collector.attempts if a.get('status')==503 and any(k.startswith(prefix) for k in a.get('ids',[]))]
         if not failures:raise RuntimeError('Actual collector failure was not matched to target native event IDs')
+        offers=[e for e in fixture.events if e['kind']=='tool-work' and e.get('token')==token and 'collector_offered_count' in e]
+        if len(offers)!=1 or offers[0]['collector_offered_count']!=count:raise RuntimeError('Reference producer did not independently confirm the exact offered workload')
+        metadata['independent_offered_workload_receipt']=offers[0]
         check('task-effect-independent-of-collector-failure',result['accepted'] and fixture.receipts.get(token)==1)
         if mode=='restart':
             os.killpg(gateway.process.pid,signal.SIGKILL);gateway.process.wait(timeout=5);gateway.stop()
-            collector.fail=False;gateway=pilot.Gateway(root,configurer=service.reuse);gateway.ready()
-            requests.extend(wait_control(gateway,fixture,token+'_POST_RESTART'))
+            collector.fail=False;gateway=pilot.Gateway(root,configurer=service.reuse)
+            try:
+                gateway.ready();requests.extend(wait_control(gateway,fixture,token+'_POST_RESTART'))
+                check('native-publisher-process-recovers-after-deliberate-kill',True)
+            except RuntimeError as error:
+                metadata['native_restart_recovery_error']=str(error)[:1800]
+                check('native-publisher-process-recovers-after-deliberate-kill',False)
         else:
             time.sleep(2 if mode=='brief' else 12 if mode=='long' else 3);collector.fail=False
+        if not collector_health():raise RuntimeError('Independent collector did not remain healthy after fault removal')
         recovered=token+'_RECOVERY';fixture.register(recovered);result=gateway.request(recovered);requests.append(result)
-        if not result['accepted'] or fixture.receipts.get(recovered)!=1:raise RuntimeError('Post-outage task control failed')
-        if not wait_delivered(collector,'EVAL_OBS_EVENT_'+recovered+'_N'):raise RuntimeError('Post-outage OTLP publication control failed')
+        check('native-task-recovers-after-collector-restoration',result['accepted'] and fixture.receipts.get(recovered)==1)
+        check('native-publication-recovers-after-collector-restoration',wait_delivered(collector,'EVAL_OBS_EVENT_'+recovered+'_N'))
         time.sleep(3)
         gateway.stop();time.sleep(.25)
         native=(root/'gateway-native.log').read_text(errors='replace')
-        expected={k.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1) for k in OFFERED.findall(native) if k.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1).startswith(prefix)}
-        if len(expected)!=count:raise RuntimeError('Native local log did not retain all offered unique target event IDs')
+        local_expected={k.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1) for k in OFFERED.findall(native) if k.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1).startswith(prefix)}
+        expected={prefix+str(index).zfill(5) for index in range(count)}
+        check('native-local-offered-event-log-retains-the-offered-workload',local_expected==expected)
         delivered={k:v for k,v in collector.deliveries.items() if k in expected}
         missing=sorted(expected-set(delivered));duplicates=sum(max(0,n-1) for n in delivered.values())
-        check('all-native-local-events-eventually-exported',not missing)
+        check('all-offered-native-diagnostic-events-eventually-exported',not missing)
         check('no-duplicate-successful-collector-deliveries',duplicates==0)
         metadata.update(mode=mode,matching_failure_boundary_ns=boundary,offered_unique_events=count,
             missing_event_count=len(missing),duplicate_successful_deliveries=duplicates,event_id_prefix=prefix,
-            native_local_event_indices=sorted(int(k.rsplit('_N',1)[1]) for k in expected),
+            native_local_event_indices=sorted(int(k.rsplit('_N',1)[1]) for k in local_expected),
+            native_local_missing_event_indices=sorted(int(k.rsplit('_N',1)[1]) for k in expected-local_expected),
             native_event_set_sha256=hashlib.sha256(json.dumps(sorted(expected)).encode()).hexdigest(),
             native_local_file_sha256=hashlib.sha256(native.encode()).hexdigest(),
             successful_deliveries_by_index={k.rsplit('_N',1)[1]:v for k,v in delivered.items()},
