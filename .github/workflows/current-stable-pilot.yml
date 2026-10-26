@@ -23,7 +23,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: current-stable-openclaw-pilot
+  group: current-stable-openclaw-${{ inputs.study }}
   cancel-in-progress: false
 
 jobs:
@@ -79,7 +79,7 @@ jobs:
           lock=json.loads((root/'openclaw-eval-runtime/package-lock.json').read_text())
           (root/'openclaw-eval-artifact/package-lock.json').write_text(json.dumps(lock,separators=(',',':'))+'\n')
           PY
-      - name: Execute first-wave native pilots with bounded ephemeral state
+      - name: Execute the selected bounded native experiment
         run: |
           sudo python3 evaluation/tools/run_local.py \
             --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
@@ -103,6 +103,15 @@ jobs:
       - name: Bind followup results to the pinned implementation source
         if: always() && (inputs.study == 'source-followup' || startsWith(inputs.study, 'SRC-'))
         run: python3 evaluation/tools/source_evidence.py --output "$RUNNER_TEMP/openclaw-eval-artifact/source-map.json"
+      - name: Enforce the final artifact budget including source excerpts
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-eval-artifact'
+          assert sum(p.stat().st_size for p in root.iterdir() if p.is_file())<=2*1024**2
+          PY
       - name: Upload compact evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
