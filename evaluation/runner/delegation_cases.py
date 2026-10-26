@@ -107,9 +107,14 @@ def run_scenario(root,scenario,unit=1):
         metadata['effects_before_explicit_operator_retry']=peer.receipts.get(effect,0)
         if mode=='child-restart':
             resumed=token+'_EXPLICIT_CONTINUATION';peer.register(effect);fixture.plan(resumed,'delegated__eval_probe',dict(token=effect),'RECEIPT:'+effect)
-            continued=privacy_cases.request(gateway,resumed,child_session,'Explicit operator continuation after interruption. Retry the owned operation without assuming that earlier remote effects were rolled back.');requests.append(continued)
-            after_resume=capture(child_session);metadata.update(explicit_operator_continuation=continued,native_child_after_explicit_continuation=after_resume,effects_after_explicit_operator_retry=peer.receipts.get(effect,0))
-            check('retained-child-conversation-accepts-explicit-native-continuation',continued['accepted'] and resumed in json.dumps(after_resume))
+            continued=privacy_cases.wire(root,[dict(method='sessions.send',params=dict(key=child_session,message=resumed+'\nExplicit operator continuation after interruption. Retry the owned operation without assuming that earlier remote effects were rolled back.',idempotencyKey=token+'_EXPLICIT_OPERATOR_RETRY',timeoutMs=45000))]);requests.append(continued)
+            responses=continued.get('responses',[]);accepted=bool(responses) and all(r.get('result',{}).get('ok') for r in responses)
+            deadline=time.monotonic()+45;after_resume=capture(child_session)
+            while accepted and time.monotonic()<deadline and (child_active(after_resume) or peer.receipts.get(effect,0)<2):
+                time.sleep(.3);after_resume=capture(child_session)
+            metadata.update(explicit_operator_continuation=continued,native_child_after_explicit_continuation=after_resume,effects_after_explicit_operator_retry=peer.receipts.get(effect,0),continuation_entry_point='Documented operator sessions.send; generic HTTP completions intentionally rejects reserved internal namespaces')
+            before_payload=before.get('responses',[{}])[0].get('result',{}).get('payload',{});after_payload=after_resume.get('responses',[{}])[0].get('result',{}).get('payload',{})
+            check('retained-child-conversation-accepts-explicit-native-continuation',accepted and after_resume.get('responses',[{}])[0].get('result',{}).get('ok') is True and resumed in json.dumps(after_resume) and before_payload.get('sessionId')==after_payload.get('sessionId') and peer.receipts.get(effect,0)>=2 and 'RECEIPT:'+effect in json.dumps(after_resume))
             metadata['retry_scope']='Any extra unkeyed effect after this explicit operator retry is recorded as operator replay, not framework automatic replay or an exactly-once promise.'
         neighbor=token+'_UNRELATED';fixture.register(neighbor);result=gateway.request(neighbor);requests.append(result)
         check('unrelated-native-work-remains-usable',result['accepted'] and fixture.receipts.get(neighbor)==1)

@@ -160,6 +160,22 @@
       "preservation": "Original compact records and manifest preserved under quarantined-results. Immutable native/provider ZIP and all real paid usage remain retained.",
       "correction": "Use exact exclusive host unit ownership first; preserve the original model prompt marker as an observation. Recalibrate and execute only missing unit 1.",
       "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40399418320",
+      "scenarios": [
+        "REL-03-S02"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "wrong-public-continuation-entry-point",
+      "reason": "The explicit child continuation incorrectly used generic HTTP completions with a reserved agent:main:subagent namespace. Native HTTP returned its documented reserved-namespace refusal before dispatch. This does not test native child resumption. Replace only S02 with documented operator sessions.send, proving the retained session ID and actual new MCP receipt; S01/S03 remain accepted.",
+      "preservation": "Original compact records and manifest preserved under quarantined-results; immutable hosted raw evidence stays unchanged.",
+      "correction": "Use documented native sessions.send and verify real child continuation after a fresh full-family calibration. Rerun S02 only.",
+      "architecture_interpretation": "deferred"
     }
   ]
 }
