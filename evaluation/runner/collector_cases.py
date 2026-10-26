@@ -19,7 +19,8 @@ import service_path_cases as service
 
 SCENARIOS={f'OBS-02-S{i:02}':name for i,name in enumerate(['brief','long','restart','overflow'],1)}
 EVENT=re.compile(r'EVAL_OBS_EVENT_PILOT_[A-Z0-9_]+_N\d{5}')
-ADDON=Path('/runtime/node_modules/@openclaw/diagnostics-otel')
+ADDON_TEMPLATE=Path('/official-addon.json')
+ADDON=Path(json.loads(ADDON_TEMPLATE.read_text())['package_root']) if ADDON_TEMPLATE.is_file() else Path('/runtime/node_modules/@openclaw/diagnostics-otel')
 
 
 def fields(data):
@@ -95,6 +96,7 @@ def configure(root,count,target):
     package=json.loads((ADDON/'package.json').read_text())
     if package['version']!='2026.10.7':raise RuntimeError('Official diagnostics addon version differs from campaign')
     config=service.configure(root)
+    config['plugins']['installs']=json.loads(ADDON_TEMPLATE.read_text())['installs']
     config['plugins']['allow'].append('diagnostics-otel');config['plugins']['load']['paths'].append(str(ADDON));config['plugins']['entries']['diagnostics-otel']=dict(enabled=True)
     config['diagnostics']=dict(enabled=True,otel=dict(enabled=True,endpoint='http://127.0.0.1:18088',protocol='http/protobuf',
         serviceName='owned-openclaw-evaluation',traces=False,metrics=False,logs=True,logsExporter='otlp',flushIntervalMs=1000,captureContent=True))
@@ -120,7 +122,8 @@ def run_scenario(root,scenario,unit=1):
     previous={key:os.environ.get(key) for key in settings};os.environ.update(settings)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['native-local-log-event-ids','independent-otlp-protobuf-deliveries','actual-collector-failures','native-task-receipts']))
     try:
-        sdk_roots=[Path('/runtime/node_modules/@opentelemetry/sdk-logs'),ADDON/'node_modules/@opentelemetry/sdk-logs']
+        project=Path(json.loads(ADDON_TEMPLATE.read_text())['project_root'])
+        sdk_roots=[project/'node_modules/@opentelemetry/sdk-logs',ADDON/'node_modules/@opentelemetry/sdk-logs']
         sources=[]
         for sdk in sdk_roots:
             if not (sdk/'package.json').is_file():continue
@@ -185,6 +188,8 @@ def run_scenario(root,scenario,unit=1):
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2500],metadata=metadata)
     finally:
         collector.fail=False
+        usage=shutil.disk_usage(pilot.BASE)
+        row['owned_tmpfs_at_cleanup']=dict(total_bytes=usage.total,used_bytes=usage.used,free_bytes=usage.free)
         if gateway:gateway.stop();row['native_gateway_tail']=''.join(gateway.log_tail)[-4000:]
         collector.close();fixture.close();shutil.rmtree(root,ignore_errors=True);row['owned_state_retained']=root.exists()
         for key,value in previous.items():

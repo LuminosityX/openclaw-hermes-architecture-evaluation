@@ -64,7 +64,7 @@ def decode_report(stdout):
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
-def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False):
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False,official_addon=False):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
     if identity_migration:
@@ -103,6 +103,12 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         command += ['--ro-bind',str(task_input),'/task/input.json']
     if measurement_group:
         command += ['--ro-bind',str(measurement_group),'/measurement/cgroup']
+    if official_addon:
+        template_path=runtime_modules.parent/'official-addon-template.json'
+        template=json.loads(template_path.read_text());project=Path(template['project_root']).resolve()
+        if not project.is_relative_to(runtime_modules.parent.resolve()) or not project.is_dir():raise ValueError('Official addon must remain within the owned hosted runtime prefix')
+        if template.get('kind')!='native-official-addon-install-template' or not Path(template['package_root']).resolve().is_relative_to(project):raise ValueError('Invalid native addon install template')
+        command+=['--ro-bind',str(project),str(project),'--ro-bind',str(template_path),'/official-addon.json']
     return command + ['--', '/usr/bin/python3', '/driver/'+driver, *driver_args]
 
 
@@ -187,7 +193,7 @@ def main():
             for scenario in args.native_scenario:driver_args+=['--scenario',scenario]
         command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
                                   measurement_group=group if driver in {'mechanism_validation.py','service_path_validation.py'} else None,
-                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation=='SEC-10')
+                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation=='SEC-10',official_addon=args.adapter_validation=='OBS-02')
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
