@@ -2,6 +2,8 @@
 
 **Role: historical bootstrap only.** These `2026.9.2` observations validate the test chain; they are excluded from conclusions about the current OpenClaw release. The [campaign pin](../design/evaluation-matrix.json) now selects the latest stable release resolved at campaign start. Current-version execution uses a hosted temporary runner to avoid installing another runtime locally.
 
+For the primary version, read the [2026.10.7 hosted campaign evidence](current-stable-20261026/README.md), including successful per-study controls, earlier setup failures and resource conditions.
+
 The [bounded evidence record](first-wave-20261026.json) contains actual OpenClaw Gateway observations using the existing `2026.9.2` build, declared source commit `3928bad9badfcb6c7d140530435e806fb8092190`. Controller hashes identify the Python sources retained at repository commit `d73f8d2`. The build pin comes from installed metadata, not an independently verified upstream-source rebuild. This is a two-block bootstrap pilot of each of three studies, not a current-release architecture verdict or completion of the full case matrix.
 
 The final sequential first wave took 123.72 seconds with a local scripted provider and no paid model calls. It used read-only shared dependencies, a 64 MiB kernel-limited tmpfs, zero allowed swap, a 1 GiB whole-experiment memory limit and two-core CPU quota. The storage guard deliberately reached `ENOSPC` before product startup and removed its files. Each arm's runtime state was deleted after compact observations were collected; namespace teardown removed remaining keys, caches and temporary data. The retained JSON is about 222 KiB; there is no runtime snapshot or compressed raw archive.

@@ -1,0 +1,127 @@
+{
+  "kind": "current-stable-pilot-evidence",
+  "target": {
+    "product": "openclaw",
+    "version": "2026.10.7",
+    "source_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+    "selection_policy": "latest-stable-at-campaign-start",
+    "release_tag": "v2026.10.7",
+    "release_url": "https://github.com/openclaw/openclaw/releases/tag/v2026.10.7",
+    "release_published_at": "2026-10-24T09:53:46Z",
+    "checked_at_utc": "2026-10-26T04:13:15.261947+00:00",
+    "npm_integrity": "sha512-iiZO+kFFBgQvxm17wn3Sc/MSC/GQu01PubAFVNA2Nn736HOHUbR0ra7a9NeW9wpjq3kDkSJ1RB7dTP+qVJFXig==",
+    "npm_tarball": "https://registry.npmjs.org/openclaw/-/openclaw-2026.10.7.tgz",
+    "node_engine": ">=24.22.1 <25 || >=26.12.1",
+    "node_version": "24.22.1",
+    "pin_policy": "Resolve GitHub stable and npm latest together before a campaign; pin version, release commit and package integrity for its duration. Historical bootstrap runs are excluded from current-release conclusions."
+  },
+  "selected_studies": [
+    {
+      "github_run_id": 40269017948,
+      "controller_commit": "daf9c985613d0c8a665ec56dda74b40a76799fcc",
+      "selected_studies": [
+        "ARC-01",
+        "ARC-03"
+      ],
+      "report": "run-40269017948.json",
+      "installation": "installation-40269017948.json",
+      "execution": "execution-40269017948.json",
+      "package_lock": "package-lock-005ded4ea9b1.json",
+      "package_lock_sha256": "005ded4ea9b1b00d511834d8bba98076d9777fd61cf8e7f1a53f61c11fe1a76b",
+      "note": "Per-study valid controls are selected; an overall harness failure in another study is not converted into a pass."
+    },
+    {
+      "github_run_id": 40269524944,
+      "controller_commit": "4b936c5dd492a139af9f9c4c02fc3833c5da590c",
+      "selected_studies": [
+        "ARC-02"
+      ],
+      "report": "run-40269524944.json",
+      "installation": "installation-40269524944.json",
+      "execution": "execution-40269524944.json",
+      "package_lock": "package-lock-005ded4ea9b1.json",
+      "package_lock_sha256": "005ded4ea9b1b00d511834d8bba98076d9777fd61cf8e7f1a53f61c11fe1a76b",
+      "note": "Per-study valid controls are selected; an overall harness failure in another study is not converted into a pass."
+    }
+  ],
+  "controls_valid_for": [
+    "ARC-01",
+    "ARC-02",
+    "ARC-03"
+  ],
+  "independent_paired_blocks_per_study": 2,
+  "attempts": [
+    {
+      "github_run_id": 40268112639,
+      "controller_commit": "8b688b5acfa035713b0da5aa651a7f77e4299091",
+      "classification": "startup-aborted-no-resource-report"
+    },
+    {
+      "github_run_id": 40268335129,
+      "controller_commit": "cb1e43ad9da5266be9574fd455465c696100a96e",
+      "classification": "resource-budget-oom",
+      "wrapper_exit_code": -9,
+      "harness_error": "Inner namespace exited before publishing a JSON report",
+      "whole_run_seconds": 19.538,
+      "resource_counters": {
+        "memory_peak_bytes": 1610612736,
+        "memory_events": "low 0\nhigh 0\nmax 41\noom 1\noom_kill 2\noom_group_kill 1\n",
+        "pids_events": "max 0\n",
+        "cpu_stat": "usage_usec 31420291\nuser_usec 27228842\nsystem_usec 4191448\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 196\nnr_throttled 80\nthrottled_usec 8785848\nnr_bursts 0\nburst_usec 0\n"
+      },
+      "valid_studies": []
+    },
+    {
+      "github_run_id": 40268588319,
+      "controller_commit": "290926114ec8825bba9907899e50ad883213fc14",
+      "classification": "provider-fixture-protocol-mismatch",
+      "wrapper_exit_code": 1,
+      "harness_error": "Queue positive control failed: {\"token\": \"PILOT_WARM_0_1\", \"status\": 200, \"accepted\": false, \"latency_ms\": 10899.3933, \"response_excerpt\": \"{\\\"id\\\": \\\"chatcmpl_7a804b72-59ef-4654-afd5-58a4357a1521\\\", \\\"object\\\": \\\"chat.completion\\\", \\\"created\\\": 1792988495, \\\"model\\\": \\\"openclaw\\\", \\\"choices\\\": [{\\\"index\\\": 0, \\\"message\\\": {\\\"role\\\": \\\"assistant\\\", \\\"content\\\": \\\"MISSING_TOOL:tool_call,tool_describe,tool_search\\\"}, \\\"finish_reason\\\": \\\"stop\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 0, \\\"completion_tokens\\\": 0, \\\"total_tokens\\\": 0}}\"}",
+      "whole_run_seconds": 21.348,
+      "resource_counters": {
+        "memory_peak_bytes": 1610739712,
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "pids_events": "max 0\n",
+        "cpu_stat": "usage_usec 32858537\nuser_usec 28471113\nsystem_usec 4387424\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 214\nnr_throttled 71\nthrottled_usec 8183457\nnr_bursts 0\nburst_usec 0\n"
+      },
+      "valid_studies": []
+    },
+    {
+      "github_run_id": 40269017948,
+      "controller_commit": "daf9c985613d0c8a665ec56dda74b40a76799fcc",
+      "classification": "two-valid-studies-and-mcp-metadata-parser-failure",
+      "wrapper_exit_code": 1,
+      "harness_error": "Route positive control failed: {\"token\": \"PILOT_ROUTE_B0_MCP\", \"status\": 200, \"accepted\": false, \"latency_ms\": 7556.702617, \"response_excerpt\": \"{\\\"id\\\": \\\"chatcmpl_25e34353-5765-4a2a-a1db-c42854d2b3b8\\\", \\\"object\\\": \\\"chat.completion\\\", \\\"created\\\": 1792988947, \\\"model\\\": \\\"openclaw\\\", \\\"choices\\\": [{\\\"index\\\": 0, \\\"message\\\": {\\\"role\\\": \\\"assistant\\\", \\\"content\\\": \\\"TOOL_ERROR:tool_call,tool_describe,tool_search\\\"}, \\\"finish_reason\\\": \\\"stop\\\"}], \\\"usage\\\": {\\\"prompt_tokens\\\": 0, \\\"completion_tokens\\\": 0, \\\"total_tokens\\\": 0}}\"} cli.bootstrap.plugin-plan-import 2.6ms total=976.2ms start=973.5ms\n[gateway] startup phase: cli.bootstrap.plugin-plan starting total=976.3ms\n[gateway] startup phase: cli.bootstrap.plugin-plan 0.2ms total=976.4ms start=976.3ms\n[gateway] startup phase: cli.command.config-ready 426.4ms total=978.8ms start=552.4ms\n[gateway] startup phase: cli.main.gateway-run-reload-environment starting total=978.8ms\n[gateway] startup phase: cli.main.gateway-run-reload-environment 0.4ms total=979.3ms start=978.8ms\n[gateway] startup phase: cli.main.gateway-run-bootstrap 428.5ms total=979.3ms start=550.8ms\n[gateway] startup phase: cli.bootstrap.lifecycle-runtime starting total=1170.9ms\n[gateway] startup phase: cli.bootstrap.lifecycle-runtime 36.9ms total=1207.8ms start=1170.9ms\n[gateway] startup phase: cli.bootstrap.gateway-lock starting total=1208.2ms\n[gateway] startup phase: cli.bootstrap.gateway-lock 190.0ms total=1398.2ms start=1208.2ms\n[gateway] startup phase: cli.bootstrap.boot-lifecycle starting total=1404.3ms\n[gateway] startup phase: cli.bootstrap.boot-lifecycle 2.7ms total=1407.0ms start=1404.3ms\n[gateway] startup phase: gateway.server-start-import starting total=1495.5ms\n[gateway] startup phase: gateway.server-start-import 307.7ms total=1803.2ms start=1495.5ms\n\u001b[90m2026-10-26T04:29:07.476+00:00\u001b[39m \u001b[36m[gateway]\u001b[39m \u001b[33mOlder local CLI/SDK versions can bypass Gateway state mutation routing. Use matching CLI/SDK and Gateway versions; direct state writes from another process while this Gateway owns state are unsupported.\u001b[39m\n\u001b[90m2026-10-26T04:29:07.657+00:00\u001b[39m \u001b[36m[heartbeat]\u001b[39m \u001b[33mscheduled heartbeats are disabled because the cron scheduler is disabled; enable cron and restart the gateway\u001b[39m\n2026-10-26T04:29:15.194+00:00 TOOL_ERROR:tool_call,tool_describe,tool_search\n",
+      "whole_run_seconds": 175.076,
+      "resource_counters": {
+        "memory_peak_bytes": 2179350528,
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "pids_events": "max 0\n",
+        "cpu_stat": "usage_usec 270177600\nuser_usec 225540043\nsystem_usec 44637557\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 1750\nnr_throttled 674\nthrottled_usec 69382958\nnr_bursts 0\nburst_usec 0\n"
+      },
+      "valid_studies": [
+        "ARC-01",
+        "ARC-03"
+      ]
+    },
+    {
+      "github_run_id": 40269524944,
+      "controller_commit": "4b936c5dd492a139af9f9c4c02fc3833c5da590c",
+      "classification": "valid-plugin-study",
+      "wrapper_exit_code": 0,
+      "harness_error": null,
+      "whole_run_seconds": 103.418,
+      "resource_counters": {
+        "memory_peak_bytes": 2010320896,
+        "memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\n",
+        "pids_events": "max 0\n",
+        "cpu_stat": "usage_usec 162510080\nuser_usec 138816145\nsystem_usec 23693935\nnice_usec 0\ncore_sched.force_idle_usec 0\nnr_periods 1033\nnr_throttled 357\nthrottled_usec 35459333\nnr_bursts 0\nburst_usec 0\n"
+      },
+      "valid_studies": [
+        "ARC-02"
+      ]
+    }
+  ],
+  "local_runtime_installation": false,
+  "interpretation": "Valid exploratory studies on the pinned release; not complete six-axis coverage, real-model quality, billed-cost evidence or a matched comparison with the historical local bootstrap."
+}

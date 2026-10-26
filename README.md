@@ -4,6 +4,8 @@
 
 The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, checked against GitHub stable and npm `latest` on 2026-10-26. The exact [campaign pin](evaluation/design/evaluation-matrix.json) is fixed for reproducibility. See the [current-version execution guide](evaluation/current-version.md); newer dependency installations run on disposable GitHub-hosted machines, not this local workspace.
 
+[Current-release evidence](evaluation/evidence/current-stable-20261026/README.md) now contains valid two-block pilots for all three first-wave studies on this version. The earlier local build remains harness-bootstrap evidence only.
+
 **Status:** 60 experiment families and 257 scenario labels remain the full-suite plan. A [bounded native pilot runner](evaluation/runner/README.md) now executes the three first-wave architecture studies using an existing OpenClaw installation and a local deterministic provider. These pilots do not complete the suite or establish real-model task quality. Offline design validation, plan selection and token-cost calculation remain available.
 
 | Dimension | Focus | Planned families |
