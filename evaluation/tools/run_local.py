@@ -57,10 +57,10 @@ def decode_report(stdout):
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
-def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False):
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
-    command = ['bwrap', *namespaces, '--die-with-parent', '--new-session', '--cap-drop', 'ALL', *capabilities,
+    command = ['bwrap', *namespaces, '--die-with-parent', '--new-session', '--clearenv', '--cap-drop', 'ALL', *capabilities,
                '--ro-bind', '/usr', '/usr', '--symlink', 'usr/bin', '/bin',
                '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/lib64', '/lib64',
                '--proc', '/proc', '--dev', '/dev', '--size', str(tmpfs_mib * 1024**2), '--tmpfs', '/scratch',
@@ -76,7 +76,9 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
     for name in ['/etc/passwd', '/etc/group', '/etc/localtime', '/etc/ssl/certs']:
         if Path(name).exists():
             command += ['--ro-bind', name, name]
-    return command + ['--', '/usr/bin/python3', '/driver/pilot.py', *driver_args]
+    if relay_socket:
+        command += ['--ro-bind',str(relay_socket),'/relay/provider.sock']
+    return command + ['--', '/usr/bin/python3', '/driver/'+driver, *driver_args]
 
 
 def main():
@@ -92,7 +94,11 @@ def main():
     parser.add_argument('--ssh-backend', action='store_true', help='Use an owned ephemeral loopback SSH backend; no Docker images')
     parser.add_argument('--allow-historical-bootstrap',action='store_true',help='Explicitly label a non-current runtime as harness bootstrap only')
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
+    parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
+    parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
     args = parser.parse_args()
+    if args.model_validation and (not args.hosted_profile or not args.relay_socket or not args.relay_socket.is_socket()):
+        parser.error('Real-model plumbing validation requires the hosted profile and an existing Unix relay socket')
     if not 16 <= args.tmpfs_mib <= 128 or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
         parser.error('Bounded pilot limits: 16..128 MiB tmpfs, 1..4 blocks, 1..1200 seconds')
     maximum_memory=4096 if args.hosted_profile else 1536
@@ -128,7 +134,8 @@ def main():
                              'pids.max':128, 'cpu.max':'200000 100000', 'memory.oom.group':1}.items():
             (group / field).write_text(str(value))
         command = sandbox_command(modules, node, args.tmpfs_mib,
-                                  ['--study', args.study, '--blocks', str(args.blocks), *(['--ssh-backend'] if args.ssh_backend else [])],args.ssh_backend)
+                                  [] if args.model_validation else ['--study', args.study, '--blocks', str(args.blocks), *(['--ssh-backend'] if args.ssh_backend else [])],
+                                  args.ssh_backend,driver='model_validation.py' if args.model_validation else 'pilot.py',relay_socket=args.relay_socket)
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,

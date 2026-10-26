@@ -1,0 +1,94 @@
+name: Real provider harness validation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openclaw-real-provider-validation
+  cancel-in-progress: false
+
+jobs:
+  validation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          persist-credentials: false
+      - name: Check campaign pin against official stable metadata
+        run: |
+          python3 evaluation/tools/target.py check-current
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          target=json.loads(Path('evaluation/design/evaluation-matrix.json').read_text())['target']
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+              output.write('OPENCLAW_EVAL_VERSION='+target['version']+'\n')
+              output.write('OPENCLAW_EVAL_NODE='+target['node_version']+'\n')
+          PY
+      - name: Set up the pinned compatible Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ env.OPENCLAW_EVAL_NODE }}
+      - name: Check hosted runner prerequisites
+        run: |
+          command -v bwrap || { sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends bubblewrap; }
+          test -d /sys/fs/cgroup/system.slice
+          node --version
+      - name: Install the exact published package on the temporary hosted runner
+        env:
+          npm_config_cache: ${{ runner.temp }}/openclaw-npm-cache
+          npm_config_update_notifier: 'false'
+          npm_config_fund: 'false'
+          npm_config_audit: 'false'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/openclaw-eval-runtime" --save-exact "openclaw@$OPENCLAW_EVAL_VERSION"
+          test "$(du -sm "$RUNNER_TEMP/openclaw-eval-runtime" "$RUNNER_TEMP/openclaw-npm-cache" | awk '{s+=$1} END {print s}')" -le 4096
+          mkdir -p "$RUNNER_TEMP/openclaw-eval-artifact"
+          python3 evaluation/tools/target.py verify-installation \
+            --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-eval-runtime/package-lock.json" \
+            > "$RUNNER_TEMP/openclaw-eval-artifact/installation.json"
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          lock=json.loads((root/'openclaw-eval-runtime/package-lock.json').read_text())
+          (root/'openclaw-eval-artifact/package-lock.json').write_text(json.dumps(lock,separators=(',',':'))+'\n')
+          PY
+      - name: Validate native Gateway, real model and independent tool receipt
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: |
+          sudo --preserve-env=DEEPSEEK_API_KEY python3 evaluation/tools/run_model_validation.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
+            --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-model-output"
+      - name: Prepare compact harness evidence
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/openclaw-eval-artifact"
+          if test -d "$RUNNER_TEMP/openclaw-model-output"; then
+            sudo cp -r "$RUNNER_TEMP/openclaw-model-output" "$RUNNER_TEMP/openclaw-eval-artifact/model-validation"
+          fi
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-eval-artifact'
+          (root/'execution.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],host='github-hosted-ubuntu-24.04',purpose='harness-validation-only',full_campaign_coverage=False,local_runtime_installation=False),indent=2)+'\n')
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())<=2*1024**2
+          PY
+      - name: Upload bounded synthetic plumbing and usage evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: real-provider-harness-validation
+          path: ${{ runner.temp }}/openclaw-eval-artifact/
+          retention-days: 3
+          if-no-files-found: error
+      - name: Remove this job's installation, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-eval-runtime" "$RUNNER_TEMP/openclaw-npm-cache" "$RUNNER_TEMP/openclaw-model-output"

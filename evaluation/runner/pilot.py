@@ -342,9 +342,9 @@ def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_b
 
 
 class Gateway:
-    def __init__(self,root,**options):
+    def __init__(self,root,configurer=configuration,**options):
         self.root=root
-        self.config=configuration(root,**options)
+        self.config=configurer(root,**options)
         print('[pilot] starting Gateway '+root.name,file=sys.stderr,flush=True)
         self.log_tail=deque(maxlen=100)
         env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),

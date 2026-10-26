@@ -1,0 +1,32 @@
+{
+  "kind": "deepseek-connection-preflight",
+  "checked_at_utc": "2026-10-26T06:33:43.969306+00:00",
+  "configured": true,
+  "authenticated": true,
+  "model": "deepseek-flash",
+  "model_metadata": {
+    "id": "deepseek-flash",
+    "name": "DeepSeek-V4.1-Flash",
+    "context_window": 1048576,
+    "max_output_tokens": 393216,
+    "effort": {
+      "supported_levels": [
+        "low",
+        "high",
+        "max"
+      ],
+      "default_level": "high"
+    },
+    "api_capabilities": {
+      "anthropic_messages": {
+        "system_prompt_update": "in-history",
+        "tool_update": "addition-only"
+      }
+    }
+  },
+  "completion_requests": 0,
+  "model_tokens_requested": 0,
+  "campaign_spend_ceiling": null,
+  "spending_authorization": "Explicit user instruction: no campaign total ceiling",
+  "limitation": "Connectivity/model discovery only; no experiment or paid model completion was executed."
+}
