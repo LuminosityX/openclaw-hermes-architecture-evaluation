@@ -12,7 +12,7 @@ This directory evaluates OpenClaw task execution on `main` across exactly six di
 6. [Architecture tradeoff studies](architecture-studies.md): seven cross-dimensional studies, a three-study first wave, and preregistration requirements for explaining benefits, costs and design intent.
 7. [First-wave pilot evidence](evidence/README.md): actual bounded execution on the installed OpenClaw build, retained observations and inference limits.
 8. [Current stable campaign](current-version.md): resolve and pin the latest stable release, run it on a disposable hosted machine, and keep old harness-bootstrap evidence separate.
-9. [Source-driven investigations](source-investigations.md): trace surprising results to implementation owners, challenge alternative explanations and execute discriminating interventions. This is the continuing work loop, not an optional narrative after a benchmark.
+9. [Source-driven investigations](source-investigations.md): trace surprising results to implementation owners, challenge alternative explanations and execute discriminating interventions. The current full campaign defers this interpretation until the complete experiment audit passes.
 
 ## Tooling
 
@@ -36,11 +36,13 @@ python3 evaluation/tools/suite.py catalogue > evaluation/experiment-catalogue.md
 python3 evaluation/tools/check_design.py
 ```
 
-## Implementation sequence
+The active workflow is defined in the [full campaign guide](full-campaign.md). Its frozen scope and completion gate supersede the exploratory sequence below.
+
+## Earlier exploratory implementation sequence
 
 The first-wave [native pilot adapter](runner/README.md) now provides isolated task state, build/configuration reporting, local provider/tool fixtures, independent receipt events, native-state inspection and resource sampling. Extend it toward the remaining deterministic authority, protocol and telemetry cases with independent fixture validation. Declare supported capabilities for the pinned runtime; unsupported hook points, transports, OS targets or deployment topologies remain explicit outcomes.
 
-Then implement independently accepted task workloads and a separately budgeted real-model phase for task quality, prompt-injection susceptibility, long context and actual billing. Record provider/model settings to distinguish model behavior from framework behavior. The [measurement contract](measurement-contract.md) defines the accounting rules; `costs.py` calculates estimates from explicitly supplied usage and dated prices.
+Then implement independently accepted task workloads and a real-model phase using the user-selected `deepseek-flash` without a campaign spending ceiling for task quality, prompt-injection susceptibility, long context and actual billing. Record provider/model settings to distinguish model behavior from framework behavior. The [measurement contract](measurement-contract.md) defines the accounting rules; `costs.py` calculates estimates from explicitly supplied usage and dated prices.
 
 No aggregate grade is defined. Compare supported OpenClaw configurations or revisions within the same task contract when useful; no Hermes installation or paired-product result is required.
 

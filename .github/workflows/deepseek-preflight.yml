@@ -1,0 +1,27 @@
+name: DeepSeek connection preflight
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  connection:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 3
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Verify secret and requested model without generating tokens
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+        run: python3 evaluation/tools/provider_connection.py --output "$RUNNER_TEMP/deepseek-connection.json"
+      - name: Retain connection metadata only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: deepseek-connection-metadata
+          path: ${{ runner.temp }}/deepseek-connection.json
+          retention-days: 3
+          if-no-files-found: error
