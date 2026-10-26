@@ -1,0 +1,58 @@
+name: Retain formal campaign evidence in GitHub
+
+on:
+  workflow_dispatch:
+    inputs:
+      runs:
+        description: 'JSON array: [{"run_id":123,"exclude_scenarios":[],"exclusion_reason":null}]'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  actions: read
+
+concurrency:
+  group: retain-formal-campaign
+  cancel-in-progress: false
+
+jobs:
+  retain:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: main
+      - name: Validate and retain bounded hosted evidence without a runtime installation
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVAL_RETENTION_RUNS: ${{ inputs.runs }}
+        run: |
+          python3 - <<'PY'
+          import json,os,subprocess
+          runs=json.loads(os.environ['EVAL_RETENTION_RUNS'])
+          assert isinstance(runs,list) and 1<=len(runs)<=20
+          for item in runs:
+              assert type(item['run_id']) is int and item['run_id']>0
+              command=['python3','evaluation/tools/retain_campaign_results.py','--run-id',str(item['run_id'])]
+              excluded=item.get('exclude_scenarios',[])
+              assert isinstance(excluded,list) and all(isinstance(s,str) for s in excluded)
+              if excluded:
+                  assert isinstance(item.get('exclusion_reason'),str) and item['exclusion_reason']
+                  command+=['--exclude-scenarios',*excluded,'--exclusion-reason',item['exclusion_reason']]
+              subprocess.run(command,check=True)
+          PY
+          python3 evaluation/tools/update_campaign_progress.py
+          python3 evaluation/tools/campaign.py status
+          python3 -m unittest discover -s evaluation/tests -p 'test_campaign*.py'
+      - name: Commit compact evidence and derived progress to main
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add evaluation/campaigns README.md
+          if ! git diff --cached --quiet; then
+            git commit -m 'Retain verified cloud campaign evidence and refresh progress'
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
