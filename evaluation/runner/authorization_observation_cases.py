@@ -12,6 +12,7 @@ from effect_recovery_cases import wait_control
 from operation_fixture import OperationFixture
 import pilot
 import privacy_cases
+import recovery_cases
 import service_path_cases as service
 
 SCENARIOS={f'OBS-01-S{i:02}':mode for i,mode in enumerate(['single-use','session','persistent','revoked-inherited'],1)}
@@ -136,9 +137,17 @@ def run_scenario(root,scenario,unit=1):
             def spawn(child,label):
                 fixture.plan(child,'exec',dict(command='python3 '+str(script)+' '+child,yieldMs=10000),'RECEIPT:'+child)
                 parent=token+'_'+label;fixture.plan(parent,'sessions_spawn',dict(task='Execute the deterministic operation for '+child,mode='run',cleanup='keep',label='owned-authorization-child'),'childSessionKey')
-                result=gateway.request(parent,session_key=token.lower());requests.append(result)
+                deadline=time.monotonic()+30
+                while True:
+                    prior=set(gateway.log_tail);result=gateway.request(parent,session_key=token.lower());requests.append(result)
+                    seen=any(e.get('token')==parent and 'provider' in e['kind'] for e in fixture.events)
+                    fresh=''.join(line for line in gateway.log_tail if line not in prior)
+                    if not recovery_cases.pending_admission(result,fresh,seen,fixture.receipts.get(parent,0)) or time.monotonic()>=deadline:break
+                    time.sleep(.5)
+                metadata.setdefault('actual_spawn_attempts',[]).append(dict(parent=parent,response=result,tool_returns=fixture.tool_returns.get(parent,[]),
+                    matching_native_provider_events=[e for e in fixture.events if e.get('token')==parent][-6:]))
                 text=json.dumps(fixture.tool_returns.get(parent,[]));keys=re.findall(r'agent:[a-z0-9_-]+:subagent:[a-zA-Z0-9-]+',text)
-                if not keys:raise RuntimeError('Native child grant probe returned no child identity: '+text[:1000])
+                if not keys:raise RuntimeError('Native child grant probe returned no child identity: '+json.dumps(metadata['actual_spawn_attempts'][-1])[:1800])
                 return keys[0]
             baseline_child=token+'_BASE_CHILD';baseline_key=spawn(baseline_child,'BASE_SPAWN')
             deadline=time.monotonic()+25
