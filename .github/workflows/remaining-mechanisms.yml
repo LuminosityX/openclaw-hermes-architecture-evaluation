@@ -12,12 +12,11 @@ on:
 permissions:
   contents: read
 
-concurrency:
-  group: openclaw-remaining-mechanisms
-  cancel-in-progress: false
-
 jobs:
   execute:
+    concurrency:
+      group: openclaw-formal-family-${{ matrix.family }}
+      cancel-in-progress: false
     strategy:
       fail-fast: false
       max-parallel: 6
