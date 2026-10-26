@@ -16,6 +16,7 @@ class AddonMountTest(unittest.TestCase):
             project=prefix/'addon';package=project/'node_modules/official-package';package.mkdir(parents=True)
             template=dict(kind='native-official-addon-install-template',project_root=str(project),package_root=str(package))
             path=prefix/'official-addon-template.json';path.write_text(json.dumps(template))
+            (prefix/'official-addon-state.sqlite').write_bytes(b'owned-test-snapshot-not-a-runtime')
             command=sandbox_command(modules,Path('/node'),128,[],ssh_backend=True,official_addon=True)
             start=command.index(str(project));self.assertEqual(command[start-1:start+2],['--ro-bind',str(project),str(project)])
             self.assertIn('/official-addon.json',command)

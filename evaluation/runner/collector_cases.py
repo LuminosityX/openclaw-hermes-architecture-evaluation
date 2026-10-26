@@ -9,6 +9,7 @@ import re
 import shutil
 import signal
 import socket
+import sqlite3
 import threading
 import time
 import zlib
@@ -96,8 +97,13 @@ def configure(root,count,target):
     package=json.loads((ADDON/'package.json').read_text())
     if package['version']!='2026.10.7':raise RuntimeError('Official diagnostics addon version differs from campaign')
     config=service.configure(root)
-    config['plugins']['installs']=json.loads(ADDON_TEMPLATE.read_text())['installs']
-    config['plugins']['allow'].append('diagnostics-otel');config['plugins']['load']['paths'].append(str(ADDON));config['plugins']['entries']['diagnostics-otel']=dict(enabled=True)
+    template=json.loads(ADDON_TEMPLATE.read_text())
+    snapshot=Path('/official-addon-state.sqlite')
+    if hashlib.sha256(snapshot.read_bytes()).hexdigest()!=template['native_state_snapshot_sha256']:raise RuntimeError('Native addon install-state snapshot digest mismatch')
+    directory=root/'state/state';directory.mkdir(mode=0o700)
+    source=sqlite3.connect('file:'+str(snapshot)+'?mode=ro',uri=True);target=sqlite3.connect(str(directory/'openclaw.sqlite'));source.backup(target);target.close();source.close()
+    (directory/'openclaw.sqlite').chmod(0o600)
+    config['plugins']['allow'].append('diagnostics-otel');config['plugins']['load']['paths'].append(str(ADDON));config['plugins']['entries']['diagnostics-otel']=template['entry_configuration']
     config['diagnostics']=dict(enabled=True,otel=dict(enabled=True,endpoint='http://127.0.0.1:18088',protocol='http/protobuf',
         serviceName='owned-openclaw-evaluation',traces=False,metrics=False,logs=True,logsExporter='otlp',flushIntervalMs=1000,captureContent=True))
     plugin=root/'composition-a/index.js';source=plugin.read_text().replace('  await announce(\'entered\');',

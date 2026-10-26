@@ -86,9 +86,9 @@ def main():
         require(not artifact['expired'] and artifact['size_in_bytes']<=ARTIFACT_LIMIT,'Hosted evidence expired or exceeded its bound')
         payload=api('actions/artifacts/'+str(artifact['id'])+'/zip')
         files=bounded_archive(payload)
-        if 'results.json' not in files and 'execution.json' not in files and any('adapter-validation-' in name for name in files):
+        if 'results.json' not in files and 'execution.json' not in files:
             skipped.append(dict(artifact_id=artifact['id'],artifact_name=artifact['name'],
-                reason='Native calibration stopped before formal execution; no accepted campaign records',
+                reason='No formal execution records available: setup, calibration or collection incomplete; this artifact contributes no accepted campaign observations',
                 artifact_zip_sha256=hashlib.sha256(payload).hexdigest()))
             continue
         rows,manifest=compact_results(plan,metadata,artifact,payload,args.exclude_scenarios,args.exclusion_reason)
