@@ -11,6 +11,7 @@ import os
 from pathlib import Path
 import re
 import signal
+import shutil
 import subprocess
 import sys
 import threading
@@ -78,7 +79,7 @@ class Effects:
                     if role=='worker' and token.startswith('PILOT_MULTI_S4_'):
                         owner.partition(token)
                     if role=='worker' and token.startswith('PILOT_MULTI_S3_'):
-                        time.sleep(.5);before=owner.members();(group/'cgroup.kill').write_text('1');owner.record('execution-host-destroyed',token=token,before_pids=before,physical_VM_powered_off=False,namespace_and_tmpfs_destroyed=True);owner.destroyed.set();return
+                        time.sleep(.5);before=owner.members();(group/'cgroup.kill').write_text('1');owner.record('execution-host-destroyed',token=token,before_pids=before,physical_VM_powered_off=False,complete_native_execution_group_killed=True,storage_erasure_confirmed_by_final_host_provenance=True);owner.destroyed.set();return
                     time.sleep(1)
                     result=dict(token=token,host_boot_id=owner.boot,role=role,helper_host_pid=identity['host_pid'],helper_namespace_pid=identity['namespace_pid'],receipt='RECEIPT:'+token)
                     owner.record('actual-tool-effect-committed',**result)
@@ -147,7 +148,7 @@ def guest_command(args,root,group):
         '--ro-bind','/usr','/usr','--symlink','usr/bin','/bin','--symlink','usr/lib','/lib','--symlink','usr/lib64','/lib64','--proc','/proc','--dev','/dev',
         '--dir','/input','--chmod','0755','/input','--dir','/runtime','--chmod','0755','/runtime','--dir','/etc','--chmod','0755','/etc','--dir','/etc/ssl','--chmod','0755','/etc/ssl','--dir','/toolchain','--chmod','0755','/toolchain','--ro-bind',str(args.node),'/toolchain/node','--ro-bind',str(args.runtime_modules),'/runtime/node_modules',
         '--ro-bind',str(ROOT/'evaluation/runner'),'/driver','--ro-bind',str(root/'private-spec.json'),'/input/spec.json','--ro-bind',str(root/'peer'),'/peer','--bind',str(root/'evidence'),'/evidence',
-        '--size',str(512*1024**2),'--tmpfs','/scratch','--chmod','1777','/scratch','--symlink','scratch/tmp','/tmp','--symlink','scratch/home','/root',
+        '--bind',str(root/'scratch'),'/scratch','--symlink','scratch/tmp','/tmp','--symlink','scratch/home','/root',
         '--setenv','PATH','/toolchain:/usr/bin:/bin','--setenv','HOME','/scratch/home','--setenv','TMPDIR','/scratch/tmp','--setenv','NODE_DISABLE_COMPILE_CACHE','1','--setenv','JITI_CACHE_DIR','/scratch/cache/jiti',
         '--setenv','OPENCLAW_SKIP_CHANNELS','1','--setenv','OPENCLAW_DISABLE_BUNDLED_PLUGINS','1']
     for path in ['/etc/passwd','/etc/group','/etc/ssl/certs','/etc/localtime','/etc/resolv.conf','/etc/nsswitch.conf','/etc/hosts']:
@@ -161,6 +162,7 @@ def daemon(args):
     signal.signal(signal.SIGTERM,stop_owned)
     root=args.output;output=root/'evidence';output.mkdir(exist_ok=True);os.chown(output,UID,UID);os.chmod(output,0o700)
     peer=root/'peer';peer.mkdir(exist_ok=True);os.chmod(peer,0o755)
+    scratch=root/'scratch';scratch.mkdir();os.chown(scratch,UID,UID);os.chmod(scratch,0o700)
     master=os.environ.pop('OPENCLAW_EVAL_TRANSPORT_FULL_20261026','');require(bool(master),'Dedicated campaign transport secret is required')
     native_token=hmac.new(master.encode(),(os.environ['GITHUB_RUN_ID']+':'+str(args.unit)).encode(),hashlib.sha256).hexdigest()
     bounds=HostBounds();group=bounds.group/'native-execution-host';group.mkdir();effects=None;guest=None;tunnel=None;secret_values=[master,native_token]
@@ -207,9 +209,13 @@ def daemon(args):
         else:descriptor.update(json.loads(ready.read_text()))
         rendezvous=root/'rendezvous';rendezvous.mkdir(exist_ok=True);save(rendezvous/'rendezvous.json',descriptor);save(root/'launch-ready.json',dict(ready=True))
         if args.role=='gateway':save(peer/'worker.json',peer_artifact(args.unit,'worker'))
+        peak_scratch=0;next_storage_check=0
         deadline=time.monotonic()+1000
         while guest.poll() is None and time.monotonic()<deadline:
             if args.role=='worker' and effects.destroyed.is_set():break
+            if time.monotonic()>=next_storage_check:
+                used=int(subprocess.check_output(['du','-sb',str(scratch)]).split()[0]);peak_scratch=max(peak_scratch,used);next_storage_check=time.monotonic()+2
+                require(used<=1024**3,'Actual disposable native state exceeds the 1 GiB write bound')
             time.sleep(.5)
         if args.role=='gateway':
             require(guest.poll() is not None,'Native multi-host campaign exceeded its bounded execution window')
@@ -217,7 +223,7 @@ def daemon(args):
             native=json.loads((output/'gateway-report.json').read_text())
             require(not native.get('harness_error'),native.get('harness_error','Native multi-host fixture failed'))
         else:require(effects.destroyed.is_set(),'Native worker was not destroyed at the declared live execution boundary')
-        result.update(resources=bounds.summary(),kernel_native_execution_group=dict(cpu_max=(group/'cpu.max').read_text(),memory_peak_bytes=int((group/'memory.peak').read_text())),execution_host_destroyed=effects.destroyed.is_set())
+        result.update(resources=bounds.summary(),host_scratch=dict(backing='Actual disposable GitHub VM disk with native free-space reserve checks unchanged',maximum_actual_bytes=1024**3,observed_peak_bytes=peak_scratch),kernel_io_stat=(bounds.group/'io.stat').read_text(),kernel_native_execution_group=dict(cpu_max=(group/'cpu.max').read_text(),memory_peak_bytes=int((group/'memory.peak').read_text())),execution_host_destroyed=effects.destroyed.is_set())
     except Exception as error:result['harness_error']=type(error).__name__+': '+str(error)[:7000]
     finally:
         if effects:effects.close()
@@ -235,6 +241,8 @@ def daemon(args):
             time.sleep(.05)
         result['native_execution_pids_after_shutdown']=live
         result['nonexecuting_zombie_records_after_shutdown']=zombies
+        if not live and scratch.exists():shutil.rmtree(scratch)
+        result['native_execution_state_removed_after_shutdown']=not scratch.exists()
         # Publish only after the native endpoint has been stopped. Private
         # configs/identities live in destroyed tmpfs and never enter artifacts.
         save(output/'host-provenance.json',result)

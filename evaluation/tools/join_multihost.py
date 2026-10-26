@@ -23,6 +23,7 @@ def joined(root,unit,plan):
         installation=json.loads((directory/'installation.json').read_text());require(installation['target']==plan['target'],'Independent host installed a different core target')
     require(gateway['host_boot_id']!=worker['host_boot_id'],'Actual independent kernel/VM identities required')
     require(not worker.get('native_execution_pids_after_shutdown'),'Owned native worker processes survived execution-host destruction')
+    require(worker.get('native_execution_state_removed_after_shutdown') is True,'Owned native worker storage was not removed after host loss')
     require(worker.get('execution_host_destroyed') is True,'Actual owned native worker host was not destroyed')
     require(not any(e['kind']=='observer-harness-error' for e in events+local),'Independent kernel observer failed')
     require(any(e['kind']=='real-native-TLS-partition-restored' and e.get('actual_dropped_packets',0)>0 for e in events),'Actual network partition lacks observed native packet drops')

@@ -29,10 +29,11 @@ Public rendezvous artifacts contain only hostname and public native device keys.
 S04 drops IPv4 and IPv6 TLS output for only that native UID on disposable B,
 requires a real existing native socket and positive kernel drop counters, then
 restores the rules. S03 subsequently destroys B's entire native execution
-namespace and its tmpfs while an actual native tool is live. The root observer
+namespace and its owned disposable disk state while an actual native tool is live. The root observer
 survives to retain evidence; this is not physical VM power loss or a kernel
 crash. Offline placement, failed/lost work and implicit replay are observed;
 operator recovery is not silently granted or treated as an automatic retry.
+Native state uses the actual GitHub VM disk, preserving the native 4 GiB free-space safety reserve check. Actual writes are monitored and bounded to 1 GiB per VM; no virtual filesystem capacity is forged.
 All private native state and credentials are destroyed and endpoints closed
 before bounded sanitized final evidence is uploaded. Real independent-host
 calibration must pass fixture validation before the six formal pairs can start.
