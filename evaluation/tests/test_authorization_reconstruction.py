@@ -18,3 +18,11 @@ class AuthorizationReconstructionTest(unittest.TestCase):
         policy=reconstruct({'file':{'agents':{'main':{'allowlist':[{'pattern':'/owned/tool'}]}}},'denial':denial})
         self.assertEqual(session['authority_choice'],'session');self.assertFalse(session['actors'])
         self.assertEqual(policy['authority_choice'],'persistent');self.assertFalse(policy['actors'])
+
+    def test_unrelated_session_mode_changes_cannot_forge_an_inherited_revocation(self):
+        records=[{'key':'agent:main:a','permissionMode':'full'},
+            {'key':'agent:main:b','permissionMode':'read-only'},
+            {'key':'agent:main:child','spawnedBy':'agent:main:b','permissionMode':'full'}]
+        self.assertNotEqual(reconstruct(records)['authority_choice'],'revoked-inherited')
+        records.append({'key':'agent:main:b','permissionMode':'full'})
+        self.assertEqual(reconstruct(records)['authority_choice'],'revoked-inherited')

@@ -12,6 +12,7 @@ from effect_recovery_cases import wait_control
 from operation_fixture import OperationFixture
 import pilot
 import privacy_cases
+import protocol_cases
 import recovery_cases
 import service_path_cases as service
 
@@ -32,7 +33,15 @@ def reconstruct(native_records):
     modes={n.get('permissionMode') for n in nodes if n.get('permissionMode') in {'full','guarded','workspace','read-only'}}
     parent_links=[n.get(key) for n in nodes for key in ['spawnedBy','parentSessionKey','parentKey'] if isinstance(n.get(key),str) and n[key].startswith('agent:')]
     allowlists=[n['allowlist'] for n in nodes if isinstance(n.get('allowlist'),list) and n['allowlist']]
-    choice=('single-use' if 'allow-once' in decisions else 'revoked-inherited' if parent_links and {'full','read-only'}<=modes else 'persistent' if allowlists else 'session' if 'full' in modes else 'unknown')
+    modes_by_key={}
+    for node in nodes:
+        key=node.get('key',node.get('sessionKey'))
+        if not isinstance(key,str) or not key.startswith('agent:'):continue
+        candidates=[node,*[node[k] for k in ['entry','sessionInfo'] if isinstance(node.get(k),dict)]]
+        for candidate in candidates:
+            if candidate.get('permissionMode') in {'full','guarded','workspace','read-only'}:modes_by_key.setdefault(key,set()).add(candidate['permissionMode'])
+    revoked_inherited=any({'full','read-only'}<=modes_by_key.get(parent,set()) for parent in parent_links)
+    choice=('single-use' if 'allow-once' in decisions else 'revoked-inherited' if revoked_inherited else 'persistent' if allowlists else 'unknown' if parent_links and {'full','read-only'}<=modes else 'session' if 'full' in modes else 'unknown')
     actors=[];targets=[];versions=[]
     for node in nodes:
         if choice=='single-use':actor_relevant=node.get('decision')=='allow-once' and node.get('status')=='allowed'
@@ -49,22 +58,34 @@ def reconstruct(native_records):
             if isinstance(value,str) and value:targets.append(dict(field=key,value=value))
         if isinstance(node.get('hash'),str) and isinstance(node.get('file'),dict):versions.append(node['hash'])
     return dict(authority_choice=choice,actors=actors,targets=targets,policy_versions=sorted(set(versions)),
-        parent_links=sorted(set(parent_links)),permission_modes=sorted(modes),terminal_decisions=sorted(decisions),
+        parent_links=sorted(set(parent_links)),permission_modes_by_session={key:sorted(value) for key,value in modes_by_key.items()},permission_modes=sorted(modes),terminal_decisions=sorted(decisions),
         scope='Native RPC projections only. Supplied observer/request truth is not used to infer an actor absent from the product records.')
 
 
 class AuthorizationFixture(OperationFixture):
-    def __init__(self):self.held_token=None;self.entered=threading.Event();self.allow_model=threading.Event();self.allow_model.set();super().__init__()
+    def __init__(self):self.child_tokens=set();self.completed_child_tokens=set();self.held_token=None;self.entered=threading.Event();self.allow_model=threading.Event();self.allow_model.set();super().__init__()
     def handler(self):
         base=super().handler();owner=self
         class Handler(base):
             def do_POST(self):
-                if self.path.endswith('/chat/completions') and owner.held_token:
+                if self.path.endswith('/chat/completions') and (owner.held_token or owner.child_tokens):
                     size=int(self.headers.get('Content-Length','0'))
                     if not 0<size<=4*1024**2:return self.send(dict(error='bounded-model-input'),413)
                     raw=self.rfile.read(size);body=json.loads(raw)
-                    users=[str(m.get('content','')) for m in body.get('messages',[]) if m.get('role')=='user']
-                    if any(owner.held_token in text for text in users):
+                    messages=body.get('messages',[])
+                    marked=[(index,match.group()) for index,message in enumerate(messages) if message.get('role')=='user' and (match:=re.search(r'PILOT_[A-Z0-9_]+',str(message.get('content',''))))]
+                    latest,active=marked[-1] if marked else (0,None)
+                    results=[message for message in messages[latest+1:] if message.get('role')=='tool']
+                    if active in owner.child_tokens and results:owner.completed_child_tokens.add(active)
+                    if active in owner.completed_child_tokens and not results:
+                        owner.event('reference-child-notification-ack',token=active,request_sha256=hashlib.sha256(raw).hexdigest())
+                        script=dict(status=200,content='REFERENCE_CHILD_NOTIFICATION_OBSERVED',finish='stop')
+                        if not body.get('stream'):
+                            return self.send(dict(id='owned-child-notification',object='chat.completion',model='fixture-model',choices=[dict(index=0,message=dict(role='assistant',content=script['content']),finish_reason='stop')],usage=dict(prompt_tokens=0,completion_tokens=0,total_tokens=0)))
+                        self.send_response(200);self.send_header('Content-Type','text/event-stream');self.end_headers()
+                        for frame in protocol_cases.completion_frames(script,active):self.wfile.write(('data: '+json.dumps(frame)+'\n\n').encode())
+                        self.wfile.write(b'data: [DONE]\n\n');self.wfile.flush();return
+                    if owner.held_token and active==owner.held_token:
                         owner.event('owned-child-model-gate',token=owner.held_token);owner.entered.set();owner.allow_model.wait(timeout=30)
                     original=self.rfile;self.rfile=io.BytesIO(raw)
                     try:return super().do_POST()
@@ -134,12 +155,13 @@ def run_scenario(root,scenario,unit=1):
             check('persistent-grant-survives-native-restart',continued['accepted'] and fixture.receipts.get(second)==1)
         else:
             patch(session,'full')
-            def spawn(child,label):
+            def spawn(child,label,parent_key=None):
+                fixture.child_tokens.add(child)
                 fixture.plan(child,'exec',dict(command='python3 '+str(script)+' '+child,yieldMs=10000),'RECEIPT:'+child)
                 parent=token+'_'+label;fixture.plan(parent,'sessions_spawn',dict(task='Execute the deterministic operation for '+child,mode='run',cleanup='keep',label='owned-authorization-child'),'childSessionKey')
                 deadline=time.monotonic()+30
                 while True:
-                    prior=set(gateway.log_tail);result=gateway.request(parent,session_key=token.lower());requests.append(result)
+                    prior=set(gateway.log_tail);result=gateway.request(parent,session_key=parent_key or token.lower());requests.append(result)
                     seen=any(e.get('token')==parent and 'provider' in e['kind'] for e in fixture.events)
                     fresh=''.join(line for line in gateway.log_tail if line not in prior)
                     if not recovery_cases.pending_admission(result,fresh,seen,fixture.receipts.get(parent,0)) or time.monotonic()>=deadline:break
@@ -153,14 +175,19 @@ def run_scenario(root,scenario,unit=1):
             deadline=time.monotonic()+25
             while time.monotonic()<deadline and fixture.receipts.get(baseline_child)!=1:time.sleep(.1)
             if fixture.receipts.get(baseline_child)!=1:raise RuntimeError('Inherited full-mode child exec positive control failed')
-            child=token+'_HELD_CHILD';fixture.held_token=child;fixture.allow_model.clear();child_key=spawn(child,'HELD_SPAWN')
+            target_parent_key=token.lower()+'_target_parent';target_session='agent:main:pilot:'+target_parent_key
+            target_control=token+'_TARGET_PARENT_CONTROL';fixture.register(target_control)
+            target_ready=gateway.request(target_control,session_key=target_parent_key);requests.append(target_ready)
+            if not target_ready['accepted'] or fixture.receipts.get(target_control)!=1:raise RuntimeError('Fresh target parent session control failed')
+            patch(target_session,'full')
+            child=token+'_HELD_CHILD';fixture.held_token=child;fixture.allow_model.clear();child_key=spawn(child,'HELD_SPAWN',parent_key=target_parent_key)
             if not fixture.entered.wait(timeout=15):raise RuntimeError('Actual child model/tool dispatch gate was not reached')
-            wire([dict(method='sessions.get',params=dict(key=child_key)),dict(method='sessions.get',params=dict(key=session))])
-            revoked=patch(session,'read-only');metadata['revocation_monotonic_ns']=time.monotonic_ns();fixture.allow_model.set()
+            wire([dict(method='sessions.get',params=dict(key=child_key)),dict(method='sessions.get',params=dict(key=target_session))])
+            revoked=patch(target_session,'read-only');metadata['revocation_monotonic_ns']=time.monotonic_ns();fixture.allow_model.set()
             deadline=time.monotonic()+20
             while time.monotonic()<deadline and not fixture.tool_returns.get(child):time.sleep(.1)
-            wire([dict(method='sessions.get',params=dict(key=child_key)),dict(method='sessions.get',params=dict(key=session))])
-            metadata.update(child_session=child_key,baseline_child_session=baseline_key,post_parent_revocation_child_effects=fixture.receipts.get(child,0),
+            wire([dict(method='sessions.get',params=dict(key=child_key)),dict(method='sessions.get',params=dict(key=target_session))])
+            metadata.update(parent_session=target_session,child_session=child_key,baseline_child_session=baseline_key,post_parent_revocation_child_effects=fixture.receipts.get(child,0),
                 revocation_scope='Actual parent session mode tightened after the inherited child was spawned and while its model response was held before tool dispatch. Child current authority is observed, not assumed to be recursively revoked by an undocumented guarantee.')
         wire([dict(method='exec.approvals.get',params={}),dict(method='sessions.get',params=dict(key=session)),dict(method='chat.history',params=dict(sessionKey=session,limit=50,maxBytes=131072,toolResultMaxChars=8000))])
         observer.stdin.write('finish\n');observer.stdin.flush();output,error=observer.communicate(timeout=20)
@@ -179,7 +206,7 @@ def run_scenario(root,scenario,unit=1):
             method='Frozen native-field reconstructor, no scenario label or expected scope input. Missing actors remain unknown; no human usability or policy violation claim is inferred.')
         row.update(state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',assertions=assertions,metadata=metadata,native_records=native,
             requests=requests,independent_events=fixture.events,independent_receipts=fixture.receipts,resources=gateway.sampler.summary(),paid_model_calls=0)
-    except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2400],metadata=metadata)
+    except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2400],metadata=metadata,partial_native_records=records)
     finally:
         fixture.allow_model.set()
         if observer:
