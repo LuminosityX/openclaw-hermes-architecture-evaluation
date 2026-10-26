@@ -1,0 +1,15 @@
+# SEC-08: native privacy storage and access paths
+
+All five scenarios run three independent native units with synthetic canaries only. A successful native provider/tool receipt precedes every intervention. Read/export authority is recorded explicitly; a shared-secret HTTP caller is the Gateway owner and is never described as a narrow end-user identity.
+
+| Scenario | Native exercise and independent evidence |
+| --- | --- |
+| S01 | A private user note and an actual CRC-valid PNG attachment enter the documented OpenAI-compatible endpoint. The provider input must contain the note and an image part, and the task must execute. A second canary lives in PNG metadata; bounded scans record which owned uncompressed stores retain it after native image preprocessing. |
+| S02 | A real workspace `MEMORY.md` is read by the native file tool. The private user note is recalled through native `sessions.search`, waiting through its explicitly reported first-use indexing. This covers file-backed memory and native full-text recall, not vector embeddings. |
+| S03 | An explicit synthetic secret regex applies before native log/transcript creation. A plugin emits an actual native log positive control; public history, log-tail export and the native file log are checked for the full unmasked canary. Live tool visibility is recorded separately. Masked hints are not called zero information leakage. |
+| S04 | Native `sessions.delete(deleteTranscript=true)` is compared with pre/post public history. One WAL-aware SQLite owner backup, bounded to 4 MiB, is deliberately retained and independently inspected. Live invisibility does not establish secure erasure of retained backups or native deletion archives. |
+| S05 | Two independently populated sessions carry distinct private canaries. A native self-history positive control precedes an attempted other-session read under `tools.sessions.visibility=self`. The owner can export the target; a separately paired device with zero scopes must be denied. This measures native session-tool/export policy, not OS tenant isolation. |
+
+Storage scans examine at most 16 MiB of owned files, each at most 4 MiB. Only exact uncompressed-byte matches, file paths and scan size are retained; negative scans do not prove absence from encoded, compressed, encrypted or unscanned representations. Raw native records are bounded hosted artifacts. The evaluator removes each unit's files and database backup after producing evidence, and the hosted job removes its runtime and cache. No real personal information or provider credential enters the agent namespace.
+
+Contracts: [pinned logging/redaction behavior](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/logging.md), [session-tool visibility](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/concepts/session-tool.md), [deletion and retained archive semantics](https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/reference/session-management-compaction/maintenance.md).

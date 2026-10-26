@@ -25,8 +25,8 @@ try{
   const refresh=[];
   // sessions.usage explicitly distinguishes a refreshing cache from finalized
   // usage. A temporary zero cannot be scored as a missing token measurement.
-  if(operation.method==='sessions.usage'){
-   const pending=value=>value?.ok&&(value.payload?.cacheStatus?.status==='refreshing'||value.payload?.sessions?.some(row=>row.computing));
+  if(operation.method==='sessions.usage'||operation.method==='sessions.search'){
+   const pending=value=>value?.ok&&(operation.method==='sessions.search'?value.payload?.indexing===true:(value.payload?.cacheStatus?.status==='refreshing'||value.payload?.sessions?.some(row=>row.computing)));
    while(pending(result)&&performance.now()-started<20000){
     refresh.push({elapsed_ms:performance.now()-started,cache_status:result.payload?.cacheStatus,totals:result.payload?.totals});
     await new Promise(resolve=>setTimeout(resolve,500));
