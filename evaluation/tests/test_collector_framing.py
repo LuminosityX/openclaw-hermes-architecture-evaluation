@@ -40,7 +40,7 @@ class CollectorFramingTest(unittest.TestCase):
             root=Path(name);addon=root/'addon';addon.mkdir();(addon/'package.json').write_text('{"version":"2026.10.7"}')
             snapshot=root/'native-state.sqlite';database=sqlite3.connect(str(snapshot));database.execute('create table owned_control(value text)');database.execute("insert into owned_control values ('original-native-metadata')");database.commit();database.close()
             template=root/'template.json';template.write_text(json.dumps(dict(native_state_snapshot_sha256=hashlib.sha256(snapshot.read_bytes()).hexdigest(),entry_configuration=dict(enabled=True))))
-            with patch.object(collector_cases,'ADDON',addon),patch.object(collector_cases,'ADDON_TEMPLATE',template),patch.object(collector_cases,'ADDON_STATE',snapshot):
+            with patch.object(collector_cases,'SDK_ENTRY',root/'public-diagnostic-sdk.mjs'),patch.object(collector_cases,'ADDON',addon),patch.object(collector_cases,'ADDON_TEMPLATE',template),patch.object(collector_cases,'ADDON_STATE',snapshot):
                 config=collector_cases.configure(root/'case',4096,'PILOT_DISTINCT_TARGET_U1')
             self.assertNotIn('installs',config['plugins'])
             source=(root/'case/composition-a/index.js').read_text()

@@ -21,17 +21,26 @@ import service_path_cases as service
 
 SCENARIOS={f'OBS-02-S{i:02}':name for i,name in enumerate(['brief','long','restart','overflow'],1)}
 EVENT=re.compile(r'EVAL_OBS_EVENT_PILOT_[A-Z0-9_]+_N\d{5}')
+OFFERED=re.compile(r'EVAL_LOCAL_OFFERED_PILOT_[A-Z0-9_]+_N\d{5}')
+SDK_ENTRY=None
 ADDON_TEMPLATE=Path('/official-addon.json')
 ADDON_STATE=Path('/official-addon-state.sqlite')
 ADDON=Path(json.loads(ADDON_TEMPLATE.read_text())['package_root']) if ADDON_TEMPLATE.is_file() else Path('/runtime/node_modules/@openclaw/diagnostics-otel')
 
 
 def environment_selfcheck():
+    global SDK_ENTRY
     template=json.loads(ADDON_TEMPLATE.read_text());cli=Path(template['core_cli'])
     package=json.loads((cli.parent/'package.json').read_text())
     if not cli.is_file() or package.get('name')!='openclaw' or package.get('version')!='2026.10.7':raise RuntimeError('Original native installer core CLI identity does not match the campaign')
+    exported=package['exports']['./plugin-sdk/diagnostic-runtime']
+    if isinstance(exported,dict):exported=exported.get('import',exported.get('default'))
+    if not isinstance(exported,str) or not exported.startswith('./'):raise RuntimeError('Public diagnostic SDK export has an unsupported shape')
+    SDK_ENTRY=(cli.parent/exported).resolve()
+    if not SDK_ENTRY.is_relative_to(cli.parent) or not SDK_ENTRY.is_file():raise RuntimeError('Public diagnostic SDK entry escaped the verified installation')
     pilot.CLI=str(cli)
     return dict(core_cli=str(cli),core_cli_sha256=hashlib.sha256(cli.read_bytes()).hexdigest(),
+        public_diagnostic_sdk_entry=str(SDK_ENTRY),public_diagnostic_sdk_sha256=hashlib.sha256(SDK_ENTRY.read_bytes()).hexdigest(),
         scope='Same verified installation, original absolute path matching the native peer-link audit; read-only alias, no copies or changed symlinks')
 
 
@@ -118,8 +127,10 @@ def configure(root,count,target):
     config['diagnostics']=dict(enabled=True,otel=dict(enabled=True,endpoint='http://127.0.0.1:18088',protocol='http/protobuf',
         serviceName='owned-openclaw-evaluation',traces=False,metrics=False,logs=True,logsExporter='both',flushIntervalMs=1000,captureContent=True))
     config['logging']['consoleLevel']='info'
+    if SDK_ENTRY is None:raise RuntimeError('Public diagnostic producer SDK was not resolved through the pinned package exports')
     plugin=root/'composition-a/index.js';source=plugin.read_text().replace('  await announce(\'entered\');',
-        "  await announce('entered');\n  for(let index=0;index<(args.token==="+json.dumps(target)+"?"+str(count)+":8);index++)api.logger.info('EVAL_OBS_EVENT_'+args.token+'_N'+String(index).padStart(5,'0')); ")
+        "  await announce('entered');\n  for(let index=0;index<(args.token==="+json.dumps(target)+"?"+str(count)+":8);index++){const suffix=args.token+'_N'+String(index).padStart(5,'0');api.logger.info('EVAL_LOCAL_OFFERED_'+suffix);emitDiagnosticEvent({type:'log.record',level:'INFO',message:'EVAL_OBS_EVENT_'+suffix});} ")
+    source="import {emitDiagnosticEvent} from "+json.dumps(SDK_ENTRY.as_uri())+";\n"+source
     plugin.write_text(source);pilot.save(root/'config.json',config);return config
 
 
@@ -183,7 +194,7 @@ def run_scenario(root,scenario,unit=1):
         time.sleep(3)
         gateway.stop();time.sleep(.25)
         native=(root/'gateway-native.log').read_text(errors='replace')
-        expected=set(k for k in EVENT.findall(native) if k.startswith(prefix))
+        expected={k.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1) for k in OFFERED.findall(native) if k.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1).startswith(prefix)}
         if len(expected)!=count:raise RuntimeError('Native local log did not retain all offered unique target event IDs')
         delivered={k:v for k,v in collector.deliveries.items() if k in expected}
         missing=sorted(expected-set(delivered));duplicates=sum(max(0,n-1) for n in delivered.values())
@@ -200,7 +211,7 @@ def run_scenario(root,scenario,unit=1):
             native_overflow_log_signal=bool(re.search(r'dropped|drop count|queue.*full|buffer.*full',native,re.I)),
             signal_scope='Native local file logs only; absence here does not prove absence from other diagnostic interfaces.',
             acceptance_scope='Lossless, nonduplicating delivery is the evaluation criterion, not an assumed durable-spool guarantee from the product. Synthetic content capture is explicitly enabled to independently join exact event IDs.',
-            addon_version='2026.10.7',buffer_intervention='4096 synchronous target native log events offered against the unchanged SDK default 2048-entry queue in S04; controls emit eight. Native IDs and failed collector batches independently establish offered load.')
+            addon_version='2026.10.7',producer='Public emitDiagnosticEvent from pinned package exports, paired with distinct local offered IDs; native logger transport is not double counted',buffer_intervention='4096 synchronous target native log events offered against the unchanged SDK default 2048-entry queue in S04; controls emit eight. Native IDs and failed collector batches independently establish offered load.')
         attempts=[]
         for attempt in collector.attempts:
             groups={}
@@ -218,8 +229,8 @@ def run_scenario(root,scenario,unit=1):
         native_log=root/'gateway-native.log'
         if native_log.is_file():
             text=native_log.read_text(errors='replace')
-            row['native_event_log_diagnostics']=dict(target_event_count=len([m for m in EVENT.findall(text) if m.startswith(prefix)]),
-                total_matching_event_count=len(EVENT.findall(text)),tail=text[-12000:],
+            row['native_event_log_diagnostics']=dict(target_event_count=len([m for m in OFFERED.findall(text) if m.replace('EVAL_LOCAL_OFFERED_','EVAL_OBS_EVENT_',1).startswith(prefix)]),
+                total_matching_event_count=len(OFFERED.findall(text)),tail=text[-12000:],
                 addon_and_exporter_lines=[line[:2000] for line in text.splitlines() if re.search(r'diagnostics-otel|exporter|internal diagnostics|plugin.services',line,re.I)][-18:])
         usage=shutil.disk_usage(pilot.BASE)
         row['owned_tmpfs_at_cleanup']=dict(total_bytes=usage.total,used_bytes=usage.used,free_bytes=usage.free)
