@@ -38,11 +38,12 @@ import admission_cases
 import external_corpus_cases
 import cancellation_cases
 import version_skew_cases
+import blind_diagnosis_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03'],required=True)
+    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03'],required=True)
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     parser.add_argument('--scenario',action='append',help='Explicit selected pending scenario; formal units only')
     args=parser.parse_args()
@@ -80,6 +81,7 @@ def main():
     if args.case=='EXT-07':module=external_corpus_cases
     if args.case=='REL-05':module=cancellation_cases
     if args.case=='EXT-03':module=version_skew_cases
+    if args.case=='OBS-03':module=blind_diagnosis_cases
     selected=[sid for sid in module.SCENARIOS if sid.startswith(args.case+'-') and (not args.scenario or sid in args.scenario)]
     if args.scenario and (len(args.scenario)!=len(set(args.scenario)) or set(args.scenario)!=set(selected)):
         parser.error('Selected scenarios must be distinct members of the selected family')
@@ -92,7 +94,7 @@ def main():
         if args.case=='SEC-10':report['network_environment_preflight']=network_boundary_cases.environment_selfcheck()
         if args.case=='SEC-07':report['oauth_environment_preflight']=oauth_cases.environment_selfcheck()
         if args.case=='OBS-02':report['addon_environment_preflight']=collector_cases.environment_selfcheck()
-        if args.case=='SEC-06':report['kernel_gate_environment_preflight']=revocation_cases.environment_selfcheck()
+        if args.case in {'SEC-06','OBS-03'}:report['kernel_gate_environment_preflight']=revocation_cases.environment_selfcheck()
         if args.case=='EXT-03':report['historical_comparison_preflight']=version_skew_cases.environment_selfcheck()
         if args.case in {*dependency_cases.FAMILIES,'SEC-12','EXT-07','EXT-03'}:report['dependency_environment_preflight']=dependency_cases.environment_selfcheck()
         for sid in selected:

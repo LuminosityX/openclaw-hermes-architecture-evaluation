@@ -51,7 +51,7 @@ def wait_control(gateway,fixture,token):
     return attempts
 
 
-def run_scenario(root,scenario,unit=1):
+def run_scenario(root,scenario,unit=1,native_observer=None):
     mode=SCENARIOS[scenario];fixture=OperationFixture();peer=EffectPeer();gateway=None;assertions=[];arms=[]
     token='PILOT_EFFECT_RECOVERY_'+scenario.replace('-','_')+'_U'+str(unit)
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
@@ -96,6 +96,7 @@ def run_scenario(root,scenario,unit=1):
                 effects_before_operator_retry=count_before_retry,explicit_operator_retry=retried,effects_after_operator_retry=peer.receipts.get(effect,0),
                 automatic_reconciliation_observed=False,operator_retry_count=1,
                 uncertainty='Committed effect is visible only to the independent ledger when native acknowledgement is lost; scripted provider does not invent successful reconciliation.'))
+        if native_observer:row['native_observer_export']=native_observer(root,token)
         row.update(state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',assertions=assertions,
             arms=arms,independent_effects=peer.receipts,independent_mcp_events=peer.events,native_provider_events=fixture.events,
             metadata=dict(mode=mode,public_api_only=True,core_edits=0,

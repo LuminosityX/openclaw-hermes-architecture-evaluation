@@ -20,6 +20,7 @@ process.stdin.on('data',async bytes=>{
     written=client.events.find(e=>e.kind==='rpc-request-written'&&e.method==='sessions.patch'&&e.monotonic_ns>=start);
     if(!written)await new Promise(resolve=>setTimeout(resolve,5));
    }
+   if(written)report.revocation_request={id:written.request_id,method:'sessions.patch',params:{key:spec.session_key,permissionMode:'read-only'}};
    await observe('actual-revocation-request-written',{written});
    const result=await pending;report.revocation=result;await observe('actual-revocation-response',{native_response:result});
   }catch(error){await observe('observer-error',{error:error.message});}

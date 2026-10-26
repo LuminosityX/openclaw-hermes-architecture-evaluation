@@ -355,7 +355,7 @@ class Gateway:
         def change_identity():
             os.setgroups([]);os.setgid(process_uid);os.setuid(process_uid)
         command=[NODE,CLI,'gateway','run','--bind','loopback','--port','18789']
-        if drop_capabilities:command=['/usr/bin/setpriv','--bounding-set=-all','--inh-caps=-all','--ambient-caps=-all',*command]
+        if drop_capabilities or os.environ.get('OPENCLAW_EVAL_DROP_GATEWAY_CAPABILITIES')=='1':command=['/usr/bin/setpriv','--bounding-set=-all','--inh-caps=-all','--ambient-caps=-all',*command]
         self.process=subprocess.Popen(command,
             stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,start_new_session=True,
             preexec_fn=change_identity if process_uid is not None else None)

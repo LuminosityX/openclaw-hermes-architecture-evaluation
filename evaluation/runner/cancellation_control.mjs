@@ -2,7 +2,7 @@
 import fs from 'node:fs';
 import {gatewayClient} from './public_gateway_client.mjs';
 const spec=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));const client=await gatewayClient(spec);
-const report={responses:[]};let finish;const done=new Promise(resolve=>{finish=resolve;});let buffer='';
+const report={requests:[],responses:[]};let finish;const done=new Promise(resolve=>{finish=resolve;});let buffer='';
 const timer=setTimeout(finish,90000);
 const observe=async(kind,values={})=>{
  const response=await fetch('http://127.0.0.1:18080/cancellation-control',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,...values})});
@@ -23,6 +23,7 @@ try{
      written=client.events.find(e=>e.kind==='rpc-request-written'&&e.method==='sessions.abort'&&e.monotonic_ns>=started);
      if(!written)await new Promise(resolve=>setTimeout(resolve,5));
     }
+    if(written)report.requests.push({id:written.request_id,method:'sessions.abort',params:{key:spec.session_key}});
     await observe('actual-stop-request-written',{written});
     const result=await pending;const received=Number(process.hrtime.bigint());report.responses.push(result);
     await observe('actual-stop-response',{native_response:result,response_received_monotonic_ns:received});
