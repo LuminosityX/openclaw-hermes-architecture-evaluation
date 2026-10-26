@@ -26,6 +26,70 @@ CLI = '/runtime/node_modules/openclaw/openclaw.mjs'
 TOKEN = 'synthetic-isolated-pilot-token'
 
 
+def target_tool(token):
+    if '_SANDBOX_' in token:
+        return 'exec'
+    return 'probe__eval_probe' if '_MCP' in token else 'eval_probe'
+
+
+def target_arguments(token,action):
+    if '_SANDBOX_' not in token:
+        return dict(token=token,action=action)
+    import shlex
+    code="import pathlib,os,json; p=pathlib.Path('scope-canary.txt'); print('SCOPE:'+json.dumps({'cwd':os.getcwd(),'had_canary':p.exists()})); "
+    if '_WRITE_' in token:
+        code+="p.write_text('SYNTHETIC_SCOPE_CANARY'); "
+    code+="print('RECEIPT:'+"+repr(token)+")"
+    return dict(command='python3 -c '+shlex.quote(code),yieldMs=10000)
+
+
+def catalog_id(results,name):
+    def visit(value,depth=0):
+        if depth>12:
+            return None
+        if isinstance(value,dict):
+            if value.get('name')==name and isinstance(value.get('id'),str):
+                return value['id']
+            for child in value.values():
+                found=visit(child,depth+1)
+                if found:
+                    return found
+        elif isinstance(value,list):
+            for child in value:
+                found=visit(child,depth+1)
+                if found:
+                    return found
+        elif isinstance(value,str):
+            try:
+                parsed=json.loads(value)
+            except ValueError:
+                return None
+            if isinstance(parsed,(dict,list)):
+                return visit(parsed,depth+1)
+        return None
+    return visit(results)
+
+
+def planned_tool_call(names,token,action,results):
+    """Use advertised direct tools or the pinned release's public catalog protocol."""
+    name=target_tool(token)
+    arguments=target_arguments(token,action)
+    if name in names and not results:
+        return name,arguments
+    dispatch=next((n for n in ['tool_call','dispatch_action'] if n in names),None)
+    if dispatch and 'tool_search' in names and 'tool_describe' in names:
+        if not results:
+            return 'tool_search',dict(query=name,limit=3)
+        identifier=catalog_id(results,name)
+        if not identifier:
+            return None
+        if len(results)==1:
+            return 'tool_describe',dict(id=identifier)
+        if len(results)==2:
+            return dispatch,dict(id=identifier,args=arguments)
+    return None
+
+
 def save(path, value):
     Path(path).write_text(json.dumps(value,ensure_ascii=False,indent=2)+'\n')
 
@@ -117,27 +181,22 @@ class Fixture:
                 calls=[]
                 if '_PLAIN_' in token:
                     content='ACCEPTED:'+token
-                elif not results:
-                    name=next((n for n in names if n.endswith('eval_probe')),None)
-                    if name:
-                        calls=[dict(id='call_'+token,type='function',function=dict(name=name,arguments=json.dumps(dict(token=token,action=action))))]
-                        content=None
-                    elif 'exec' in names and '_SANDBOX_' in token:
-                        code="import pathlib,os,json; p=pathlib.Path('scope-canary.txt'); print('SCOPE:'+json.dumps({'cwd':os.getcwd(),'had_canary':p.exists()})); "
-                        if '_WRITE_' in token:
-                            code+="p.write_text('SYNTHETIC_SCOPE_CANARY'); "
-                        code+="print('RECEIPT:'+"+repr(token)+")"
-                        import shlex
-                        calls=[dict(id='call_'+token,type='function',function=dict(name='exec',arguments=json.dumps(dict(command='python3 -c '+shlex.quote(code),yieldMs=10000))))]
-                        content=None
-                    else:
-                        content='MISSING_TOOL:'+','.join(names)
                 else:
                     result_text=json.dumps(results,ensure_ascii=False)
-                    owner.event('tool-result',token=token,receipt_visible=('RECEIPT:'+token in result_text),
-                                error_visible=bool(re.search(r'error|failed|not found|unavailable',result_text,re.I)),
-                                excerpt=result_text[:1500])
-                    content=('ACCEPTED:' if 'RECEIPT:'+token in result_text else 'TOOL_ERROR:')+token
+                    if results:
+                        owner.event('tool-result',token=token,receipt_visible=('RECEIPT:'+token in result_text),
+                                    error_visible=bool(re.search(r'error|failed|not found|unavailable',result_text,re.I)),
+                                    excerpt=result_text[:1500])
+                    if 'RECEIPT:'+token in result_text:
+                        content='ACCEPTED:'+token
+                    else:
+                        planned=planned_tool_call(names,token,action,results)
+                        if planned:
+                            name,arguments=planned
+                            calls=[dict(id='call_'+str(len(results))+'_'+token,type='function',function=dict(name=name,arguments=json.dumps(arguments)))]
+                            content=None
+                        else:
+                            content=('TOOL_ERROR:' if results else 'MISSING_TOOL:')+','.join(names)
                 message=dict(role='assistant',content=content)
                 if calls:
                     message['tool_calls']=calls
@@ -531,7 +590,7 @@ def ssh_sandbox_study(fixture,blocks):
                     read=gateway.request(f'PILOT_SANDBOX_READ_B{block}_{scope.upper()}',session_key='sandbox-reader')
                     revisit=gateway.request(f'PILOT_SANDBOX_REVISIT_B{block}_{scope.upper()}',session_key='sandbox-writer')
                     events=fixture.events[start:]
-                    results=[e for e in events if e['kind']=='tool-result']
+                    results=[e for e in events if e['kind']=='tool-result' and e['receipt_visible']]
                     decoded=[]
                     for event in results:
                         text=event['excerpt'].replace('\\"','"').replace('\\n','\n')
