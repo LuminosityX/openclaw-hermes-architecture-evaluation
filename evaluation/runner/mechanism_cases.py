@@ -113,6 +113,7 @@ class MechanismFixture(pilot.Fixture):
         self.receipts = {}
         self.release = threading.Event()
         self.release.set()
+        self.gate_timeout_seconds = 12
         self.transmit_bytes = 0
         self.receive_bytes = 0
         super().__init__()
@@ -156,7 +157,7 @@ class MechanismFixture(pilot.Fixture):
                     task = owner.tasks[token]
                     owner.event('effect-start', **body)
                     if task['gate']:
-                        released = owner.release.wait(timeout=12)
+                        released = owner.release.wait(timeout=owner.gate_timeout_seconds)
                         if not released:
                             owner.event('fixture-gate-timeout', token=token)
                             return self.send(dict(error='fixture-gate-timeout'), 504)

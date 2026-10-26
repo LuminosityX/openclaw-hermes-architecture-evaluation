@@ -13,11 +13,12 @@ import execution_authority_cases
 import operational_diagnosis_cases
 import isolation_setup_cases
 import instruction_input_cases
+import backup_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06'],required=True)
+    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10'],required=True)
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     parser.add_argument('--scenario',action='append',help='Explicit selected pending scenario; formal units only')
     args=parser.parse_args()
@@ -30,6 +31,7 @@ def main():
     if args.case=='OBS-05':module=operational_diagnosis_cases
     if args.case=='SEC-03':module=isolation_setup_cases
     if args.case=='EXT-06':module=instruction_input_cases
+    if args.case=='REL-10':module=backup_cases
     selected=[sid for sid in module.SCENARIOS if sid.startswith(args.case+'-') and (not args.scenario or sid in args.scenario)]
     if args.scenario and (len(args.scenario)!=len(set(args.scenario)) or set(args.scenario)!=set(selected)):
         parser.error('Selected scenarios must be distinct members of the selected family')
