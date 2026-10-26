@@ -28,5 +28,7 @@ jobs:
           python-version: '3.12'
       - name: Validate repository and frozen scorer
         run: python3 tools/check_repository.py
-      - name: Validate the V7 experimental design
-        run: python3 v7/tools/check_design.py
+      - name: Validate the six-dimension OpenClaw design
+        run: python3 evaluation/tools/check_design.py
+      - name: Test plan selection and cost accounting
+        run: python3 -m unittest discover -s evaluation/tests -v

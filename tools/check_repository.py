@@ -115,7 +115,7 @@ def check_protocol():
 
 
 def check_documentation():
-    documents = sorted(ROOT.glob("*.md")) + sorted((ROOT / "docs").glob("*.md"))
+    documents = sorted(ROOT.glob("*.md")) + sorted((ROOT / "docs").rglob("*.md"))
     documents.append(ROOT / "v6/windows-native-bundle/README.md")
     for path in documents:
         text = path.read_text(encoding="utf-8")

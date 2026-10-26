@@ -1,5 +1,7 @@
 # Review of the V6 evaluation
 
+Historical review of the former eleven-dimension, two-product evaluation. Current work follows the six-dimension [OpenClaw design](../../evaluation/README.md).
+
 ## What went wrong in the interpretation
 
 The earlier review treated coverage of eleven headings as sufficient support for broad architectural conclusions. It was too quick to turn an observed difference into a general property of a framework. A result from one execution path cannot characterize every plugin, tool, provider, or harness path, and a latency difference does not identify its cause without phase and runtime attribution.
@@ -8,7 +10,7 @@ This is not a claim that V6 had only fourteen test executions. The frozen protoc
 
 ## Evidence reviewed
 
-The review uses the frozen V6 protocol and scripts, plus the separately retained `observations.json` and `final-grades.json`. [The evidence review record](design/v6-evidence-review.json) identifies those artifacts by SHA-256 without copying raw logs or result databases into this repository.
+The review uses the frozen V6 protocol and scripts, plus the separately retained `observations.json` and `final-grades.json`. [The evidence review record](v6-evidence-review.json) identifies those artifacts by SHA-256 without copying raw logs or result databases into this repository.
 
 Thirty of thirty-three metrics have entries in the retained observations. An entry is not necessarily a complete or decisive measurement: for example, the migration metric includes dependency reconstruction but lacks its required native cross-OS case. The final resource/cost and portability dimensions remain ungraded. Native Windows execution and colleague review are recorded as pending.
 
@@ -28,10 +30,10 @@ Thirty of thirty-three metrics have entries in the retained observations. An ent
 | Operations | Real restore, upgrade, and dependency cases | Test backups during writes, partial migrations, interrupted generation publication, and operator diagnosis |
 | Compatibility | A finite, explicit protocol/content/package list | Add expired MCP sessions, cancellation, declared legacy transport support, OAuth lifecycles, external guidance/Skill formats, external plugin/harness contracts, and opaque model payloads |
 
-The retained V6 evidence explicitly leaves the complete intervention-time contract, native cross-OS case, and full audit retention/export contract unresolved. It also states that legacy MCP SSE, expired-session/cancellation edge cases, and opaque reasoning signatures were not separately exercised. V7 makes these gaps visible rather than converting them into general product claims.
+The retained V6 evidence explicitly leaves the complete intervention-time contract, native cross-OS case, and full audit retention/export contract unresolved. It also states that legacy MCP SSE, expired-session/cancellation edge cases, and opaque reasoning signatures were not separately exercised. The current OpenClaw design makes these gaps visible rather than converting them into general product claims.
 
 ## What must change in the reporting
 
 A safe stop can preserve correctness while requiring manual work. An automatically resumed task can improve availability while repeating an external effect. Those outcomes must not disappear into one recovery verdict. Likewise, a separate process can limit crash impact without restricting its filesystem or network authority.
 
-For every architecture claim, report the observed outcome, the concrete process/thread/state/connection mechanism, a matched intervention when feasible, and the conditions under which the advantage reverses. Source inspection alone supports a mechanism hypothesis; it does not replace an experiment. V6 grades remain historical results under their frozen rubric, not V7 findings.
+For every architecture claim, report the observed outcome, the concrete process/thread/state/connection mechanism, a matched intervention when feasible, and the conditions under which the advantage reverses. Source inspection alone supports a mechanism hypothesis; it does not replace an experiment. V6 grades remain historical results under their frozen rubric, not current OpenClaw findings.

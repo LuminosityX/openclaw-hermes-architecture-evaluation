@@ -1,56 +1,54 @@
-# OpenClaw and Hermes Architecture Evaluation
+# OpenClaw Task Framework Evaluation
 
-**Branch status:** `main` is the default branch for ongoing maintenance and the [V7 evaluation design](v7/README.md). `archive/v6` is the frozen historical branch, preserved at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`; do not submit changes to it. V7 product experiments have not been executed.
+`main` focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
 
-V6 experiment harnesses, task fixtures, scoring rules, and source references for evaluating the architecture of OpenClaw and Hermes.
+**Status:** 60 planned experiment families and 257 scenario labels, not completed product tests. The repository provides design validation, plan selection and token-cost calculation. OpenClaw runtime adapters and acceptance fixtures still need implementation before product execution; no new product result is claimed.
 
-This repository is a **source archive**. Repository checks run offline with Python 3.11 or later. Repeating the product experiments requires reconstructing the pinned runtimes; cloning this repository does not install or start either product.
-
-## Evaluated versions
-
-| Product | Main evaluation version | Source commit |
+| Dimension | Focus | Planned families |
 | --- | --- | --- |
-| OpenClaw | `2026.10.6` | `fe06181dc5ecc01cf8904abbfc26925925efefbc` |
-| Hermes | `0.22.5` | `bf0203a794a07aac3ff764972ab9087baa4e4f4e` |
+| Reliability / 可靠性 | Task loss, duplicate effects, state consistency, retries, cancellation, recovery and dependency failures | 15 |
+| Security / 安全性 | User privacy, isolation, permissions, prompt injection, network egress, gateway access and extension supply chains | 12 |
+| Performance / 性能 | Problem-solving success, deliverable quality, latency, concurrency, overload and sustained capacity | 10 |
+| Resource usage and cost / 资源占用与成本 | CPU, RSS/PSS/cgroup memory, swap, disk/inodes/IO, network, processes, tokens and USD charges | 7 |
+| Extensibility / 可扩展性 | Public plugin interfaces, hooks, lifecycle, composition, tools and integration contracts | 9 |
+| Observability / 可观测性 | Accessible agent trajectories, event linkage, export, fault reconstruction and observer overhead | 7 |
 
-These are historical experiment pins, not recommendations for current deployments. Upgrade cases use the additional versions recorded in [the version lock](v6/protocol/version_lock.json).
+## Getting started
 
-## Quick start
+Requirements: Git and Python 3.11 or later; no third-party Python packages are needed for these commands.
 
 ```sh
 git clone https://github.com/zyw02/openclaw-hermes-architecture-evaluation.git
 cd openclaw-hermes-architecture-evaluation
 python3 tools/check_repository.py
+python3 evaluation/tools/check_design.py
+python3 -m unittest discover -s evaluation/tests -v
+python3 evaluation/tools/suite.py list
 ```
 
-The check validates archive hashes, source references, Windows bundle integrity, Python syntax, JSON structure, documentation links, and the existing scorer self-tests. It does not install dependencies, contact model APIs, start containers, or run product experiments.
+Select a plan by dimension or case. These commands only print JSON; they never start OpenClaw, install software, or call a provider.
 
-## Repository layout
+```sh
+python3 evaluation/tools/suite.py plan --dimension reliability
+python3 evaluation/tools/suite.py plan --dimension security --case SEC-08
+python3 evaluation/tools/suite.py plan --dimension performance --phase real-model
+python3 evaluation/tools/suite.py plan --phase all
+```
 
-| Path | Contents |
-| --- | --- |
-| [`v6/scripts/`](v6/scripts/) | Experiment controllers, analysis scripts, and audit utilities |
-| [`v6/fixtures/`](v6/fixtures/) | Public task inputs and pinned project fixtures |
-| [`v6/private-fixtures/`](v6/private-fixtures/) | Synthetic evaluator inputs and acceptance oracles; no service credentials |
-| [`v6/protocol/`](v6/protocol/) | Frozen protocol, observation template, scorer, and version lock |
-| [`v6/support/`](v6/support/) | Shared scripts required by V6 |
-| [`v6/dependencies/`](v6/dependencies/) | Archived product dependency declarations and lock files |
-| [`v6/references/`](v6/references/) | Referenced upstream source files, claim index, and licenses |
-| [`v6/patches/`](v6/patches/) | Controlled counterfactual patch and source revision records |
-| [`v6/windows-native-bundle/`](v6/windows-native-bundle/README.md) | Separate native Windows verification bundle |
-| [`docs/`](docs/) | Methodology, reproduction, and provenance documentation |
-| [`tools/`](tools/) | Offline repository validation and manifest maintenance |
+The default plan contains deterministic mechanism tests. Actual task capability, model prompt-injection susceptibility and provider charges require separately budgeted real usage. Selecting that phase does not enable execution.
 
-Earlier experiment versions and duplicate controller snapshots are excluded from the current source tree. Historical upgrade targets and shared support scripts remain where V6 requires them.
+## Current evaluation
 
-## Scope and reproduction
+Start with the [evaluation guide](evaluation/README.md), [experiment catalogue](evaluation/experiment-catalogue.md), [measurement contract](evaluation/measurement-contract.md) and [methodology](docs/methodology.md). The [matrix](evaluation/design/evaluation-matrix.json) defines the current six dimensions and required metrics. The [reproduction guide](docs/reproduction.md) explains validation, selection and execution prerequisites.
 
-The evaluation covers eleven architecture dimensions, from recovery and isolation to extensibility and compatibility. See [methodology](docs/methodology.md) for the scope and [reproduction](docs/reproduction.md) for the distinction between offline validation and product execution.
+Measure actual task outcomes and independently observed effects. Keep failed, cancelled and incomplete attempts in denominators; missing counters or prices remain unknown. A passing CI check validates repository tooling, not OpenClaw reliability, safety or task quality.
 
-Raw logs, state databases, result records, installed applications, package caches, and real credentials are not distributed here. They are maintained separately from the source archive. The Windows bundle was prepared on Linux; its presence does not establish successful native Windows execution.
+## Historical materials
 
-Repository documentation is written in English. Frozen protocol fields, synthetic task prompts, multilingual test strings, and quoted upstream source are preserved in their original language because changing them would alter experiment inputs or provenance.
+`archive/v6` is the locked historical branch at `a33644efc9490ff771d058ebf047f08550e4ccb3`. `v6/` on `main` remains unchanged and retains the former OpenClaw/Hermes controllers, fixtures, frozen protocol, source references, dependency snapshots and Windows bundle. Do not use those paired controllers as the current OpenClaw runner.
 
-## Contributing and licensing
+Historical product pins and grades apply only to the [V6 protocol](v6/protocol/protocol_v1.json). See the [historical methodology](docs/history/v6-methodology.md), [historical reproduction guide](docs/history/v6-reproduction.md), [evidence review](docs/history/v6-evidence-review.md) and [provenance](docs/provenance.md). Each future OpenClaw run must independently pin its installed revision, configuration, plugins, model and provider; historical pins are not new-run defaults.
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for archive-preserving changes and [SECURITY.md](SECURITY.md) for private reporting. The original evaluation materials remain all rights reserved under [LICENSE](LICENSE). Included third-party materials retain their own licenses, listed in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+Raw trajectories, state databases, runtime installations, results and credentials stay outside version control. Repository documentation is in English; frozen inputs, upstream quotations and multilingual test strings retain their original language.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for contribution, reporting and licensing terms.

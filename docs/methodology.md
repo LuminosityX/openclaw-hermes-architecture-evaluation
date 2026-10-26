@@ -1,35 +1,25 @@
-# Evaluation methodology
+# Current evaluation methodology
 
-V6 compares the pinned OpenClaw and Hermes releases under controlled task, fault, policy, and integration scenarios. The [frozen protocol](../v6/protocol/protocol_v1.json) is the authoritative experiment specification; this document provides an English guide without changing that specification.
+The current subject is OpenClaw as a task-execution framework. Results are organized into exactly six dimensions in the [matrix](../evaluation/design/evaluation-matrix.json): reliability, security, performance, resource usage/cost, extensibility, and observability. The former eleven-dimension OpenClaw/Hermes comparison is [historical](history/v6-methodology.md).
 
-## Architecture dimensions
+## Task outcomes and mechanism tests
 
-| ID | Dimension | Architectural question |
-| --- | --- | --- |
-| D01 | Reliability and recoverability | Who owns task progress, and which records support restart, reconciliation, or safe retry? |
-| D02 | Security and isolation | Which boundaries are enforced by the operating system, containers, or proxies, and which components retain host privileges? |
-| D03 | Architectural control | Where are policies enforced, and are they checked again after delegation, restart, or a change of entry point? |
-| D04 | Performance and responsiveness | How much waiting comes from model calls, admission queues, tool serialization, state handling, and startup? |
-| D05 | Resource and cost efficiency | How do context construction, call counts, resident processes, and shared state affect measured resource use and cost? |
-| D06 | Scalability | Does added capacity expand execution resources, and what limits admission, state access, connections, or queues? |
-| D07 | Modifiability and extensibility | Which changes use public interfaces, and which require core changes or a maintained product fork? |
-| D08 | Portability | How do state identity, paths, authentication, dependencies, and service bindings affect migration? |
-| D09 | Observability and auditability | Where are records produced and stored, and which execution or failure paths can leave gaps? |
-| D10 | Maintainability and operability | How are dependencies, upgrades, rollback, backups, and extension lifecycles managed? |
-| D11 | Compatibility | At which layers are external protocols, extension formats, and persisted data adapted? |
+Performance includes the ability to solve the problem: acceptance of coding, data, research and multistep workflow deliverables, constraint retention, timeout/failure rate and success under concurrency. A fast incorrect answer is not successful throughput. Count attempted tasks, accepted tasks, all failures/cancellations and correct goodput. Report latency distributions alongside sample sizes and timeouts; never silently remove slow or failed requests.
 
-## Workloads and controls
+Real-model workloads evaluate task completion and model-dependent attacks. Pin model/provider, decoding settings, tools, context and acceptance checks. Deterministic provider/tool fixtures isolate protocol handling, retry logic, authority boundaries and scheduling. They cannot establish reasoning quality or real-model prompt-injection resistance. Record model failures, framework failures, unsupported capabilities and harness errors separately.
 
-The task fixtures cover regression repair in a pinned real project, feature delivery, data reconciliation against supplied rules, and a multistep service workflow. Separate controllers examine faults, security boundaries, policies, tool protocols, extensions, migration, state operations, and observability.
+## Six reporting dimensions
 
-Real-model tasks and deterministic protocol fixtures serve different purposes. Deterministic fixtures prescribe requests while installed products execute the operations; they are not evidence about model reasoning quality. Controlled ablations, including the [Hermes MCP lock patch](../v6/patches/hermes-mcp-lock-ablation.patch), are counterfactual experiments rather than baseline product behavior.
+Reliability covers acknowledged task durability, effect duplication, state continuity, provider/tool failures, cancellation, restore and dependency failure. Security covers synthetic personal-data disclosure, permission and session boundaries, untrusted instructions, local network attack fixtures and control-plane access. Extensions require documented interfaces rather than assuming every plugin is sandboxed. Observability asks whether a reviewer can actually access and use the trajectory to diagnose behavior, including unavailable events and required privileges.
 
-## Scoring and evidence
+Resources include complete process/container membership: CPU time/throttling, memory RSS/PSS/cgroup peak and swap, allocated/apparent disk bytes, inodes, IO, network, processes, threads and descriptors. Separate idle, incremental, peak, sustained and residual usage. Token cost includes successful and failed requests, retries, delegation, auxiliary calls and cache behavior. Hardware consumption, calculated token estimates and provider-reported charges are separate measurements.
 
-The [scorer](../v6/protocol/score_protocol.py) consumes paired observations and explicit evidence references. Quantitative comparisons require sufficient independent units and preserve clustering. Functional comparisons require repeated acceptance outcomes. Missing measurements and failed validity gates must not be converted into parity or a product failure.
+## Experimental controls
 
-The protocol's grade values are retained as `强`, `中`, and `弱` (strong, medium, and weak). A missing grade remains missing. These grades are relative to the frozen criteria and evaluated product set, not universal rankings of current releases.
+Each run pins OpenClaw source/version, effective configuration, plugins/hooks, execution surface, host and fixture revisions. Use fresh state or documented resets. Requests sharing a service are repeated observations within that unit; do not inflate independent samples. Choose repetitions, concurrency levels, acceptance thresholds and stopping rules before execution, and preserve incomplete evidence.
 
-## What repository checks establish
+Keep an independent outcome/event ledger separate from native traces. Faults occur at observable task boundaries; fixture validation must demonstrate the intended failure. Changes to one supported configuration or mechanism enable controlled interventions. A patched runtime is a counterfactual and source inspection is a mechanism hypothesis, not an executed outcome. Unsupported advertised contracts and absent advertised support require different labels.
 
-Offline checks establish that the retained files match their manifests, references resolve, supported source files parse, and the scorer's synthetic decision-rule tests pass. They do not establish product performance, successful model calls, runtime recovery, isolation effectiveness, or native Windows execution. Those conclusions require the separately retained execution evidence.
+## Evidence and current status
+
+All 60 families are planned; runtime adapters and acceptance fixtures are not yet implemented. Product results require fixture validation, adapter validation, execution, independent evidence verification and review. CI validates source integrity, design consistency, selector behavior and accounting arithmetic only. See the [measurement contract](../evaluation/measurement-contract.md) for record and price requirements. Historical V6 grades remain scoped to their frozen two-product rubric.

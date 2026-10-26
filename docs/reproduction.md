@@ -1,50 +1,37 @@
-# Reproduction guide
+# Current evaluation reproduction
 
-## Offline validation
+Current work targets OpenClaw only. The executable commands below validate and select plans or calculate token estimates; they do not execute product workloads. Historical two-product reconstruction instructions are preserved in the [V6 reproduction guide](history/v6-reproduction.md).
 
-Requirements: Git and Python 3.11 or later. No third-party Python packages are required for repository validation.
+## Offline checks and selection
 
-From the repository root, run:
+Use Python 3.11 or later from the repository root:
 
 ```sh
 python3 tools/check_repository.py
+python3 evaluation/tools/check_design.py
+python3 -m unittest discover -s evaluation/tests -v
+python3 evaluation/tools/suite.py list
+python3 evaluation/tools/suite.py plan --dimension reliability
+python3 evaluation/tools/suite.py plan --case EXT-08
+python3 evaluation/tools/suite.py plan --dimension performance --phase real-model
 ```
 
-To run only the existing scorer self-tests:
+No third-party Python packages, OpenClaw installation, network access or model credentials are needed. Plans always report execution disabled. There is no current `run` command; the V6 scripts are historical and must not be used as an implicit runner for these cases.
+
+## Preparing a product run
+
+Select cases from the [matrix](../evaluation/design/evaluation-matrix.json). Implement and validate their OpenClaw adapter and independent acceptance fixtures. Record the exact installed revision, effective config, plugin/hook revisions, model/provider, host topology, supported capabilities, task acceptance checks, fault triggers and independent event/effect ledger. Do not inherit historical pins or credentials.
+
+Predeclare whole-run and per-case time, CPU, memory, disk/inode, process and connection limits, owned paths, cleanup behavior, repetition counts and required evidence. Keep one immutable dependency installation shared when compatible; writable copies are only for cases requiring mutation. Model-dependent task quality, prompt injection and billing require a separately defined real-usage budget. Validate fixtures before executing workloads; unknown capabilities remain unsupported or inconclusive rather than passes.
+
+Record native trajectories and independent ledgers separately. Collect all attempted calls, failures, cancellations, resource samples, provider usage and charges; verify evidence before reporting product outcomes. Raw evidence and secrets stay outside version control. See the [measurement contract](../evaluation/measurement-contract.md).
+
+## Token-cost calculation
 
 ```sh
-python3 v6/protocol/score_protocol.py --selftest
+python3 evaluation/tools/costs.py --usage /absolute/path/usage.json --pricing /absolute/path/pricing.json --accepted-tasks 1
 ```
 
-To score an observation file that already satisfies the frozen protocol:
+Input formats and inclusive token semantics are specified in the [measurement contract](../evaluation/measurement-contract.md). Usage and prices must refer to the same provider and model. The calculator is offline and requires a dated price source; it ships no current model prices. It does not fetch invoices or measure usage by itself. Group requests by provider/model/price date and calculate each group separately before summing.
 
-```sh
-python3 v6/protocol/score_protocol.py --observations /absolute/path/to/observations.json --output /absolute/path/to/scores.json
-```
-
-The empty observation template is not a completed evaluation and must not be presented as one.
-
-## Reconstructing a Linux experiment environment
-
-The archived controllers are historical experiment code, not a portable installer. Before running them:
-
-1. Read the [protocol](../v6/protocol/protocol_v1.json) and the specific controller to identify its inputs and required services.
-2. Reconstruct the application revisions in [version_lock.json](../v6/protocol/version_lock.json). The Hermes dependency files are upstream snapshots, not installation metadata for this repository.
-3. Resolve the historical paths using [HISTORICAL_LAYOUT.json](../HISTORICAL_LAYOUT.json). Apply the most specific mapping first. The original `private/` input directory is archived as `v6/private-fixtures/`.
-4. Rebuild omitted runtimes and tools. Depending on the controller, these include Node.js, a Hermes-managed Python environment, PyYAML for the host-side YAML reader, Bubblewrap, cgroup v2 support, and a dedicated Docker daemon. Binary paths, sockets, caches, and application installation stores are not included in the source mappings.
-5. Supply fresh credentials and an explicit budget for real-model runs. Historical authorization records and controller defaults do not define a budget for a new run.
-6. Execute the required preflight checks in a dedicated experiment environment before collecting paired measurements.
-
-There is no single supported command that reconstructs all of these services. Individual `run_*.py`, `prepare_*.py`, and cleanup scripts can create, modify, or delete experiment state; they are not part of the offline validation command.
-
-## Data and storage
-
-The source archive includes synthetic public inputs and evaluator-only expected outputs. The `private-fixtures` name describes evaluator visibility; those files are not a credential store.
-
-Raw logs, state databases, final results, and their compressed evidence archive are stored separately. Do not recreate historical result claims from source inspection alone. Match source versions, observation identifiers, and manifests to the retained evidence when auditing a result.
-
-For a new run, keep immutable application dependencies shared where the experiment permits it. Create writable dependency copies only for cases that intentionally test installation, upgrades, or storage faults. Keep dependency installations and caches out of version control, and remove the dedicated run environment after preserving the required evidence.
-
-## Windows bundle
-
-Use the [Windows-specific instructions](../v6/windows-native-bundle/README.md). This is a separate CLI verification bundle, not a Linux-to-Windows full-state migration test. Native execution is not performed by this repository's CI.
+The result separates provider-reported amounts and calculated model-token estimates. Missing counters/rates remain unknown; cache and reasoning categories are subtracted from inclusive totals before pricing. Record non-token model fees, tool fees and infrastructure costs separately.

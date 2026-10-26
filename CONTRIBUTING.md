@@ -1,15 +1,16 @@
 # Contributing
 
-Submit ongoing maintenance and V7 evaluation work to the default branch, `main`. The `archive/v6` branch is a frozen historical snapshot at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`; do not push changes or target pull requests to it.
+Submit ongoing OpenClaw evaluation and maintenance to `main`. Current work uses exactly six dimensions: reliability, security, performance, resource usage/cost, extensibility, and observability. Hermes is outside the current test scope. The `archive/v6` branch is a frozen historical snapshot at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`; do not push changes or target pull requests to it.
 
 Use English for repository documentation, issue descriptions, and pull request descriptions. Preserve multilingual inputs and upstream quotations where they are part of the experiment.
 
 Before submitting a change:
 
 1. Run `python3 tools/check_repository.py` from the repository root.
-2. Run `python3 v7/tools/check_design.py` to validate the V7 design.
-3. Explain the problem, the changed behavior or documentation, and the validation performed.
-4. Keep runtime installations, logs, databases, generated results, and credentials out of the commit.
+2. Run `python3 evaluation/tools/check_design.py` and `python3 -m unittest discover -s evaluation/tests -v`.
+3. If the matrix changes, regenerate the catalogue with `python3 evaluation/tools/suite.py catalogue > evaluation/experiment-catalogue.md` before running the design check.
+4. Explain the problem, the changed behavior or documentation, and the validation performed. A selected plan or passing fixture test is not a completed OpenClaw experiment.
+5. Keep runtime installations, logs, databases, generated results, and credentials out of the commit.
 
 Do not reformat vendored sources, rewrite frozen protocol fields, or translate task prompts as documentation cleanup. Behavioral changes require a separately identified experiment revision and evidence; V6 remains the historical reference.
 
