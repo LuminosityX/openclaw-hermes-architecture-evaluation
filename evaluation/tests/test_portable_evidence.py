@@ -39,6 +39,9 @@ class PortableEvidenceTest(unittest.TestCase):
     def test_native_process_handle_text_is_decoded_without_trusting_command_stdout_as_a_handle(self):
         result=[dict(role='tool',content=json.dumps(dict(content=[dict(type='text',text='actual-handle running 2s :: owned-process.py')])))]
         self.assertIn('actual-handle running 2s :: owned-process.py',native_texts(result))
+        windows=[dict(role='tool',content='actual-handle running 2s :: & C:\\hostedtoolcache\\win...\\python.exe')]
+        import re
+        self.assertEqual(re.findall(r'(?m)^\s*([^\s]+)\s+running\s+[^\n]*::','\n'.join(native_texts(windows))),['actual-handle'])
 
     def test_child_environment_does_not_propagate_real_tokens_or_provider_keys(self):
         import os

@@ -110,7 +110,10 @@ def run_local_semantics(root,node,modules,unit):
             pid=int(pidfile.read_text());identity=process_identity(pid)
             token,listed=perform('LIST_PROCESS','process',dict(action='list'))
             text_return='\n'.join(native_texts(fixture.returns.get(token,[])))
-            matches=sorted(set(re.findall(r'(?m)^\s*([^\s]+)\s+running\s+[^\n]*::[^\n]*owned-process',text_return)))
+            # The fresh native registry contains our one controlled exec only.
+            # PowerShell's native display name may contain just '& python.exe'
+            # and omit the script after truncation; it is not the handle.
+            matches=sorted(set(re.findall(r'(?m)^\s*([^\s]+)\s+running\s+[^\n]*::',text_return)))
             if len(matches)==1:
                 native_process_id=matches[0];perform('KILL_PROCESS','process',dict(action='kill',sessionId=native_process_id))
                 deadline=time.monotonic()+2
@@ -185,16 +188,19 @@ def target_unit(root,node,modules,unit,source,archive):
         save(root/'config.json',config);env=owned_child_environment(root);env['OPENCLAW_STATE_DIR']=str(state)
         metadata['documented_operator_mapping']=dict(state=str(state),workspace=str(workspace),agentDir=config['agents']['entries']['main']['agentDir'],database_rows_manually_changed=False)
         metadata['native_doctor']=native_command(root,node,modules,'doctor','--fix','--non-interactive',env=env,timeout=90)
+        activated_at=time.monotonic_ns();metadata['activation_ready_deadline_seconds']=120
         try:
-            gateway=PortableGateway(root,node,modules,config=config,state=state);gateway.ready();before=gateway.history(source['session_key'])
+            gateway=PortableGateway(root,node,modules,config=config,state=state);gateway.ready(timeout=120);before=gateway.history(source['session_key'])
             token='PILOT_CROSS_OS_CONTINUE_U'+str(unit);fixture.plan(token,'read',dict(path=str(workspace/'public-ready.txt')),'OWNED_PORTABLE_READY')
             actual=gateway.request(token,source['session_key']);after=gateway.history(source['session_key'])
             continuation.extend([assertion('actual-Windows-activation-keeps-the-original-native-session-id',before.get('sessionId')==source['session_id'] and after.get('sessionId')==source['session_id']),
                 assertion('original-native-message-identities-survive-and-new-work-continues',set(source['message_ids'])<=set(message_ids(after)) and actual['accepted'])])
             metadata.update(native_history_before=before,native_continuation=actual,native_history_after=after)
         except RuntimeError as error:
+            if gateway and gateway.guard_failure:raise RuntimeError('Owned cross-OS fixture guard invalidated activation: '+gateway.guard_failure)
             continuation.append(assertion('actual-Windows-native-activation-and-continuation-succeed',False));metadata['actual_native_activation_error']=str(error)[:2200]
         finally:
+            metadata['activation_observation_ms']=(time.monotonic_ns()-activated_at)/1e6
             if gateway:gateway.stop();metadata['native_gateway_tail']=''.join(gateway.tail)[-2500:]
             fixture.close()
     else:continuation.append(assertion('native-continuation-can-activate-the-source-state',False))

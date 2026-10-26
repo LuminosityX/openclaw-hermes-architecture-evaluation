@@ -91,8 +91,8 @@ class PortableGateway:
             if total>128*1024**2:
                 self.guard_failure='Owned native semantic state exceeded the 128 MiB sampled disk guard';stop_owned_process(self.process);return
 
-    def ready(self):
-        deadline=time.monotonic()+45
+    def ready(self,timeout=45):
+        deadline=time.monotonic()+timeout
         while time.monotonic()<deadline:
             connection=http.client.HTTPConnection('127.0.0.1',18789,timeout=.5)
             try:
@@ -102,7 +102,7 @@ class PortableGateway:
             finally:connection.close()
             if self.process.poll() is not None:break
             time.sleep(.1)
-        raise RuntimeError('Actual native '+os.name+' Gateway readiness failed: '+''.join(self.tail)[-2000:])
+        raise RuntimeError('Actual native '+os.name+' Gateway readiness failed within '+str(timeout)+' seconds: '+''.join(self.tail)[-2000:])
 
     def request(self,token,session):
         connection=http.client.HTTPConnection('127.0.0.1',18789,timeout=45);started=time.monotonic_ns()
