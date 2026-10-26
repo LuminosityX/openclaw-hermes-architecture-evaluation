@@ -64,7 +64,7 @@ def decode_report(stdout):
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
-def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None):
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
     command = ['bwrap', *namespaces, '--die-with-parent', '--new-session', '--clearenv', '--cap-drop', 'ALL', *capabilities,
@@ -87,6 +87,8 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         command += ['--ro-bind',str(relay_socket),'/relay/provider.sock']
     if task_input:
         command += ['--ro-bind',str(task_input),'/task/input.json']
+    if measurement_group:
+        command += ['--ro-bind',str(measurement_group),'/measurement/cgroup']
     return command + ['--', '/usr/bin/python3', '/driver/'+driver, *driver_args]
 
 
@@ -105,7 +107,7 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
-    parser.add_argument('--adapter-validation',choices=['REL-14','REL-15','EXT-08'],help='Validate candidate adapters; contributes no full-campaign coverage')
+    parser.add_argument('--adapter-validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09'],help='Validate candidate adapters; contributes no full-campaign coverage')
     parser.add_argument('--task-input',type=Path,help='Public task specification only; hidden oracle remains on the host')
     args = parser.parse_args()
     if args.model_validation and (not args.hosted_profile or not args.relay_socket or not args.relay_socket.is_socket()):
@@ -149,8 +151,11 @@ def main():
                              'pids.max':128, 'cpu.max':'200000 100000', 'memory.oom.group':1}.items():
             (group / field).write_text(str(value))
         driver='task_unit.py' if args.task_input else 'model_validation.py' if args.model_validation else 'adapter_validation.py' if args.adapter_validation else 'pilot.py'
+        if args.adapter_validation in {'PERF-05','PERF-06','COST-01','COST-06','EXT-09'}:
+            driver='mechanism_validation.py'
         driver_args=[] if args.model_validation or args.task_input else ['--case',args.adapter_validation] if args.adapter_validation else ['--study',args.study,'--blocks',str(args.blocks),*(['--ssh-backend'] if args.ssh_backend else [])]
-        command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input)
+        command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
+                                  measurement_group=group if driver=='mechanism_validation.py' else None)
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,

@@ -18,6 +18,9 @@ SOURCES={
                'evaluation/runner/pilot.py','evaluation/tools/run_local.py','evaluation/tools/run_task_unit.py',
                'evaluation/tools/task_workloads.py','evaluation/tools/task_acceptance.py','evaluation/tools/model_relay.py','evaluation/tools/task_transcripts.py'],
 }
+for _family in ['PERF-05','PERF-06','COST-01','COST-06','EXT-09']:
+    SOURCES[_family]=['evaluation/runner/mechanism_cases.py','evaluation/runner/mechanism_validation.py',
+                      'evaluation/runner/pilot.py','evaluation/runner/hook_cases.py','evaluation/tools/run_local.py']
 
 
 def native_validation(plan,proofs):

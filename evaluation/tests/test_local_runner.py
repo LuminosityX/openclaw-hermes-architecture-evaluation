@@ -53,6 +53,12 @@ class LocalRunnerTests(unittest.TestCase):
         self.assertEqual(set(capabilities),{'CAP_SETUID','CAP_SETGID','CAP_SYS_CHROOT'})
         self.assertNotIn('CAP_SYS_ADMIN',capabilities)
 
+    def test_phase_measurement_mount_is_read_only_and_run_owned(self):
+        command=runner.sandbox_command(Path('/existing/modules'),Path('/existing/node'),64,[],measurement_group=Path('/owned/cgroup'))
+        readonly=[command[i+1:i+3] for i,arg in enumerate(command) if arg=='--ro-bind']
+        self.assertIn(['/owned/cgroup','/measurement/cgroup'],readonly)
+        self.assertNotIn('--bind',command)
+
     def test_old_runtime_cannot_become_current_release_evidence(self):
         target=dict(version='2026.10.7',source_commit='a'*40)
         old=dict(version='2026.9.2',commit='b'*40)
