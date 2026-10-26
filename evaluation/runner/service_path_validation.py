@@ -15,11 +15,12 @@ import isolation_setup_cases
 import instruction_input_cases
 import backup_cases
 import mcp_contract_cases
+import relocation_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10'],required=True)
+    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,*mcp_contract_cases.FAMILIES,'OBS-07','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-06'],required=True)
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     parser.add_argument('--scenario',action='append',help='Explicit selected pending scenario; formal units only')
     args=parser.parse_args()
@@ -34,6 +35,7 @@ def main():
     if args.case=='EXT-06':module=instruction_input_cases
     if args.case=='REL-10':module=backup_cases
     if args.case in mcp_contract_cases.FAMILIES:module=mcp_contract_cases
+    if args.case=='REL-06':module=relocation_cases
     selected=[sid for sid in module.SCENARIOS if sid.startswith(args.case+'-') and (not args.scenario or sid in args.scenario)]
     if args.scenario and (len(args.scenario)!=len(set(args.scenario)) or set(args.scenario)!=set(selected)):
         parser.error('Selected scenarios must be distinct members of the selected family')

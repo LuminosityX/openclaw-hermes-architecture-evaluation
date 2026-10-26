@@ -345,15 +345,18 @@ def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_b
 
 
 class Gateway:
-    def __init__(self,root,configurer=configuration,**options):
+    def __init__(self,root,configurer=configuration,process_uid=None,**options):
         self.root=root
         self.config=configurer(root,**options)
         print('[pilot] starting Gateway '+root.name,file=sys.stderr,flush=True)
         self.log_tail=deque(maxlen=100)
         env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),
                  OPENCLAW_SKIP_CHANNELS='1',OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
+        def change_identity():
+            os.setgroups([]);os.setgid(process_uid);os.setuid(process_uid)
         self.process=subprocess.Popen([NODE,CLI,'gateway','run','--bind','loopback','--port','18789'],
-            stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,start_new_session=True)
+            stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,start_new_session=True,
+            preexec_fn=change_identity if process_uid is not None else None)
         self.reader=threading.Thread(target=self.read_log,daemon=True)
         self.reader.start()
         self.started=time.monotonic()
