@@ -92,7 +92,7 @@ def main():
             execution=subprocess.run([sys.executable,str(ROOT/'evaluation/tools/run_local.py'),
                 '--runtime-modules',str(args.runtime_modules),'--node',str(args.node),
                 '--output',str(args.output/'native'),'--hosted-profile','--memory-mib','3072',
-                '--timeout',str(unit_timeout),'--ssh-backend','--task-input',str(input_path),'--relay-socket',str(relay.path)],
+                '--timeout',str(unit_timeout),'--tmpfs-mib','128' if task.get('reuse') else '64','--ssh-backend','--task-input',str(input_path),'--relay-socket',str(relay.path)],
                 env=dict(os.environ),timeout=unit_timeout+30,check=False)
         finally:
             relay.shutdown();thread.join(timeout=3)

@@ -14,17 +14,18 @@ from task_cases import TaskFixture, configure, selfcheck
 
 def main():
     resource.setrlimit(resource.RLIMIT_CORE,(0,0))
-    resource.setrlimit(resource.RLIMIT_FSIZE,(16*1024**2,16*1024**2))
     for name in ['tmp','home','cache','run']: (pilot.BASE/name).mkdir(exist_ok=True)
     spec=json.loads(Path('/task/input.json').read_text())
     task=spec['task']
+    file_limit=(64 if task.get('reuse') else 16)*1024**2
+    resource.setrlimit(resource.RLIMIT_FSIZE,(file_limit,file_limit))
     fixture_class=TaskFixture;configure_task=configure;check_fixture=selfcheck
     if task.get('injection'):
         from injection_cases import InjectionFixture,configure as injection_configure,selfcheck as injection_selfcheck
         fixture_class=InjectionFixture;configure_task=injection_configure;check_fixture=injection_selfcheck
     root=pilot.BASE/'task-unit'
     report=dict(kind='native-task-unit',product='openclaw',studies=[],task_id=task['task_id'],
-                full_campaign_coverage=spec.get('full_campaign_coverage') is True,artifacts={},independent_events=[])
+                full_campaign_coverage=spec.get('full_campaign_coverage') is True,artifacts={},independent_events=[],per_file_limit_bytes=file_limit)
     fixture=None;gateway=None;server=None
     try:
         report['storage_guard_check']=pilot.storage_guard_check()

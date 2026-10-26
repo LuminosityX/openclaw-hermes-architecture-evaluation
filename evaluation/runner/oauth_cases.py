@@ -118,10 +118,11 @@ def run_scenario(root,scenario,unit=1):
     def request(item):
         result=gateway.request(item);requests.append(result);return result
     try:
-        gateway=pilot.Gateway(root,configurer=configure);gateway.ready()
+        configure(root)
+        metadata['login']=native_login(root)
+        gateway=pilot.Gateway(root,configurer=service.reuse);gateway.ready()
         c=token+'_PROVIDER_CONTROL';fixture.register(c)
         if not request(c)['accepted'] or fixture.receipts.get(c)!=1:raise RuntimeError('Native provider/effect positive control failed')
-        metadata['login']=native_login(root)
         c=token+'_OAUTH_CONTROL';plan(c,'read');positive=request(c)
         if not positive['accepted'] or peer.receipts.get(c)!=1:raise RuntimeError('Native OAuth/MCP read control failed: '+json.dumps(positive)[:1200])
         if not any(e['kind']=='oauth-pkce-token-exchange' and e['accepted'] for e in peer.events):raise RuntimeError('Actual authorization-code/PKCE token exchange was not observed')
