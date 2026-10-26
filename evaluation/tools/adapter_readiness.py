@@ -23,6 +23,11 @@ for _family in ['PERF-05','PERF-06','COST-01','COST-06','EXT-09']:
                       'evaluation/runner/pilot.py','evaluation/runner/hook_cases.py','evaluation/tools/run_local.py']
 SOURCES['SEC-11']=['evaluation/runner/gateway_auth_cases.py','evaluation/runner/gateway_auth_probe.mjs',
                    'evaluation/runner/mechanism_cases.py','evaluation/runner/hook_cases.py','evaluation/runner/pilot.py','evaluation/tools/run_local.py']
+for _family in ['PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07']:
+    SOURCES[_family]=['evaluation/runner/service_path_cases.py','evaluation/runner/service_path_validation.py',
+        'evaluation/runner/trace_access_cases.py','evaluation/runner/trace_access_probe.mjs',
+        'evaluation/runner/public_gateway_client.mjs','evaluation/runner/mechanism_cases.py',
+        'evaluation/runner/hook_cases.py','evaluation/runner/pilot.py','evaluation/tools/run_local.py']
 
 
 def native_validation(plan,proofs):

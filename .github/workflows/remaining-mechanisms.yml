@@ -1,0 +1,92 @@
+name: Remaining mechanism experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      families:
+        description: JSON array of new unmeasured families; existing accepted units are rejected
+        default: '["PERF-01","PERF-02","PERF-04","COST-02","COST-04","OBS-07"]'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: openclaw-remaining-mechanisms
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        family: ${{ fromJSON(inputs.families) }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    env:
+      EVAL_FAMILY: ${{ matrix.family }}
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Reject already accepted units before installing a runtime
+        run: |
+          python3 - <<'PY'
+          import os,sys
+          sys.path.insert(0,'evaluation/tools')
+          from campaign import DEFAULT_PLAN,load_plan,records_from
+          from run_campaign_family import NATIVE_FAMILIES
+          family=os.environ['EVAL_FAMILY']
+          assert family in NATIVE_FAMILIES
+          assert not any(r['scenario_id'].startswith(family+'-') for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units already exist; select only pending work'
+          PY
+      - name: Prepare one disposable pinned runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Calibrate the selected adapter against native OpenClaw
+        run: |
+          sudo python3 evaluation/tools/run_local.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --node "$(command -v node)" --adapter-validation "$EVAL_FAMILY" --hosted-profile --ssh-backend \
+            --memory-mib 3072 --timeout 600 --output "$RUNNER_TEMP/openclaw-campaign-validation"
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-proofs"
+          sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" \
+            "$RUNNER_TEMP/openclaw-campaign-proofs/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"
+      - name: Execute all prescribed independent units only after matching calibration
+        run: |
+          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_campaign_family.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
+            --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
+            --node "$(command -v node)" --case "$EVAL_FAMILY" \
+            --proofs "$RUNNER_TEMP/openclaw-campaign-proofs" --output "$RUNNER_TEMP/openclaw-campaign-result"
+      - name: Collect bounded calibration and formal provenance
+        if: always()
+        run: |
+          sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-result/provenance"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          if sudo test -f "$RUNNER_TEMP/openclaw-campaign-validation/summary.json"; then
+            sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" "$RUNNER_TEMP/openclaw-campaign-result/provenance/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"
+            sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
+          fi
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-result'
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file())<=8*1024**2
+          PY
+      - name: Upload bounded native evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: campaign-${{ matrix.family }}
+          path: ${{ runner.temp }}/openclaw-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove this job's installation, caches, proofs and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-campaign-validation" "$RUNNER_TEMP/openclaw-campaign-proofs" "$RUNNER_TEMP/openclaw-campaign-result"

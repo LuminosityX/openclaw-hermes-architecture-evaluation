@@ -14,7 +14,7 @@ from provider_plugin import verify as verify_plugin
 from suite import ROOT, require
 from target import verify_installation
 
-NATIVE_FAMILIES = ['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11']
+NATIVE_FAMILIES = [family for family in SOURCES if family!='PERF-09']
 
 
 def bind_unit(plan, family, unit, native, run_id, controller_commit, native_reference, native_sha256):
@@ -54,10 +54,11 @@ def main():
     parser.add_argument('--node',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True)
     parser.add_argument('--case',choices=NATIVE_FAMILIES,required=True)
+    parser.add_argument('--proofs',type=Path,help='Current native calibration proofs, including proofs produced earlier in this hosted job')
     args=parser.parse_args()
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0,'Formal execution is restricted to the disposable hosted controller')
     plan=load_plan()
-    require_execution_ready(plan,args.case,load_proofs(proof_directory(plan)))
+    require_execution_ready(plan,args.case,load_proofs(args.proofs or proof_directory(plan)))
     installation=verify_installation(plan['target'],args.runtime_modules,args.package_lock)
     plugin=verify_plugin(args.runtime_modules,args.package_lock)
     case=next(c for c in plan['cases'] if c['id']==args.case)
