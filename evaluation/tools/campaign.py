@@ -60,13 +60,15 @@ def scenario_index(plan):
     return {s['id']:(case,s) for case in plan['cases'] for s in case['scenarios']}
 
 
-def validate_result(result,plan):
+def validate_result(result,plan,allow_development=False):
     require(result['schema_version']==1 and result['plan_sha256']==plan['plan_sha256'],'Result must bind the frozen full campaign')
     require(result['product']=='openclaw','Result must target OpenClaw')
     require(result['target_version']==plan['target']['version'] and result['target_commit']==plan['target']['source_commit'],'Result runtime pin mismatch')
     require(result['scenario_id'] in scenario_index(plan),'Unknown scenario')
     require(result['state'] in RESULT_STATES,'Unknown result state')
     require(result['evidence'] and result['run_id'],'Actual run and evidence references required')
+    require(allow_development or result.get('full_campaign_coverage') is not False,
+            'Development calibration cannot count as full campaign execution')
     require(not {'architecture_conclusion','causal_interpretation','overall_grade'}&set(result),'Architecture interpretation is deferred until the experiment campaign is sealed')
     state=result['state']
     if state in {'pass','fail'}:

@@ -33,6 +33,7 @@ class TaskWorkloadTests(unittest.TestCase):
         expected=task['oracle']['expected']
         self.assertTrue(judge(task,{'answer.json':json.dumps(expected)})['accepted'])
         self.assertFalse(judge(task,{'answer.json':json.dumps(dict(expected,cache_ttl_seconds=999))})['accepted'])
+        self.assertFalse(judge(task,{'answer.json':json.dumps(dict(expected,legacy_export_enabled=0))})['accepted'])
 
     def test_duplicate_effect_or_unverified_receipt_fails(self):
         import json
@@ -40,7 +41,8 @@ class TaskWorkloadTests(unittest.TestCase):
         receipt=dict(order_id=task['oracle']['order_id'],amount_cents=task['oracle']['amount_cents'],receipt_id='receipt-1')
         artifact={'receipt.json':json.dumps(receipt)}
         commit=dict(kind='commit-effect',sequence=1,**receipt)
-        read=dict(kind='status-read',sequence=2)
-        self.assertTrue(judge(task,artifact,service_events=[commit,read])['accepted'])
-        self.assertFalse(judge(task,artifact,service_events=[commit,commit,read])['accepted'])
+        lost=dict(kind='commit-ack-lost',sequence=2)
+        read=dict(kind='status-read',sequence=3)
+        self.assertTrue(judge(task,artifact,service_events=[commit,lost,read])['accepted'])
+        self.assertFalse(judge(task,artifact,service_events=[commit,commit,lost,read])['accepted'])
         self.assertFalse(judge(task,artifact,service_events=[commit])['accepted'])

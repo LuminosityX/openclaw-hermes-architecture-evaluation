@@ -98,11 +98,15 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
     daemon_threads=True
     block_on_close=False
 
-    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled'):
+    def __init__(self,path,key,max_output_tokens=4096,open_request=None,thinking='disabled',maximum_requests=None):
         if not key: raise ValueError('DeepSeek key is required')
         self.key=key
         self.max_output_tokens=max_output_tokens
         self.thinking=thinking
+        if maximum_requests is not None and (type(maximum_requests) is not int or not 1<=maximum_requests<=128):
+            raise ValueError('Finite task protocol request condition must be 1..128')
+        self.maximum_requests=maximum_requests
+        self.forwarded_requests=0
         self.open_request=open_request or urllib.request.build_opener(NoRedirect()).open
         self.records=[]
         self.lock=threading.Lock()
@@ -142,6 +146,14 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
                             requested_model='deepseek-flash',thinking=owner.thinking,max_output_tokens=owner.max_output_tokens,
                             stream=bool(body.get('stream')),upstream_status=None,usage=None,
                             provider_reported_cost_usd=None,invoice_reconciliation=None)
+                with owner.lock:
+                    admitted=owner.maximum_requests is None or owner.forwarded_requests<owner.maximum_requests
+                    if admitted: owner.forwarded_requests+=1
+                if not admitted:
+                    record.update(error_type='evaluator-task-request-limit',forwarded_to_provider=False)
+                    owner.append(record)
+                    return self.error(400,'Declared evaluator task model-request limit reached')
+                record['forwarded_to_provider']=True
                 started=time.monotonic_ns()
                 metadata=Metadata(record['stream'])
                 headers_sent=False
@@ -185,6 +197,7 @@ class Relay(socketserver.ThreadingMixIn,socketserver.UnixStreamServer):
         Path(path).write_text(json.dumps(dict(kind='real-provider-request-ledger',provider='deepseek',
             base_url='https://api.deepseek.com',model='deepseek-flash',campaign_spend_ceiling=None,
             requests=records,request_count=len(records),unattributed_request_count=sum(r['task_id'] is None for r in records),
+            forwarded_request_count=self.forwarded_requests,task_protocol_maximum_requests=self.maximum_requests,
             raw_prompts_retained=False,raw_responses_retained=False,credentials_retained=False,
             actual_charges_known=False,limitation='Usage metadata is not a provider invoice. Missing usage remains unknown.'),
             ensure_ascii=False,indent=2)+'\n')

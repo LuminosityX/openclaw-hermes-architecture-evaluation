@@ -13,6 +13,9 @@ SOURCES={
     'REL-14':['evaluation/runner/protocol_cases.py','evaluation/runner/pilot.py','evaluation/runner/adapter_validation.py','evaluation/runner/mcp_probe.py','evaluation/tools/run_local.py'],
     'REL-15':['evaluation/runner/protocol_cases.py','evaluation/runner/pilot.py','evaluation/runner/adapter_validation.py','evaluation/runner/mcp_probe.py','evaluation/tools/run_local.py'],
     'EXT-08':['evaluation/runner/hook_cases.py','evaluation/runner/pilot.py','evaluation/runner/adapter_validation.py','evaluation/tools/run_local.py'],
+    'PERF-09':['evaluation/runner/task_cases.py','evaluation/runner/task_unit.py','evaluation/runner/function_probe.py',
+               'evaluation/runner/pilot.py','evaluation/tools/run_local.py','evaluation/tools/run_task_unit.py',
+               'evaluation/tools/task_workloads.py','evaluation/tools/task_acceptance.py','evaluation/tools/model_relay.py'],
 }
 
 
@@ -40,7 +43,7 @@ def readiness(plan,proofs=()):
     rows=[]
     for sid,(case,scenario) in scenario_index(plan).items():
         family=case['id']
-        state='native-validated-candidate' if sid in verified else 'candidate-awaiting-native-validation' if family in SOURCES else 'fixture-only' if family=='PERF-09' else 'not-implemented'
+        state='native-validated-candidate' if sid in verified else 'candidate-awaiting-native-validation' if family in SOURCES else 'not-implemented'
         rows.append(dict(scenario_id=sid,case_id=family,dimension=case['dimension'],name=scenario['name'],
                          preparation_state=state,full_campaign_executed=False,
                          source_files=SOURCES.get(family,['evaluation/tools/task_workloads.py','evaluation/tools/task_acceptance.py'] if family=='PERF-09' else [])))

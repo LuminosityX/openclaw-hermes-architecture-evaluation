@@ -52,6 +52,12 @@ class CampaignTests(unittest.TestCase):
         record['native_invoked']=False
         with self.assertRaises(ValueError): validate_result(record,self.plan)
 
+    def test_development_calibration_cannot_be_promoted_to_full_results(self):
+        record=self.observation('REL-01-S01')
+        record['full_campaign_coverage']=False
+        validate_result(record,self.plan,allow_development=True)
+        with self.assertRaisesRegex(ValueError,'calibration'): audit(self.plan,[record])
+
     def test_nonapplicable_requires_versioned_native_capability_proof(self):
         record=self.observation('REL-01-S01',state='unsupported')
         record.update(native_capability_absent=True,capability_evidence=['probe-receipt'],probe_attempted=True)

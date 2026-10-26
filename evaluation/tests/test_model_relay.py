@@ -39,6 +39,12 @@ class RelayTests(unittest.TestCase):
         self.assertEqual(body['stream_options'],{'include_usage':True})
         self.assertEqual(task_id(body),'EVAL_NEW')
 
+    def test_thinking_and_output_budget_are_explicit_conditions(self):
+        body=request_body(dict(messages=[],stream=True),16384,'enabled')
+        self.assertEqual(body['thinking'],{'type':'enabled'})
+        self.assertEqual(body['max_tokens'],16384)
+        with self.assertRaises(ValueError): request_body(dict(messages=[]),-1,'enabled')
+
     def test_unix_relay_never_passes_inbound_auth_or_follows_an_arbitrary_path(self):
         calls=[]
         class Response(io.BytesIO):

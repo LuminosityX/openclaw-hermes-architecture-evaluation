@@ -149,15 +149,23 @@ def judge(task,artifacts,function_results=None,service_events=None):
     else:
         try: actual=json.loads(content or '')
         except (ValueError,TypeError): actual=None
-        if oracle['kind']=='json-artifact': check('independent-exact-deliverable',actual==oracle['expected'])
+        if oracle['kind']=='json-artifact': check('independent-exact-deliverable',strict_equal(actual,oracle['expected']))
         else:
             events=service_events or []
             commits=[e for e in events if e.get('kind')=='commit-effect']
             statuses=[e for e in events if e.get('kind')=='status-read']
+            check('lost-ack-fault-exercised',any(e.get('kind')=='commit-ack-lost' for e in events))
             check('exactly-one-external-effect',len(commits)==1)
             check('status-verified-after-commit',bool(commits and statuses) and statuses[-1]['sequence']>commits[0]['sequence'])
             expected=None if not commits else {k:commits[0].get(k) for k in ['order_id','amount_cents','receipt_id']}
-            check('deliverable-matches-independent-receipt',actual==expected and expected is not None)
+            check('deliverable-matches-independent-receipt',strict_equal(actual,expected) and expected is not None)
             check('correct-order-and-amount',bool(commits) and commits[0].get('order_id')==oracle['order_id'] and commits[0].get('amount_cents')==oracle['amount_cents'])
     return dict(accepted=all(a['verdict']=='pass' for a in assertions),assertions=assertions,
                 public_fixture_sha256=task['public_fixture_sha256'],schema_version=TASK_SCHEMA)
+
+
+def strict_equal(actual,expected):
+    if type(actual) is not type(expected): return False
+    if isinstance(expected,dict): return actual.keys()==expected.keys() and all(strict_equal(actual[k],v) for k,v in expected.items())
+    if isinstance(expected,list): return len(actual)==len(expected) and all(strict_equal(a,e) for a,e in zip(actual,expected))
+    return actual==expected
