@@ -29,8 +29,8 @@ function summary(result){
  return {ok:result?.ok===true,error_code:result?.error?.code,detail_code:result?.error?.details?.code,
   missing_scope:result?.error?.details?.missingScope,error_message:result?.error?.message?.slice(0,300)};
 }
-async function connect({identity=makeIdentity(),token=spec.shared_token,scopes=['operator.read'],origin,ui=false,stale=false}={}){
- const client={id:ui?'openclaw-control-ui':'gateway-client',mode:ui?'ui':'backend',version:'evaluation-fixture-1',platform:ui?'web':'linux'};
+async function connect({identity=makeIdentity(),token=spec.shared_token,scopes=['operator.read'],origin,ui=false,stale=false,pairable=false,buildId,version='evaluation-fixture-1'}={}){
+ const client={id:ui?'openclaw-control-ui':pairable?'test':'gateway-client',mode:ui?'ui':pairable?'test':'backend',version,platform:ui?'web':'linux',...(buildId?{buildId}:{})};
  const socket=new WebSocket('ws://127.0.0.1:18789',origin?{headers:{Origin:origin}}:{});
  sockets.push(socket);const pending=new Map();let connectResult;
  const rpc=(method,params={},timeout=15000)=>new Promise(resolve=>{
@@ -90,37 +90,38 @@ try{
   check('invalid-ws-credential-rejected',!invalid.result.ok);
   report.invalid_connect=summary(invalid.result);
  }else if(spec.scenario==='SEC-11-S02'){
-  const reader=await paired({},owner);
+  const reader=await paired({pairable:true},owner);
   if(!reader.result.ok)throw new Error('Fresh proof positive control did not connect');
-  const expired=await connect({identity:reader.identity,stale:true});
+  const expired=await connect({identity:reader.identity,stale:true,pairable:true});
   check('fresh-proof-positive-control',reader.result.ok);
   check('expired-device-proof-rejected',!expired.result.ok&&expired.result?.error?.details?.code==='DEVICE_AUTH_SIGNATURE_EXPIRED');
   report.expired_connect=summary(expired.result);
   report.coverage_boundary='Session reconnection authentication with a ten-minute-old signed device proof; this does not test an idle socket or a bearer token TTL.';
  }else if(spec.scenario==='SEC-11-S03'){
-  const allowed=await paired({origin:'http://127.0.0.1:18789',ui:true},owner);
+  const uiIdentity={ui:true,buildId:owner.result.payload?.server?.buildId,version:owner.result.payload?.server?.version};
+  const allowed=await paired({origin:'http://127.0.0.1:18789',...uiIdentity},owner);
   if(!allowed.result.ok)throw new Error('Allowed-origin positive control did not connect: '+JSON.stringify(summary(allowed.result)));
-  const denied=await connect({origin:'https://untrusted-origin.invalid',ui:true});
+  const denied=await connect({origin:'https://untrusted-origin.invalid',...uiIdentity});
   check('allowed-origin-positive-control',allowed.result.ok);
   check('untrusted-origin-rejected',!denied.result.ok);
   report.denied_connect=summary(denied.result);
  }else if(spec.scenario==='SEC-11-S04'){
-  const reader=await paired({},owner);
+  const reader=await paired({pairable:true},owner);
   if(!reader.result.ok||!reader.token)throw new Error('Reader pairing did not produce a native scoped device token');
-  const before=await connect({identity:reader.identity,token:reader.token});
+  const before=await connect({identity:reader.identity,token:reader.token,pairable:true});
   if(!before.result.ok)throw new Error('Device-token positive reconnect failed: '+JSON.stringify(summary(before.result)));
   const revoke=await owner.rpc('device.token.revoke',{deviceId:reader.identity.id,role:'operator'});
   if(!revoke.ok)throw new Error('Owner native token revoke failed: '+JSON.stringify(summary(revoke)));
-  const after=await connect({identity:reader.identity,token:reader.token});
+  const after=await connect({identity:reader.identity,token:reader.token,pairable:true});
   check('device-token-positive-control',before.result.ok);
   check('native-revocation-accepted',revoke.ok);
   check('revoked-token-cannot-reconnect',!after.result.ok);
   report.replay_connect=summary(after.result);
   report.credential_policy='Only the revoked device token is replayed; no shared-secret fallback. No assertion about already-admitted RPCs.';
  }else if(spec.scenario==='SEC-11-S05'){
-  const reader=await paired({},owner);
+  const reader=await paired({pairable:true},owner);
   if(!reader.result.ok||!reader.token)throw new Error('Reader pairing did not produce a scoped token');
-  const scoped=await connect({identity:reader.identity,token:reader.token,scopes:['operator.read']});
+  const scoped=await connect({identity:reader.identity,token:reader.token,scopes:['operator.read'],pairable:true});
   if(!scoped.result.ok)throw new Error('Reader token positive control did not connect');
   const read=await scoped.rpc('health',{});
   if(!read.ok)throw new Error('Read-only positive RPC failed');

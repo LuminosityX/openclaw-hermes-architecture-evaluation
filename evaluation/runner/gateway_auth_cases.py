@@ -70,6 +70,7 @@ def main():
                 execution=subprocess.run([pilot.NODE,'/driver/gateway_auth_probe.mjs',str(spec)],capture_output=True,text=True,timeout=100)
                 if not execution.stdout.strip():raise RuntimeError('Wire probe exited '+str(execution.returncode)+': '+execution.stderr[-1800:])
                 wire=json.loads(execution.stdout)
+                observation['wire']=wire
                 if wire.get('scenario_id')!=sid:raise RuntimeError('Wire probe scenario mismatch')
                 if wire.get('harness_error'):raise RuntimeError(wire['harness_error'])
                 if execution.returncode or not wire['fixture_validated'] or not wire['native_invoked']:raise RuntimeError('Wire probe did not validate its native positive controls')
