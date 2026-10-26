@@ -49,6 +49,10 @@ def goal_from(messages):
     return next((node['goal'] for node in decoded_tool_records(messages) if isinstance(node.get('goal'),dict) and node['goal'].get('tokenBudget')==5000),None)
 
 
+def missing_goal(messages):
+    return any(node.get('status')=='missing' and node.get('goal') is None for node in decoded_tool_records(messages))
+
+
 class BudgetFixture(AuthorizationFixture):
     def __init__(self):
         self.catalogues=[];self.batch_token=None;self.children=[];self.batch_ids=[];self.batch_emitted=False;self.retry_token=None;self.retry_injected=False
@@ -136,8 +140,8 @@ def run_scenario(root,scenario,unit=1):
         deadline=time.monotonic()+25
         while time.monotonic()<deadline and not all(fixture.tool_returns.get(child) for child in fixture.children):time.sleep(.1)
         child_snapshots=[decoded_tool_records(fixture.tool_returns.get(child,[])) for child in fixture.children]
-        if not all(any('goal' in node and node['goal'] is None for node in nodes) for nodes in child_snapshots):raise RuntimeError('Real sibling get_goal probes did not establish their independent session scope')
         metadata.update(actual_sibling_spawn_results=fixture.tool_returns.get(fixture.batch_token,[]),actual_sibling_goal_snapshots=child_snapshots)
+        if not all(missing_goal(fixture.tool_returns.get(child,[])) for child in fixture.children):raise RuntimeError('Real sibling get_goal probes did not establish their independent session scope')
         if mode=='retry':
             item=token+'_RETRY';fixture.retry_token=item;fixture.register(item);result=gateway.request(item);requests.append(result)
             if not fixture.retry_injected or not result['accepted'] or fixture.receipts.get(item)!=1:raise RuntimeError('Actual native provider retry positive probe failed')
@@ -164,7 +168,7 @@ def run_scenario(root,scenario,unit=1):
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2400],metadata=metadata)
     finally:
         if gateway:gateway.stop();row['native_gateway_tail']=''.join(gateway.log_tail)[-4000:]
-        row.update(requests=requests,independent_events=fixture.events,independent_effects=fixture.receipts,independent_tool_events=peer.events if peer else [])
+        row.update(requests=requests,native_tool_returns=fixture.tool_returns,independent_events=fixture.events,independent_effects=fixture.receipts,independent_tool_events=peer.events if peer else [])
         if peer:peer.close()
         fixture.close();shutil.rmtree(root,ignore_errors=True);row['owned_state_retained']=root.exists()
     return row

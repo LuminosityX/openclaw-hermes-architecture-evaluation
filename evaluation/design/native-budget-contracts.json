@@ -24,6 +24,12 @@
       "sha256": "9efd316ecf1c4c60f6fd5d26433142fff2b6794d7d328e9bc6179b29bf9c82a4",
       "bytes": 1076,
       "reference": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/LICENSE"
+    },
+    {
+      "path": "src/config/sessions/goals.ts",
+      "sha256": "de739180717deb946ccd710086088ba6788b3fa12c11a84b8b587abec0086505",
+      "bytes": 7268,
+      "reference": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/config/sessions/goals.ts"
     }
   ],
   "scope": "Pinned native session-goal API and separate child-session scope; capability probes must not substitute a custom global budget manager"
