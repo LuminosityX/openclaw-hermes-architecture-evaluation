@@ -1,0 +1,10 @@
+{
+  "product": "openclaw",
+  "version": "2026.10.6",
+  "source_commit": "fe06181dc5ecc01cf8904abbfc26925925efefbc",
+  "release_tag": "v2026.10.6",
+  "release_published_at": "2026-10-22T12:53:10Z",
+  "npm_integrity": "sha512-jSpQPa2Jw5rG0J2GC07j9+qHtVYIuoHjgccU88JeS+p7188sBCnvIJeuaiNPHj1zsWkuHcBv443QiEUh7qrxwA==",
+  "node_version": "24.22.1",
+  "role": "Historical comparison control only for explicitly registered compatibility and migration experiments; never the current campaign target"
+}
