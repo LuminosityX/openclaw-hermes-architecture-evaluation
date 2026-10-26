@@ -62,11 +62,13 @@ def main():
     parser.add_argument('--timeout', type=int, default=600)
     parser.add_argument('--ssh-backend', action='store_true', help='Use an owned ephemeral loopback SSH backend; no Docker images')
     parser.add_argument('--allow-historical-bootstrap',action='store_true',help='Explicitly label a non-current runtime as harness bootstrap only')
+    parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     args = parser.parse_args()
     if not 16 <= args.tmpfs_mib <= 128 or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
         parser.error('Bounded pilot limits: 16..128 MiB tmpfs, 1..4 blocks, 1..1200 seconds')
-    if not 512 <= args.memory_mib <= 1536:
-        parser.error('Pilot memory budget must be 512..1536 MiB')
+    maximum_memory=4096 if args.hosted_profile else 1536
+    if not 512 <= args.memory_mib <= maximum_memory:
+        parser.error(f'Pilot memory budget must be 512..{maximum_memory} MiB for this explicit profile')
     modules = args.runtime_modules.resolve()
     node = args.node.resolve()
     build_path = modules / 'openclaw/dist/build-info.json'
@@ -117,6 +119,9 @@ def main():
                         stderr_tail=stderr[-2000:],stdout_tail=stdout[-2000:])
         report.update(runtime_identity=build, runtime_build_info_sha256=hashlib.sha256(build_path.read_bytes()).hexdigest(),
                       evaluation_role=role,campaign_target=target,
+                      execution_budget=dict(profile='hosted' if args.hosted_profile else 'local',
+                          memory_limit_bytes=args.memory_mib*1024**2,swap_limit_bytes=0,
+                          cpu_quota_cores=2,pids_limit=128,timeout_seconds=args.timeout),
                       controller_sha256=controller_hashes,
                       wrapper_exit_code=process.returncode, whole_run_seconds=round(time.monotonic()-started,3),
                       storage_policy=dict(shared_installation_copied=False, downloads=0,

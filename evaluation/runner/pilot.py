@@ -16,6 +16,7 @@ import shutil
 import signal
 import sqlite3
 import subprocess
+import sys
 import threading
 import time
 
@@ -68,6 +69,8 @@ class Fixture:
         with self.lock:
             record = dict(kind=kind, monotonic_ns=time.monotonic_ns(), **values)
             self.events.append(record)
+            if kind=='provider-request':
+                print('[pilot] provider '+values['token']+' tool_results='+str(values['tool_results']),file=sys.stderr,flush=True)
             return record
 
     def handler(self):
@@ -227,6 +230,7 @@ class Gateway:
     def __init__(self,root,**options):
         self.root=root
         self.config=configuration(root,**options)
+        print('[pilot] starting Gateway '+root.name,file=sys.stderr,flush=True)
         self.log_tail=deque(maxlen=100)
         env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),
                  OPENCLAW_SKIP_CHANNELS='1',OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
@@ -252,6 +256,7 @@ class Gateway:
                 response=connection.getresponse()
                 response.read()
                 if response.status==200:
+                    print('[pilot] ready Gateway '+self.root.name,file=sys.stderr,flush=True)
                     return
             except (OSError,http.client.HTTPException):
                 pass

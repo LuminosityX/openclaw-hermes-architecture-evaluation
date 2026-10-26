@@ -16,7 +16,7 @@ The manually dispatched `Current stable OpenClaw pilot` GitHub workflow installs
 
 Only compact evidence is uploaded: installation identity, a minified dependency lock, execution metadata and the pilot's bounded JSON report. Their total must be at most 2 MiB; artifacts expire after three days. Local retrieval is limited to those small files. The runtime and cache are not downloaded back to the user's machine.
 
-Runtime state still uses the 64 MiB tmpfs and zero-swap experiment cgroup. Hosted runs allow 1536 MiB experiment memory, explicitly recorded in the command and execution environment, so they are not a resource-matched comparison with the historical 1 GiB local bootstrap. The hosted installation/cache check is capped at 4 GiB after installation; that is temporary cloud disk, not local disk or a claim about the product's minimum footprint.
+Runtime state still uses the 64 MiB tmpfs and zero-swap experiment cgroup. Hosted runs use an explicit `--hosted-profile` with 3072 MiB experiment memory, recorded in the report, and are not a resource-matched comparison with the historical 1 GiB local bootstrap. A 1536 MiB current-release attempt was terminated by its cgroup OOM policy before producing product observations; it is retained as a resource-budget failure, not silently counted as a completed experiment. The hosted installation/cache check is capped at 4 GiB after installation; that is temporary cloud disk, not local disk or a claim about the product's minimum footprint.
 
 ## Keep bootstrap evidence separate
 

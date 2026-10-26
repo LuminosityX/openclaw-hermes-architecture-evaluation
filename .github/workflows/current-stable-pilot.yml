@@ -67,7 +67,7 @@ jobs:
             --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
             --node "$(command -v node)" \
             --output "$RUNNER_TEMP/openclaw-eval-output" \
-            --study first-wave --ssh-backend --blocks 2 --memory-mib 1536 --timeout 600
+            --study first-wave --ssh-backend --blocks 2 --hosted-profile --memory-mib 3072 --timeout 600
       - name: Prepare bounded evidence only
         if: always()
         run: |
