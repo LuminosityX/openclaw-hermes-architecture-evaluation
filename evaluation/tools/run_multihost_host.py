@@ -223,7 +223,18 @@ def daemon(args):
         if effects:effects.close()
         if guest and guest.poll() is None:(group/'cgroup.kill').write_text('1');guest.wait(timeout=10)
         if tunnel and tunnel.poll() is None:os.killpg(tunnel.pid,signal.SIGTERM);tunnel.wait(timeout=10)
-        result['native_execution_pids_after_shutdown']=[pid for pid in effects.members() if Path('/proc',str(pid),'stat').exists()] if effects else []
+        until=time.monotonic()+5;live=[];zombies=[]
+        while effects and time.monotonic()<until:
+            live=[];zombies=[]
+            for pid in effects.members():
+                try:
+                    state=Path('/proc',str(pid),'stat').read_text().rsplit(') ',1)[1].split()[0]
+                    (zombies if state=='Z' else live).append(pid)
+                except (OSError,IndexError):pass
+            if not live:break
+            time.sleep(.05)
+        result['native_execution_pids_after_shutdown']=live
+        result['nonexecuting_zombie_records_after_shutdown']=zombies
         # Publish only after the native endpoint has been stopped. Private
         # configs/identities live in destroyed tmpfs and never enter artifacts.
         save(output/'host-provenance.json',result)

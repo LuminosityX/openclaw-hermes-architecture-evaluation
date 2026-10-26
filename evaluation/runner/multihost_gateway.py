@@ -74,8 +74,13 @@ def main():
             for entry in items:
                 if entry.get('deviceId')==device:
                     pair_records.append(rpc('device.pair.approve',dict(requestId=entry['requestId'])))
+            for entry in payload.get('paired',[]) if isinstance(payload,dict) else []:
+                surface=entry.get('pendingNodeSurface')
+                if entry.get('deviceId')==device and surface and surface.get('requestId'):
+                    pair_records.append(rpc('node.pair.approve',dict(requestId=surface['requestId'])))
             inventory=rpc('environments.list')
-            if device in json.dumps(inventory) and 'workerHost' in json.dumps(inventory):break
+            environments=inventory.get('payload',{}).get('environments',[])
+            if any(e.get('id')=='node:'+device and e.get('sessionHost') is True and e.get('status')=='available' for e in environments):break
             time.sleep(1)
         report['exact_device_pairing_and_inventory']=dict(pairing=pair_records[-8:],inventory=inventory)
         # A fresh native session is dispatched in full. A second HTTP server or
