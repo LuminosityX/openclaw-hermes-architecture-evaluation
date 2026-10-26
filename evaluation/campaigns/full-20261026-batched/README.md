@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **242/257 scenarios completed**, with **924 independent observations**. 208 scenarios pass and 34 retain failure observations. Another 11 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **245/257 scenarios completed**, with **933 independent observations**. 210 scenarios pass and 35 retain failure observations. Another 8 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -8,6 +8,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | --- | ---: | ---: | --- |
 | REL-01 Admission and persistence boundaries | 3 | 9 | [40374512119](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40374512119) |
 | REL-02 External effects and lost acknowledgments | 3 | 9 | [40323072237](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323072237) |
+| REL-03 Delegated work and stale owners | 3 | 9 | [40399418320](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40399418320) |
 | REL-04 Recovery automation and service availability | 4 | 12 | [40315477743](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40315477743), [40322602646](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40322602646) |
 | REL-05 Cancellation across descendants | 4 | 12 | [40374512119](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40374512119) |
 | REL-06 State identity under relocation | 4 | 12 | [40317319057](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40317319057) |
@@ -71,14 +72,14 @@ Verified nonapplicability requires an actual native capability probe and pinned 
 
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
-| reliability | 51 / 58 |
+| reliability | 54 / 58 |
 | security | 54 / 54 |
 | performance | 37 / 41 |
 | resources_cost | 29 / 33 |
 | extensibility | 39 / 39 |
 | observability | 32 / 32 |
 
-Scenarios retaining failed acceptance observations: REL-05-S01, REL-05-S02, REL-06-S01, REL-06-S04, REL-08-S01, SEC-02-S02, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, COST-07-S04, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-03-S03, OBS-03-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results; source-backed architectural diagnosis remains deferred.
+Scenarios retaining failed acceptance observations: REL-03-S02, REL-05-S01, REL-05-S02, REL-06-S01, REL-06-S04, REL-08-S01, SEC-02-S02, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, COST-07-S04, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-03-S03, OBS-03-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results; source-backed architectural diagnosis remains deferred.
 
 Passing conditions apply only to the declared fixtures, workload sizes, deadlines and hardware bounds. In particular, PERF-09 uses five synthetic task types with six variants each; it does not establish general task-solving ability.
 
