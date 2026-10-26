@@ -50,14 +50,14 @@ def configure(root,mode):
     pilot.save(root/'config.json',config);return config
 
 
-def run_scenario(root,scenario,unit=1):
+def run_scenario(root,scenario,unit=1,configurer=None):
     mode=SCENARIOS[scenario];token='PILOT_HARNESS_'+scenario.replace('-','_')+'_U'+str(unit)
     task=dict(task_id='owned-arithmetic-'+scenario+'-'+str(unit),operation='add',left=137+unit,right=286-unit)
     fixture=HarnessFixture();gateway=None;assertions=[];metadata={};requests=[];exports=[]
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['actual-public-harness-or-provider-callback','independent-external-process-and-checkpoint-events','native-public-transcript-and-session-records']))
     try:
-        gateway=pilot.Gateway(root,configurer=lambda p:configure(p,mode));gateway.ready();wait_control(gateway,fixture,token+'_CONTROL')
+        gateway=pilot.Gateway(root,configurer=configurer or (lambda p:configure(p,mode)));gateway.ready();wait_control(gateway,fixture,token+'_CONTROL')
         if mode in {'tool','provider'}:
             fixture.plan(token,'external__eval_probe',dict(token=token,left=task['left'],right=task['right']),'ANSWER:423')
             result=gateway.request(token);requests.append(result)

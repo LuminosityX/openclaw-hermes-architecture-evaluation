@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import signal
 import sqlite3
@@ -12,7 +13,6 @@ import threading
 import time
 import uuid
 
-from backup_cases import queued_admission
 from effect_recovery_cases import wait_control
 import mechanism_cases
 from operation_fixture import OperationFixture
@@ -24,7 +24,7 @@ SCENARIOS={f'REL-01-S{i:02}':mode for i,mode in enumerate(['before-append','befo
 
 
 def committed_matches(root,token):
-    matches=[];examined=0
+    matches=[];examined=0;exact=re.compile(rb'(?<![A-Z0-9_])'+re.escape(token.encode())+rb'(?![A-Z0-9_])')
     for path in sorted(root.rglob('*.sqlite')):
         if path.stat().st_size>8*1024**2:raise RuntimeError('Owned admission SQLite inspection exceeds its declared bound')
         connection=sqlite3.connect('file:'+str(path)+'?mode=ro',uri=True,timeout=2)
@@ -35,9 +35,16 @@ def committed_matches(root,token):
                     fragments=[v if isinstance(v,str) else v.decode(errors='ignore') for v in values if isinstance(v,(str,bytes))]
                     raw=' '.join(fragments).encode();examined+=len(raw)
                     if examined>16*1024**2:raise RuntimeError('Owned admission committed-row inspection exceeds its total bound')
-                    if token.encode() in raw:matches.append(dict(database=str(path.relative_to(root)),table=table,row_sha256=hashlib.sha256(repr(values).encode()).hexdigest()))
+                    if exact.search(raw):matches.append(dict(database=str(path.relative_to(root)),table=table,row_sha256=hashlib.sha256(repr(values).encode()).hexdigest()))
         finally:connection.close()
     return dict(matches=matches,examined_text_bytes=examined,scope='Independent read-only SQLite connections, at most 500 rows per table and 16 MiB text total. A negative scan alone is not a global absence proof.')
+
+
+def admitted_run(probe,session,run_id):
+    for response in probe.get('responses',[]):
+        result=response.get('result',{});info=result.get('payload',{}).get('sessionInfo',{})
+        if result.get('ok') and info.get('key')==session and info.get('hasActiveRun') and run_id in info.get('activeRunIds',[]):return True
+    return False
 
 
 class AdmissionFixture(OperationFixture):
@@ -109,7 +116,7 @@ def run_scenario(root,scenario,unit=1):
             durable=committed_matches(root,token);metadata['committed_records_before_fault']=durable
             if mode!='before-append':
                 queued=privacy_cases.history(root,session);metadata['native_pre_fault_queue']=queued
-                if not queued_admission(queued,session):raise RuntimeError('Acknowledged target lacked actual queued native custody before dispatch')
+                if not admitted_run(queued,session,ack['payload'].get('runId')):raise RuntimeError('Acknowledged target lacked native custody linked to its exact ACK run ID')
                 if not durable['matches']:raise RuntimeError('Native ACK has no independently visible committed target record')
                 if any(e.get('token')==token and 'provider' in e['kind'] for e in fixture.events):raise RuntimeError('Target reached its worker/provider before the declared pre-dispatch crash boundary')
             old_pid=gateway.process.pid;metadata['fault_started_monotonic_ns']=time.monotonic_ns();os.killpg(old_pid,signal.SIGKILL);gateway.process.wait(timeout=5)

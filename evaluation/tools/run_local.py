@@ -144,7 +144,7 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
-    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
+    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7),help='Formal independent unit, invoked by the readiness-checked hosted campaign controller')
     parser.add_argument('--native-scenario',action='append',help='Selected pending formal scenario, passed to the family driver')
     parser.add_argument('--task-input',type=Path,help='Public task specification only; hidden oracle remains on the host')
@@ -201,7 +201,7 @@ def main():
             driver='mechanism_validation.py'
         if args.adapter_validation=='SEC-11':
             driver='gateway_auth_cases.py'
-        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01'}:
+        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07'}:
             driver='service_path_validation.py'
         driver_args=[] if args.model_validation or args.task_input else ['--case',args.adapter_validation] if args.adapter_validation else ['--study',args.study,'--blocks',str(args.blocks),*(['--ssh-backend'] if args.ssh_backend else [])]
         if args.campaign_unit:
@@ -211,7 +211,7 @@ def main():
             for scenario in args.native_scenario:driver_args+=['--scenario',scenario]
         command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
                                   measurement_group=group if driver in {'mechanism_validation.py','service_path_validation.py'} else None,
-                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02',dependency_installation=args.adapter_validation in {'REL-07','REL-12','SEC-12'},permission_gate=args.adapter_validation=='SEC-06')
+                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02',dependency_installation=args.adapter_validation in {'REL-07','REL-12','SEC-12','EXT-07'},permission_gate=args.adapter_validation=='SEC-06')
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
