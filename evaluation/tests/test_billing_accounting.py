@@ -31,3 +31,10 @@ class BillingAccountingTest(unittest.TestCase):
         self.assertEqual(result['unfinished_attempts_with_unknown_usage'],1)
         self.assertIsNone(result['input_tokens_inclusive'])
         self.assertIsNone(result['calculated_usd'])
+
+    def test_owned_unit_identity_survives_a_partial_model_prompt_marker(self):
+        record=self.record(task_id='EVAL_BILLIN',synthetic_input_observations=dict(owned_accounting_task_id='EVAL_BILLING_COST_07_S04_U1'))
+        result=account(dict(requests=[record]))['requests'][0]
+        self.assertEqual(result['task_id'],'EVAL_BILLING_COST_07_S04_U1')
+        self.assertEqual(result['native_prompt_task_marker'],'EVAL_BILLIN')
+        self.assertEqual(result['attribution_method'],'exclusive-owned-task-relay')

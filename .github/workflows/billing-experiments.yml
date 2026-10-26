@@ -11,6 +11,10 @@ on:
         type: string
         default: '["COST-07-S01","COST-07-S02","COST-07-S03","COST-07-S04","COST-07-S05","COST-07-S06"]'
         description: JSON array of pending formal scenarios; calibration exercises the whole family
+      units:
+        type: string
+        default: '[1,2,3,4,5,6]'
+        description: JSON array of pending unit indices only
 permissions:
   contents: read
 concurrency:
@@ -22,6 +26,7 @@ jobs:
     timeout-minutes: 150
     env:
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
+      EVAL_UNITS: ${{ inputs.units }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -33,8 +38,10 @@ jobs:
           sys.path.insert(0,'evaluation/tools')
           from campaign import DEFAULT_PLAN,records_from
           selected=json.loads(os.environ['EVAL_SCENARIOS'])
+          units=json.loads(os.environ['EVAL_UNITS'])
+          assert units and all(type(u) is int and 1<=u<=6 for u in units)
           assert selected and set(selected)<={f'COST-07-S{i:02}' for i in range(1,7)}
-          assert not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results'))
+          assert not any(r['scenario_id'] in selected and r['unit'] in units and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results'))
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
@@ -46,7 +53,7 @@ jobs:
           sudo --preserve-env=DEEPSEEK_API_KEY,GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_billing_family.py \
             --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
             --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" \
-            --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-campaign-result" --mode "$EVAL_MODE" --scenarios-json "$EVAL_SCENARIOS"
+            --node "$(command -v node)" --output "$RUNNER_TEMP/openclaw-campaign-result" --mode "$EVAL_MODE" --scenarios-json "$EVAL_SCENARIOS" --units-json "$EVAL_UNITS"
       - name: Retain bounded accounting and installation provenance
         if: always()
         run: |

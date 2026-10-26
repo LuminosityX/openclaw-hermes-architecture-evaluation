@@ -88,13 +88,15 @@ def unit(args,plan,installation,sid,index,calibration):
 def main():
     parser=argparse.ArgumentParser()
     for name in ['runtime-modules','package-lock','node','output']:parser.add_argument('--'+name,type=Path,required=True)
-    parser.add_argument('--mode',choices=['calibration','formal'],required=True);parser.add_argument('--scenarios-json',default='null');args=parser.parse_args()
+    parser.add_argument('--mode',choices=['calibration','formal'],required=True);parser.add_argument('--scenarios-json',default='null');parser.add_argument('--units-json',default='null');args=parser.parse_args()
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0,'Accounting execution is GitHub-only')
     plan=load_plan();installation=verify_installation(plan['target'],args.runtime_modules,args.package_lock);family=next(c for c in plan['cases'] if c['id']=='COST-07')
     selected=json.loads(args.scenarios_json) or [s['id'] for s in family['scenarios']]
     require(isinstance(selected,list) and len(selected)==len(set(selected)) and set(selected)<={s['id'] for s in family['scenarios']},'Invalid selected accounting scenarios')
+    units=json.loads(args.units_json) or list(range(1,family['required_independent_units']+1))
+    require(isinstance(units,list) and len(units)==len(set(units)) and all(type(u) is int and 1<=u<=family['required_independent_units'] for u in units),'Invalid selected accounting units')
     args.output.mkdir(parents=True,exist_ok=True);proofs=args.output/'provenance';proofs.mkdir(exist_ok=True)
-    require(not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')),'Accounting family already has accepted units')
+    require(not any(r['scenario_id'] in selected and r['unit'] in units and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')),'Accounting family already has accepted units')
     observations=[]
     for scenario in family['scenarios']:
         row=unit(args,plan,installation,scenario['id'],1,True);require(row['state']!='harness-error','Accounting calibration did not establish a real native intervention');observations.append(row)
@@ -103,7 +105,7 @@ def main():
     require_execution_ready(plan,'COST-07',load_proofs(proofs))
     if args.mode=='calibration':return
     results=[]
-    for index in range(1,family['required_independent_units']+1):
+    for index in units:
         for scenario in family['scenarios']:
             if scenario['id'] not in selected:continue
             row=unit(args,plan,installation,scenario['id'],index,False);results.append(row)
