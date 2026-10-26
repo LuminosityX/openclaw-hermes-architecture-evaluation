@@ -10,6 +10,7 @@ import shutil
 import signal
 import socket
 import sqlite3
+import subprocess
 import threading
 import time
 import zlib
@@ -142,6 +143,12 @@ def run_scenario(root,scenario,unit=1):
         if not sources:raise RuntimeError('Installed official log SDK does not expose the registered default queue/batch limits')
         metadata['sdk_queue_contract_sources']=sources
         gateway=pilot.Gateway(root,configurer=lambda p:configure(p,count,token));gateway.ready()
+        inspect_env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
+        inspection=subprocess.run([pilot.NODE,pilot.CLI,'plugins','inspect','diagnostics-otel','--json'],env=inspect_env,capture_output=True,text=True,timeout=45)
+        try:inspected=json.loads(inspection.stdout)
+        except ValueError:inspected=None
+        metadata['native_addon_inspection']=dict(returncode=inspection.returncode,payload=inspected,stderr_tail=inspection.stderr[-1500:])
+        metadata['native_diagnostics_configuration']=gateway.config.get('diagnostics')
         control=token+'_CONTROL';fixture.register(control);result=gateway.request(control);requests.append(result)
         if not result['accepted'] or fixture.receipts.get(control)!=1:raise RuntimeError('Native task control failed')
         # Controls emit only eight events; only the matched S04 target emits
@@ -203,7 +210,8 @@ def run_scenario(root,scenario,unit=1):
         if native_log.is_file():
             text=native_log.read_text(errors='replace')
             row['native_event_log_diagnostics']=dict(target_event_count=len([m for m in EVENT.findall(text) if m.startswith(prefix)]),
-                total_matching_event_count=len(EVENT.findall(text)),tail=text[-12000:])
+                total_matching_event_count=len(EVENT.findall(text)),tail=text[-12000:],
+                addon_and_exporter_lines=[line[:2000] for line in text.splitlines() if re.search(r'diagnostics-otel|exporter|internal diagnostics|plugin.services',line,re.I)][-18:])
         usage=shutil.disk_usage(pilot.BASE)
         row['owned_tmpfs_at_cleanup']=dict(total_bytes=usage.total,used_bytes=usage.used,free_bytes=usage.free)
         if gateway:gateway.stop();row['native_gateway_tail']=''.join(gateway.log_tail)[-4000:]
