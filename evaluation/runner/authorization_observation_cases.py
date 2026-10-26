@@ -34,7 +34,11 @@ def reconstruct(native_records):
     choice=('single-use' if 'allow-once' in decisions else 'revoked-inherited' if parent_links and {'full','read-only'}<=modes else 'persistent' if allowlists else 'session' if 'full' in modes else 'unknown')
     actors=[];targets=[];versions=[]
     for node in nodes:
-        actor_relevant=(node.get('decision')=='allow-once' and node.get('status')=='allowed') if choice=='single-use' else (node.get('permissionMode')=='full' if choice=='session' else bool(node.get('allowlist') or isinstance(node.get('file'),dict)) if choice=='persistent' else node.get('permissionMode') in {'full','read-only'} if choice=='revoked-inherited' else False
+        if choice=='single-use':actor_relevant=node.get('decision')=='allow-once' and node.get('status')=='allowed'
+        elif choice=='session':actor_relevant=node.get('permissionMode')=='full'
+        elif choice=='persistent':actor_relevant=bool(node.get('allowlist') or isinstance(node.get('file'),dict))
+        elif choice=='revoked-inherited':actor_relevant=node.get('permissionMode') in {'full','read-only'}
+        else:actor_relevant=False
         if actor_relevant:
             for key in ['resolvedBy','resolver','reviewer','updatedBy']:
                 value=node.get(key)
