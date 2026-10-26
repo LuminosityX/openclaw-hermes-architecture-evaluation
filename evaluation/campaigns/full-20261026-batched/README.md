@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **245/257 scenarios completed**, with **933 independent observations**. 211 scenarios pass and 34 retain failure observations. Another 8 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **249/257 scenarios completed**, with **945 independent observations**. 215 scenarios pass and 34 retain failure observations. Another 4 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -16,6 +16,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | REL-08 Native cross-OS semantics | 4 | 12 | [40391948174](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40391948174) |
 | REL-09 Credential and endpoint rebind | 4 | 12 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
 | REL-10 Consistent backup during active work | 4 | 12 | [40311076074](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40311076074), [40312921492](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40312921492) |
+| REL-11 Upgrade and rollback after partial migration | 4 | 12 | [40404642169](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40404642169) |
 | REL-12 Dependency publication and repair | 4 | 12 | [40349097396](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40349097396) |
 | REL-13 MCP session and cancellation lifecycle | 4 | 12 | [40311646155](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40311646155), [40312916295](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40312916295) |
 | REL-14 Model streaming and reasoning payloads | 4 | 12 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
@@ -72,7 +73,7 @@ Verified nonapplicability requires an actual native capability probe and pinned 
 
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
-| reliability | 54 / 58 |
+| reliability | 58 / 58 |
 | security | 54 / 54 |
 | performance | 37 / 41 |
 | resources_cost | 29 / 33 |
