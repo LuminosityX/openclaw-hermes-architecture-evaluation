@@ -34,6 +34,7 @@ def environment(root,cache):
 
 
 def command(root,cache,*arguments,timeout=90):
+    if arguments and arguments[0]=='install':arguments=(*arguments,'--force')
     begin=time.monotonic_ns();execution=subprocess.run([pilot.NODE,pilot.CLI,'plugins',*map(str,arguments)],env=environment(root,cache),capture_output=True,text=True,timeout=timeout)
     return dict(arguments=list(map(str,arguments)),returncode=execution.returncode,stdout=execution.stdout[-8000:],stderr=execution.stderr[-4000:],
         started_monotonic_ns=begin,ended_monotonic_ns=time.monotonic_ns())
@@ -77,7 +78,7 @@ def run_scenario(root,scenario,unit=1):
         event_start=len(registry.events)
         if mode=='interrupted':
             registry.mode='gate';registry.release.clear();registry.tarball_started.clear()
-            child=subprocess.Popen([pilot.NODE,pilot.CLI,'plugins','install',str(archive),'--accept-capabilities'],env=environment(root,cache),
+            child=subprocess.Popen([pilot.NODE,pilot.CLI,'plugins','install',str(archive),'--accept-capabilities','--force'],env=environment(root,cache),
                 stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True,start_new_session=True)
             deadline=time.monotonic()+60
             while time.monotonic()<deadline and not registry.tarball_started.is_set() and child.poll() is None:time.sleep(.05)
@@ -89,7 +90,7 @@ def run_scenario(root,scenario,unit=1):
         else:
             env=environment(root,cache)
             if mode=='verified-cache':env['npm_config_offline']='true'
-            begin=time.monotonic_ns();execution=subprocess.run([pilot.NODE,pilot.CLI,'plugins','install',str(archive),'--accept-capabilities'],env=env,capture_output=True,text=True,timeout=90)
+            begin=time.monotonic_ns();execution=subprocess.run([pilot.NODE,pilot.CLI,'plugins','install',str(archive),'--accept-capabilities','--force'],env=env,capture_output=True,text=True,timeout=90)
             initial=dict(returncode=execution.returncode,stdout=execution.stdout[-8000:],stderr=execution.stderr[-4000:],started_monotonic_ns=begin,ended_monotonic_ns=time.monotonic_ns())
         commands.append(initial);initial_inspection=inspect(root,cache);metadata['initial_inspection']=initial_inspection
         intervention_events=registry.events[event_start:];metadata['fault_phase_registry_events']=intervention_events
