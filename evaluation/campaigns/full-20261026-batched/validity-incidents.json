@@ -37,12 +37,12 @@
       "reason": "The 800 ms external operation completed before the native CLI reached cancellation. Every original RPC explicitly returned status=no-active-run and abortedRunId=null. A successful cancellation of an active run was therefore never exercised; these observations cannot count as product failures or accepted coverage.",
       "preservation": "Original hosted native summaries and no-active-run RPC results remain unchanged; compact manifests retain explicit exclusions and hashes.",
       "correction": "Gate the external operation at its independently observed effect-start until the native cancellation RPC returns. Record request liveness and monotonic RPC/gate timestamps. Calibrate the whole family, then rerun only the six pending PERF-04-S04 units.",
-      "repair_run_id": null,
+      "repair_run_id": "40309012602",
       "architecture_interpretation": "deferred"
     },
     {
       "run_id": "40308284917",
-      "controller_commit": "6430a72",
+      "controller_commit": "6430a720e8a3c2526177d7d0433b4e334e27878e",
       "scenarios": [
         "PERF-04-S04"
       ],
@@ -58,12 +58,12 @@
       "reason": "The gated active cancellation succeeded (status=aborted, pending HTTP request stopped without task completion), but the revised oracle additionally required a nonnull abortedRunId. The pinned public sessionAbortResult contract permits a null ID with status=aborted. These six scored failures are invalid and quarantined.",
       "preservation": "Normalized original rows and the original manifest are retained under quarantined-results; hosted raw evidence stays unchanged.",
       "correction": "Score explicit native status=aborted together with independent pre-RPC liveness and the external gate, accepting nullable IDs. Add a regression test for all pending/status combinations, recalibrate, then rerun only the six pending units.",
-      "repair_run_id": null,
+      "repair_run_id": "40309012602",
       "architecture_interpretation": "deferred"
     },
     {
       "run_id": "40307698568",
-      "controller_commit": "65229ac",
+      "controller_commit": "65229acdf4818f7d38aaf083202df2d746cb3a53",
       "scenarios": [
         "SEC-01-S03"
       ],
@@ -76,7 +76,7 @@
       "reason": "The canary MCP fixture posts an entry callback to /fault before reading the canary. The new generic operation fixture did not implement that endpoint, so the fixture failed and native MCP timed out. This does not measure product authority and cannot count as a product failure.",
       "preservation": "Hosted raw records remain unchanged; retention must exclude only these three invalid scenario observations with original artifact/record hashes.",
       "correction": "Implement the bounded registered-task callback, add positive/negative HTTP regression controls, and require a successful native MCP receipt control before the canary operation. Recalibrate the family and rerun only SEC-01-S03.",
-      "repair_run_id": null,
+      "repair_run_id": "40309312751",
       "architecture_interpretation": "deferred"
     }
   ]
