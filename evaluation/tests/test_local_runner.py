@@ -61,6 +61,14 @@ class LocalRunnerTests(unittest.TestCase):
         self.assertEqual(runner.runtime_role(old,target,allow_historical=True),'historical-bootstrap-only')
         self.assertEqual(runner.runtime_role(dict(version=target['version'],commit=target['source_commit']),target),'current-stable-pilot')
 
+    def test_timeout_recovers_completed_arms_without_claiming_the_whole_study(self):
+        import json
+        frame=dict(kind='arm-checkpoint',product='openclaw',study='SRC-01',planned_arms=8,arm=dict(block=0,valid=True))
+        result=runner.decode_report(json.dumps(frame)+'\n{"truncated":')
+        self.assertEqual(len(result['studies'][0]['arms']),1)
+        self.assertFalse(result['studies'][0]['complete'])
+        self.assertTrue(result['harness_error'])
+
 
 if __name__=='__main__':
     unittest.main()

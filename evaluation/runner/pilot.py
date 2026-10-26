@@ -148,6 +148,8 @@ class Fixture:
         self.fault_started = threading.Event()
         self.strategy='conservative'
         self.effect_delay_ms=150
+        self.denied_attempted=set()
+        self.provider_attempts={}
         self.server = ThreadingHTTPServer(('127.0.0.1',18080), self.handler())
         self.server.daemon_threads = True
         threading.Thread(target=self.server.serve_forever,daemon=True).start()
@@ -194,7 +196,8 @@ class Fixture:
                 if not self.path.endswith('/chat/completions'):
                     return self.send({'error':'unrecognized local fixture path'},404)
                 messages=body.get('messages',[])
-                last=max((i for i,m in enumerate(messages) if m.get('role')=='user'),default=0)
+                task_users=[i for i,m in enumerate(messages) if m.get('role')=='user' and re.search(r'PILOT_[A-Z0-9_]+',str(m.get('content','')))]
+                last=max(task_users) if task_users else max((i for i,m in enumerate(messages) if m.get('role')=='user'),default=0)
                 text=str(messages[last].get('content',''))
                 match=re.search(r'PILOT_[A-Z0-9_]+',text)
                 token=match.group() if match else 'PILOT_AUXILIARY'
@@ -206,8 +209,19 @@ class Fixture:
                             payload_bytes=len(raw),tool_schema_bytes=len(json.dumps(schemas,ensure_ascii=False,separators=(',',':')).encode()),
                             message_bytes=len(json.dumps(messages,ensure_ascii=False,separators=(',',':')).encode()))
                 calls=[]
+                with owner.lock:
+                    already_denied=token in owner.denied_attempted
+                    if '_DENIED_' in token:
+                        owner.denied_attempted.add(token)
+                    owner.provider_attempts[token]=owner.provider_attempts.get(token,0)+1
+                    attempts=owner.provider_attempts[token]
                 if '_PLAIN_' in token:
                     content='ACCEPTED:'+token
+                elif '_DENIED_' in token and already_denied:
+                    content='CONTROLLED_DENIAL_FINISHED:'+token
+                elif attempts>8:
+                    owner.event('fixture-turn-limit',token=token)
+                    content='FIXTURE_TURN_LIMIT:'+token
                 else:
                     result_text=json.dumps(results,ensure_ascii=False)
                     if results:

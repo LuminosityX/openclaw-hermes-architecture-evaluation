@@ -8,6 +8,7 @@ import select
 import shutil
 import signal
 import subprocess
+import sys
 import threading
 import time
 
@@ -96,6 +97,10 @@ def compact_request(request):
     return {key:value for key,value in request.items() if key!='response_excerpt'}
 
 
+def checkpoint(study,arm,planned):
+    print(json.dumps(dict(kind='arm-checkpoint',product='openclaw',study=study,planned_arms=planned,arm=arm),ensure_ascii=False,separators=(',',':')),flush=True)
+
+
 def batch(pilot,fixture,gateway,label,profile=False):
     profiler=MainThreadProfiler(pilot,gateway,label) if profile else None
     start_profile=profiler.command('start') if profiler else None
@@ -175,6 +180,7 @@ def workload_study(pilot,fixture,blocks,scheduling=False):
             finally:
                 gateway.stop()
                 shutil.rmtree(root)
+            checkpoint('SRC-02' if scheduling else 'SRC-01',arms[-1],len(conditions)*blocks)
     return dict(study='SRC-02' if scheduling else 'SRC-01',status='source-directed-executed',
                 independent_blocks=blocks,arms=arms,valid=all(a['valid'] for a in arms),
                 contrasts=['cap 1 versus 4 within each declared effect delay; short versus long delay within each cap'] if scheduling else
@@ -227,6 +233,7 @@ def failure_study(pilot,fixture,blocks):
             finally:
                 gateway.stop()
                 shutil.rmtree(root)
+            checkpoint('SRC-03',arms[-1],2*blocks)
     return dict(study='SRC-03',status='source-directed-executed',independent_blocks=blocks,arms=arms,
                 valid=all(a['valid'] for a in arms),
                 limitations=['Trusted synthetic code reading an explicitly owned accessible canary; not a bypass of a declared permission.',
@@ -276,6 +283,7 @@ def scope_study(pilot,fixture,blocks):
                 finally:
                     gateway.stop()
                     shutil.rmtree(root)
+                checkpoint('SRC-04',arms[-1],2*blocks)
     finally:
         server.stop()
     return dict(study='SRC-04',status='source-directed-executed',independent_blocks=blocks,arms=arms,

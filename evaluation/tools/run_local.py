@@ -28,6 +28,30 @@ def runtime_role(build,target,allow_historical=False):
     raise ValueError('Runtime differs from the pinned current stable release '+target['version']+'; use --allow-historical-bootstrap only for historical harness checks')
 
 
+def decode_report(stdout):
+    final=None
+    checkpoints={}
+    for line in stdout.splitlines():
+        try:
+            value=json.loads(line)
+        except ValueError:
+            continue
+        if value.get('product')!='openclaw':
+            continue
+        if value.get('kind')=='arm-checkpoint':
+            study=checkpoints.setdefault(value['study'],dict(study=value['study'],status='recovered-checkpoints',planned_arms=value['planned_arms'],arms=[]))
+            study['arms'].append(value['arm'])
+        elif isinstance(value.get('studies'),list):
+            final=value
+    if final is not None:
+        return final
+    for study in checkpoints.values():
+        study['complete']=len(study['arms'])==study['planned_arms']
+        study['valid']=all(a.get('valid') for a in study['arms'])
+    return dict(kind='pilot-aborted',product='openclaw',studies=list(checkpoints.values()),
+                harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
+
+
 def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
@@ -91,6 +115,7 @@ def main():
                        for p in [Path(__file__), *sorted(p for p in (ROOT/'evaluation/runner').iterdir() if p.suffix in {'.py','.mjs'})]}
     group = Path('/sys/fs/cgroup/system.slice') / ('openclaw-evaluation-' + uuid.uuid4().hex[:12] + '.scope')
     process = None
+    timed_out=False
     started = time.monotonic()
     try:
         group.mkdir()
@@ -106,17 +131,18 @@ def main():
         try:
             stdout, stderr = process.communicate(timeout=args.timeout)
         except subprocess.TimeoutExpired:
+            timed_out=True
             (group / 'cgroup.kill').write_text('1')
             stdout, stderr = process.communicate(timeout=10)
-            raise RuntimeError('Pilot exceeded its whole-run timeout; its cgroup was killed')
-        if len(stdout.encode()) > 1024**2 or len(stderr.encode()) > 128*1024:
+        source_run=args.study=='source-followup' or args.study.startswith('SRC-')
+        if len(stdout.encode()) > (2 if source_run else 1)*1024**2 or len(stderr.encode()) > 128*1024:
             raise RuntimeError('Pilot exceeded its persisted evidence budget; no raw output retained')
-        try:
-            report = json.loads(stdout)
-        except ValueError:
-            report=dict(kind='pilot-aborted',product='openclaw',studies=[],
-                        harness_error='Inner namespace exited before publishing a JSON report',
-                        stderr_tail=stderr[-2000:],stdout_tail=stdout[-2000:])
+        report=decode_report(stdout)
+        if timed_out:
+            report['harness_error']='Whole-run time budget exhausted; completed arm checkpoints retained'
+        if report.get('harness_error'):
+            report['stderr_tail']=stderr[-8000:]
+            report['whole_run_timeout']=timed_out
         report.update(runtime_identity=build, runtime_build_info_sha256=hashlib.sha256(build_path.read_bytes()).hexdigest(),
                       evaluation_role=role,campaign_target=target,
                       execution_budget=dict(profile='hosted' if args.hosted_profile else 'local',
@@ -130,7 +156,6 @@ def main():
                       whole_run_cgroup=dict(memory_peak_bytes=int((group/'memory.peak').read_text()),
                           memory_events=(group/'memory.events').read_text(),
                           pids_events=(group/'pids.events').read_text(),cpu_stat=(group/'cpu.stat').read_text()))
-        source_run=args.study=='source-followup' or args.study.startswith('SRC-')
         encoded = (json.dumps(report,ensure_ascii=False,indent=None if source_run else 2,separators=(',',':') if source_run else None)+'\n').encode()
         if len(encoded) > 1024**2:
             raise RuntimeError('Summary exceeds the 1 MiB evidence budget')
