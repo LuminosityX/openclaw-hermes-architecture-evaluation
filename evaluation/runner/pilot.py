@@ -345,20 +345,22 @@ def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_b
 
 
 class Gateway:
-    def __init__(self,root,configurer=configuration,process_uid=None,drop_capabilities=False,**options):
+    def __init__(self,root,configurer=configuration,process_uid=None,drop_capabilities=False,native_cgroup=False,port=18789,**options):
         self.root=root
+        self.port=port
         self.config=configurer(root,**options)
         print('[pilot] starting Gateway '+root.name,file=sys.stderr,flush=True)
         self.log_tail=deque(maxlen=100)
         env=dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),
                  OPENCLAW_SKIP_CHANNELS='1',OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
         def change_identity():
-            os.setgroups([]);os.setgid(process_uid);os.setuid(process_uid)
-        command=[NODE,CLI,'gateway','run','--bind','loopback','--port','18789']
+            if native_cgroup:Path('/native-control/procs').write_text(str(os.getpid()))
+            if process_uid is not None:os.setgroups([]);os.setgid(process_uid);os.setuid(process_uid)
+        command=[NODE,CLI,'gateway','run','--bind','loopback','--port',str(port)]
         if drop_capabilities or os.environ.get('OPENCLAW_EVAL_DROP_GATEWAY_CAPABILITIES')=='1':command=['/usr/bin/setpriv','--bounding-set=-all','--inh-caps=-all','--ambient-caps=-all',*command]
         self.process=subprocess.Popen(command,
             stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,start_new_session=True,
-            preexec_fn=change_identity if process_uid is not None else None)
+            preexec_fn=change_identity if process_uid is not None or native_cgroup else None)
         self.reader=threading.Thread(target=self.read_log,daemon=True)
         self.reader.start()
         self.started=time.monotonic()
@@ -368,12 +370,12 @@ class Gateway:
         for line in self.process.stdout:
             self.log_tail.append(line[:2000])
 
-    def ready(self):
-        until=time.monotonic()+50
+    def ready(self,timeout=50):
+        until=time.monotonic()+timeout
         while time.monotonic()<until:
             if self.process.poll() is not None:
                 raise RuntimeError('Gateway exited: '+''.join(self.log_tail)[-5000:])
-            connection=http.client.HTTPConnection('127.0.0.1',18789,timeout=.5)
+            connection=http.client.HTTPConnection('127.0.0.1',self.port,timeout=.5)
             try:
                 connection.request('GET','/readyz')
                 response=connection.getresponse()
@@ -390,7 +392,7 @@ class Gateway:
 
     def request(self,token,session_key=None):
         begin=time.monotonic_ns()
-        connection=http.client.HTTPConnection('127.0.0.1',18789,timeout=35)
+        connection=http.client.HTTPConnection('127.0.0.1',self.port,timeout=35)
         try:
             connection.request('POST','/v1/chat/completions',json.dumps(dict(model='openclaw',messages=[dict(role='user',content='Execute the requested deterministic operation for '+token)],user=token,stream=False)),
                                {'Content-Type':'application/json','Authorization':'Bearer '+TOKEN,'x-openclaw-session-key':'agent:main:pilot:'+(session_key or token).lower()})

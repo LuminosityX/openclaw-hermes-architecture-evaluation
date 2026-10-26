@@ -90,6 +90,8 @@ SOURCES['COST-05']=list(dict.fromkeys([*SOURCES['OBS-01'],*SOURCES['REL-13'],'ev
 
 SOURCES['REL-08']=['evaluation/runner/portable_support.py','evaluation/runner/portable_core.py','evaluation/tools/run_cross_os.py','evaluation/tools/prepare_portable_runtime.py','evaluation/tools/download_cross_os_source.py','evaluation/tools/target.py','.github/workflows/cross-os-experiments.yml']
 
+SOURCES['REL-03']=list(dict.fromkeys([*SOURCES['OBS-01'],*SOURCES['REL-13'],'evaluation/runner/delegation_cases.py','evaluation/runner/native_freeze.py']))
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""

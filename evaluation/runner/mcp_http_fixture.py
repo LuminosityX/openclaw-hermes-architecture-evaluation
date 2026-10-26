@@ -21,7 +21,9 @@ def content_result(token,format='text'):
 
 
 class McpHTTPFixture:
-    def __init__(self,transport='streamable-http',port=18085,tls_context=None,bind_host='127.0.0.1'):
+    def __init__(self,transport='streamable-http',port=18085,tls_context=None,bind_host='127.0.0.1',gate_timeout_seconds=15):
+        if type(gate_timeout_seconds) is not int or not 1<=gate_timeout_seconds<=600:raise ValueError('Owned MCP gate requires a finite 1..600 second limit')
+        self.gate_timeout_seconds=gate_timeout_seconds
         self.transport=transport;self.events=[];self.sessions={};self.tasks={};self.calls={};self.receipts={}
         self.lock=threading.Lock();self.stop=threading.Event();self.release=threading.Event();self.release.set()
         self.expire_on_tokens=set()
@@ -72,7 +74,7 @@ class McpHTTPFixture:
                 self.event('mcp-effect-commit',token=token,generation=generation,ordinal=ordinal)
             try:
                 if task['commit_before_gate']:commit()
-                if task['gate'] and not self.release.wait(timeout=15):
+                if task['gate'] and not self.release.wait(timeout=self.gate_timeout_seconds):
                     self.event('mcp-fixture-gate-timeout',token=token)
                     return dict(jsonrpc='2.0',id=identifier,error=dict(code=-32001,message='Owned fixture gate timed out'))
                 if cancel.is_set() and not task['ignore_cancel']:
