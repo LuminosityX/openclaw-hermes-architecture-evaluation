@@ -4,6 +4,8 @@ import {createRequire} from 'node:module';
 import {pathToFileURL} from 'node:url';
 const require=createRequire('/runtime/node_modules/openclaw/package.json');
 const sdk=async name=>import(pathToFileURL(require.resolve('openclaw/plugin-sdk/'+name)).href);
+export const supportsOwnedHarness=ctx=>ctx.provider==='fixture'&&ctx.requestedRuntime==='eval-external-harness'
+ ?{supported:true,priority:100}:{supported:false,reason:'Owned fixture route and explicit harness selection required'};
 export default {id:'eval-external-harness',register(api){
  const record=async(kind,fields={})=>{
   const response=await fetch('http://127.0.0.1:18080/harness-event',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind,pid:process.pid,...fields})});
@@ -11,7 +13,7 @@ export default {id:'eval-external-harness',register(api){
  };
  api.registerAgentHarness({id:'eval-external-harness',label:'Owned tool-free external reference harness',
   executionEnvironment:'host-only',supportsTurnScopedToolRestrictions:true,conversationToolPolicySupport:'exact',
-  supports(ctx){return ctx.provider==='fixture'?{supported:true,priority:100}:{supported:false,reason:'Owned fixture route only'};},
+  supports:supportsOwnedHarness,
   async runAttempt(params){
    const started=Date.now();const host=params.hostCapabilities;
    host.assertActive();
