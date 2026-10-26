@@ -10,7 +10,7 @@ import service_path_cases
 
 class OperationFixture(service_path_cases.InstrumentedFixture):
     def __init__(self):
-        self.plans={};self.tool_returns={}
+        self.plans={};self.tool_returns={};self.native_inputs={}
         super().__init__()
 
     def plan(self,token,tool,arguments,expected):
@@ -41,6 +41,7 @@ class OperationFixture(service_path_cases.InstrumentedFixture):
                     finally:self.rfile=original
                 plan=owner.plans[token]
                 results=[m for m in body.get('messages',[])[index+1:] if m.get('role')=='tool']
+                if not results:owner.native_inputs[token]=body.get('messages',[])
                 names=[t.get('function',{}).get('name') for t in body.get('tools',[])]
                 owner.event('native-operation-provider-request',token=token,tool=plan['tool'],tool_results=len(results),
                     advertised_tools=names,request_sha256=hashlib.sha256(raw).hexdigest())

@@ -11,9 +11,23 @@ import execution_authority_cases as authority
 import operational_diagnosis_cases as operations
 from operation_fixture import OperationFixture
 import isolation_setup_cases
+import instruction_input_cases
 
 
 class AuthorityAndOperationsTests(unittest.TestCase):
+    def test_instruction_fixture_declares_extra_skill_precedence_and_explicit_read_grant(self):
+        plan=json.loads((Path(__file__).resolve().parents[1]/'campaigns/full-20261026-batched/plan.json').read_text())
+        expected={s['id'] for c in plan['cases'] if c['id']=='EXT-06' for s in c['scenarios']}
+        self.assertEqual(expected,set(instruction_input_cases.SCENARIOS))
+        with tempfile.TemporaryDirectory() as directory:
+            root=Path(directory)/'owned'
+            config=instruction_input_cases.configure(root,'precedence-and-metadata')
+            self.assertEqual(config['skills']['load']['extraDirs'],[str(root/'extra-skills')])
+            self.assertFalse(config['tools']['fs']['workspaceOnly'])
+            self.assertIn('WORKSPACE_PRIORITY_SKILL_42a82e',(root/'workspace/skills/conflict/SKILL.md').read_text())
+            self.assertIn('LOW_PRIORITY_SKILL_13ac57',(root/'extra-skills/conflict/SKILL.md').read_text())
+            self.assertIn('"openclaw"',(root/'extra-skills/gated/SKILL.md').read_text())
+            self.assertIn('"clawdbot"',(root/'extra-skills/legacy/SKILL.md').read_text())
     def test_exact_campaign_scope_and_explicit_authority_policy(self):
         plan=json.loads((Path(__file__).resolve().parents[1]/'campaigns/full-20261026-batched/plan.json').read_text())
         expected={s['id'] for c in plan['cases'] if c['id'] in {'SEC-01','OBS-05'} for s in c['scenarios']}
