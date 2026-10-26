@@ -74,6 +74,10 @@ def run_scenario(root,scenario,unit=1):
         nonlocal gateway
         if gateway:gateway.stop();gateway=None
         native_freeze.kill()
+    def capture():
+        result=privacy_cases.wire(subject,[dict(method='chat.history',params=dict(sessionKey='agent:main:pilot:'+session,limit=100,maxBytes=262144))])
+        if not all(v.get('result',{}).get('ok') for v in result['responses']):raise RuntimeError('Version-compatible native history positive control failed')
+        return result
     def probe(suffix,tool='probe__eval_probe'):
         item=token+'_'+suffix;fixture.plan(item,tool,dict(token=item),'RECEIPT:'+item);result=gateway.request(item,session_key=session);requests.append(result);return result['accepted'] and fixture.receipts.get(item)==1
     try:
@@ -81,7 +85,7 @@ def run_scenario(root,scenario,unit=1):
         if expected['version']!='2026.10.4' or expected['agent_schema_version']!=24:raise RuntimeError('Actual schema-migration source must be the explicitly pinned 24 source')
         start(OLD,configure)
         if not probe('ACKNOWLEDGED'):raise RuntimeError('Old native persisted transcript control failed')
-        acknowledged=privacy_cases.history(subject,'agent:main:pilot:'+session)
+        acknowledged=capture()
         stop();before=schemas(subject)
         if before['user_version']!=24:raise RuntimeError('Historical core did not produce actual schema 24')
         archive=root/'pre-upgrade.tar.gz'
@@ -148,7 +152,7 @@ def run_scenario(root,scenario,unit=1):
             elif destination.exists():destination.unlink()
             shutil.move(str(source),str(destination))
         start(OLD);check('actual-old-core-continues-after-native-snapshot-rollback',probe('AFTER_SNAPSHOT_ROLLBACK'))
-        recovered=privacy_cases.history(subject,'agent:main:pilot:'+session)
+        recovered=capture()
         check('acknowledged-pre-upgrade-user-message-remains-visible',token+'_ACKNOWLEDGED' in json.dumps(recovered))
         metadata.update(post_rollback_schema=schemas(subject),post_rollback_native_history=recovered,rollback_steps=['stop all owned native processes','native backup restore to clean staging using matching current CLI','activate entire native state/config/workspace assets at original paths','start pinned historical binary','continue original session with actual MCP effect'])
         row.update(state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',assertions=assertions,metadata=metadata,requests=requests,paid_model_calls=0,resources=gateway.sampler.summary())

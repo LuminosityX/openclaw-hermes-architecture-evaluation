@@ -37,7 +37,7 @@ def schema_payload(data,version,cookie):
                 return dict(schema_cookie=observed_cookie,user_version=observed_version,payload_offset=start)
     return None
 
-def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,timeout=150):
+def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,timeout=180):
     if os.uname().machine!='x86_64':raise RuntimeError('Native migration syscall decoder requires actual Linux x86-64')
     database=database.resolve();wal=str(database)+'-wal'
     # A stopped preexec cannot be used with Popen's exec-error pipe: use a tiny
@@ -49,12 +49,12 @@ def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,time
         if initial!=process.pid or not os.WIFSTOPPED(status):raise RuntimeError('Owned trace child did not reach native tracing boundary')
         options=1|2|4|8|0x40|0x100000 # syscall, fork/vfork/clone/exec, exit-kill
         trace(0x4200,process.pid,0,options)
-        active={process.pid};headers={};pending={};observation=None;deadline=time.monotonic()+timeout
+        active={process.pid};headers={};pending={};observation=None;wal_writes=[];syscall_stops=0;deadline=time.monotonic()+timeout
         trace(24,process.pid)
         try:
             while active and time.monotonic()<deadline and observation is None:
                 pid,status=os.waitpid(-1,os.WNOHANG|0x40000000)
-                if not pid:time.sleep(.0005);continue
+                if not pid:time.sleep(.0001);continue
                 if os.WIFEXITED(status) or os.WIFSIGNALED(status):
                     active.discard(pid)
                     if pid==process.pid:process.returncode=os.waitstatus_to_exitcode(status)
@@ -64,6 +64,7 @@ def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,time
                 if event in (1,2,3):
                     new=ctypes.c_ulonglong();trace(0x4201,pid,0,ctypes.addressof(new));active.add(new.value)
                 if sig==(signal.SIGTRAP|0x80):
+                    syscall_stops+=1
                     regs=Registers();trace(12,pid,0,ctypes.addressof(regs))
                     info=ctypes.create_string_buffer(128)
                     trace(0x420e,pid,128,ctypes.addressof(info))
@@ -75,6 +76,7 @@ def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,time
                         except OSError:destination=None
                         if destination==wal and 0<regs.rdx<=131072:
                             data=read_memory(pid,regs.rsi,regs.rdx);offset=regs.r10
+                            if len(wal_writes)<20:wal_writes.append(dict(pid=pid,offset=offset,bytes=len(data),prefix_hex=data[:64].hex()))
                             # SQLite's separate 24-byte WAL frame header is the
                             # authoritative page/commit marker for its payload.
                             if len(data)>=24 and offset>=32 and len(data)==24:
@@ -96,7 +98,7 @@ def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,time
                     try:trace(24,pid,0,delivery)
                     except OSError as error:
                         if error.errno!=errno.ESRCH:raise
-            if observation is None:raise RuntimeError('No proven uncommitted schema-page migration write was reached before native exit/timeout')
+            if observation is None:raise RuntimeError('No proven uncommitted schema-page migration write: '+str(dict(syscall_stops=syscall_stops,wal_writes=wal_writes,native_tail=log_path.read_text()[-2200:])))
         finally:
             (native_freeze.ROOT/'kill').write_text('1')
             for pid in active:

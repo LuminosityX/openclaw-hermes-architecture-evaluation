@@ -33,11 +33,12 @@ jobs:
       matrix:
         family: ${{ fromJSON(inputs.families) }}
     runs-on: ubuntu-24.04
-    timeout-minutes: 60
+    timeout-minutes: 90
     env:
       EVAL_FAMILY: ${{ matrix.family }}
       EVAL_MODE: ${{ inputs.mode }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
+      EVAL_TIMEOUT_SECONDS: ${{ matrix.family == 'REL-11' && 1200 || 600 }}
       EVAL_TMPFS_MIB: ${{ (matrix.family == 'REL-10' || matrix.family == 'REL-11') && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04' || matrix.family == 'REL-07' || matrix.family == 'REL-12' || matrix.family == 'SEC-12' || matrix.family == 'OBS-01' || matrix.family == 'EXT-04' || matrix.family == 'SEC-04' || matrix.family == 'EXT-02' || matrix.family == 'SEC-02' || matrix.family == 'SEC-06' || matrix.family == 'REL-01' || matrix.family == 'EXT-07' || matrix.family == 'REL-05' || matrix.family == 'EXT-03' || matrix.family == 'OBS-03' || matrix.family == 'COST-05' || matrix.family == 'REL-03' || matrix.family == 'REL-11') && 128 || 64 }}
     steps:
       - name: Check out evaluation sources
@@ -134,7 +135,7 @@ jobs:
           sudo python3 evaluation/tools/run_local.py \
             --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
             --node "$EVAL_NODE_PATH" --adapter-validation "$EVAL_FAMILY" --hosted-profile --ssh-backend \
-            --memory-mib 3072 --tmpfs-mib "$EVAL_TMPFS_MIB" --timeout 600 --output "$RUNNER_TEMP/openclaw-campaign-validation"
+            --memory-mib 3072 --tmpfs-mib "$EVAL_TMPFS_MIB" --timeout "$EVAL_TIMEOUT_SECONDS" --output "$RUNNER_TEMP/openclaw-campaign-validation"
           sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-proofs"
           sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" \
             "$RUNNER_TEMP/openclaw-campaign-proofs/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"
