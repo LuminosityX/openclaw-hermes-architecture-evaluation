@@ -59,6 +59,9 @@ SOURCES['OBS-04']=[*SOURCES['SEC-08'],'evaluation/runner/retention_cases.py','ev
 
 SOURCES['OBS-06']=[*SOURCES['SEC-08'],'evaluation/runner/trajectory_cases.py']
 
+for _family in ['REL-07','REL-12']:
+    SOURCES[_family]=[*SOURCES['SEC-01'],'evaluation/runner/dependency_cases.py','evaluation/runner/package_registry_fixture.py']
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""

@@ -38,7 +38,7 @@ jobs:
       EVAL_FAMILY: ${{ matrix.family }}
       EVAL_MODE: ${{ inputs.mode }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
-      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04') && 128 || 64 }}
+      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04' || matrix.family == 'REL-07' || matrix.family == 'REL-12') && 128 || 64 }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -62,6 +62,24 @@ jobs:
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
+      - name: Expose only the existing npm CLI for owned dependency-registry experiments
+        if: matrix.family == 'REL-07' || matrix.family == 'REL-12'
+        run: |
+          python3 - <<'PYCODE'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          cli=Path(shutil.which('npm')).resolve()
+          root=cli.parent.parent
+          package=json.loads((root/'package.json').read_text())
+          assert package['name']=='npm' and cli==root/'bin/npm-cli.js'
+          files=[p for p in root.rglob('*') if p.is_file() and not p.is_symlink()]
+          assert sum(p.stat().st_size for p in files)<=32*1024**2
+          metadata=dict(npm_root=str(root),npm_version=package['version'],npm_cli_sha256=hashlib.sha256(cli.read_bytes()).hexdigest(),
+              scope='Read-only npm executable package and its own tooling dependencies only. No host project packages are exposed, no extra tool is installed.')
+          destination=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-runtime/owned-npm-toolchain.json'
+          destination.write_text(json.dumps(metadata)+'\n')
+          (Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-metadata/npm-toolchain.json').write_text(json.dumps(metadata)+'\n')
+          PYCODE
       - name: Install official OTLP addon through native OpenClaw only for collector experiments
         if: matrix.family == 'OBS-02'
         env:

@@ -83,7 +83,7 @@ def main():
             execution=subprocess.run([sys.executable,str(ROOT/'evaluation/tools/run_local.py'),
                 '--runtime-modules',str(args.runtime_modules),'--node',str(args.node),'--output',str(directory),
                 '--native-case',args.case,'--campaign-unit',str(unit),'--hosted-profile','--ssh-backend',
-                '--memory-mib','3072','--timeout','600','--tmpfs-mib','384' if args.case=='REL-10' else '128' if args.case in {'OBS-02','OBS-04'} else '64',
+                '--memory-mib','3072','--timeout','600','--tmpfs-mib','384' if args.case=='REL-10' else '128' if args.case in {'OBS-02','OBS-04','REL-07','REL-12'} else '64',
                 *[value for sid in (args.scenarios or []) for value in ['--native-scenario',sid]]],timeout=640,check=False)
             require(execution.returncode==0,'Native unit controller did not finish successfully')
             path=directory/'summary.json'

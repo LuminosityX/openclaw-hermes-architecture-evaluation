@@ -64,7 +64,7 @@ def decode_report(stdout):
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
-def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False,official_addon=False):
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False,official_addon=False,dependency_installation=False):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
     if identity_migration:
@@ -103,6 +103,13 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         command += ['--ro-bind',str(task_input),'/task/input.json']
     if measurement_group:
         command += ['--ro-bind',str(measurement_group),'/measurement/cgroup']
+    if dependency_installation:
+        metadata=json.loads((runtime_modules.parent/'owned-npm-toolchain.json').read_text())
+        npm_root=Path(metadata['npm_root']).resolve();npm_cli=npm_root/'bin/npm-cli.js'
+        if not npm_root.is_dir() or json.loads((npm_root/'package.json').read_text()).get('name')!='npm':raise ValueError('Dependency tooling must be the npm CLI package only')
+        if hashlib.sha256(npm_cli.read_bytes()).hexdigest()!=metadata['npm_cli_sha256']:raise ValueError('Owned npm CLI digest changed')
+        command+=['--ro-bind',str(npm_root),'/toolchain/npm-package','--symlink','npm-package/bin/npm-cli.js','/toolchain/npm',
+            '--symlink','npm-package/bin/npx-cli.js','/toolchain/npx']
     if official_addon:
         template_path=runtime_modules.parent/'official-addon-template.json'
         template=json.loads(template_path.read_text());project=Path(template['project_root']).resolve()
@@ -132,7 +139,7 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
-    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
+    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7),help='Formal independent unit, invoked by the readiness-checked hosted campaign controller')
     parser.add_argument('--native-scenario',action='append',help='Selected pending formal scenario, passed to the family driver')
     parser.add_argument('--task-input',type=Path,help='Public task specification only; hidden oracle remains on the host')
@@ -189,7 +196,7 @@ def main():
             driver='mechanism_validation.py'
         if args.adapter_validation=='SEC-11':
             driver='gateway_auth_cases.py'
-        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06'}:
+        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12'}:
             driver='service_path_validation.py'
         driver_args=[] if args.model_validation or args.task_input else ['--case',args.adapter_validation] if args.adapter_validation else ['--study',args.study,'--blocks',str(args.blocks),*(['--ssh-backend'] if args.ssh_backend else [])]
         if args.campaign_unit:
@@ -199,7 +206,7 @@ def main():
             for scenario in args.native_scenario:driver_args+=['--scenario',scenario]
         command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
                                   measurement_group=group if driver in {'mechanism_validation.py','service_path_validation.py'} else None,
-                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02')
+                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02',dependency_installation=args.adapter_validation in {'REL-07','REL-12'})
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
