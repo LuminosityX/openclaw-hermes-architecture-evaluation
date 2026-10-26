@@ -1,0 +1,61 @@
+{
+  "kind": "real-provider-batch-usage-accounting",
+  "purpose": "Execution accounting only; not COST-07 completion or architecture interpretation",
+  "github_run_id": "40291350809",
+  "formal_task_units": 30,
+  "real_provider_requests": 163,
+  "response_models": [
+    "deepseek-flash"
+  ],
+  "known_provider_usage_sums": {
+    "prompt_tokens": 605340,
+    "completion_tokens": 60363,
+    "prompt_cache_hit_tokens": 558464,
+    "prompt_cache_miss_tokens": 46876
+  },
+  "requests_missing_counter": {
+    "prompt_tokens": 0,
+    "completion_tokens": 0,
+    "prompt_cache_hit_tokens": 0,
+    "prompt_cache_miss_tokens": 0
+  },
+  "requests_without_complete_usage": 0,
+  "cache_note": "Cache hit/miss counters partition inclusive prompt tokens; do not add them to prompt_tokens.",
+  "actual_charge_usd": null,
+  "invoice_reconciliation": null,
+  "campaign_spend_ceiling": null,
+  "raw_prompts_retained": false,
+  "raw_responses_retained": false,
+  "sources": [
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636544022#unit-1/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636544022#unit-2/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636544022#unit-3/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636544022#unit-4/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636544022#unit-5/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636544022#unit-6/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635853074#unit-1/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635853074#unit-2/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635853074#unit-3/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635853074#unit-4/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635853074#unit-5/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635853074#unit-6/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635429373#unit-1/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635429373#unit-2/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635429373#unit-3/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635429373#unit-4/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635429373#unit-5/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635429373#unit-6/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636348251#unit-1/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636348251#unit-2/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636348251#unit-3/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636348251#unit-4/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636348251#unit-5/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12636348251#unit-6/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635878994#unit-1/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635878994#unit-2/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635878994#unit-3/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635878994#unit-4/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635878994#unit-5/provider-usage.json",
+    "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40291350809/artifacts/12635878994#unit-6/provider-usage.json"
+  ]
+}
