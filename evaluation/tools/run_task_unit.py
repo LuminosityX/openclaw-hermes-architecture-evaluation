@@ -26,7 +26,7 @@ from task_transcripts import provider_for
 
 
 def native_completion_assertion(native,task):
-    completed=native.get('native_http_status')==200 and not native.get('task_transport_error') and type(native.get('completion_ms')) in {int,float} and 0<=native['completion_ms']<=task['resource_limits']['timeout_seconds']*1000
+    completed=native.get('native_http_status')==200 and not native.get('task_transport_error') and type(native.get('completion_ms')) in {int,float} and 0<=native['completion_ms']<=task['timeout_seconds']*1000
     return dict(name='native-task-finished-within-deadline',verdict='pass' if completed else 'fail',evidence=['native/summary.json:native_http_status,completion_ms,task_transport_error'])
 
 

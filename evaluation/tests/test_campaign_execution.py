@@ -11,11 +11,12 @@ from run_campaign_family import bind_unit
 from adapter_readiness import SOURCES
 from suite import ROOT
 from run_task_unit import native_completion_assertion
+from task_workloads import workload
 
 
 class CampaignExecutionTests(unittest.TestCase):
     def test_correct_artifact_does_not_hide_task_timeout_or_native_http_failure(self):
-        task=dict(resource_limits=dict(timeout_seconds=180))
+        task=workload('PERF-09-S01',1)
         good=dict(native_http_status=200,completion_ms=100)
         self.assertEqual(native_completion_assertion(good,task)['verdict'],'pass')
         for bad in [dict(good,task_transport_error='TimeoutError'),dict(good,completion_ms=181000),dict(good,native_http_status=500),{}]:
