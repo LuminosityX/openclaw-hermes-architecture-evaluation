@@ -19,9 +19,14 @@ def owned_chown(path,uid):
     """Never follow links or leave the explicitly owned /scratch subtree."""
     if path==pilot.BASE or pilot.BASE not in path.parents:raise RuntimeError('Ownership mutation is outside the owned fixture paths')
     if not path.exists() and not path.is_symlink():return
-    os.chown(path,uid,uid,follow_symlinks=False)
+    # Without DAC override, changing a 0700 parent to another UID before walking
+    # it revokes our own traversal access. Transfer children first; restoring
+    # ownership to the controller uses the opposite order to regain access.
+    restoring=uid==os.geteuid()
+    if restoring:os.chown(path,uid,uid,follow_symlinks=False)
     if path.is_dir() and not path.is_symlink():
         for child in path.iterdir():owned_chown(child,uid)
+    if not restoring:os.chown(path,uid,uid,follow_symlinks=False)
 
 
 def query(operations):
