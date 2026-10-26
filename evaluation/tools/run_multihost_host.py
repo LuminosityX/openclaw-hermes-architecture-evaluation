@@ -145,12 +145,12 @@ class Effects:
 def guest_command(args,root,group):
     command=['bwrap','--unshare-pid','--unshare-ipc','--unshare-uts','--unshare-cgroup','--die-with-parent','--new-session','--clearenv','--cap-drop','ALL','--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SETPCAP',
         '--ro-bind','/usr','/usr','--symlink','usr/bin','/bin','--symlink','usr/lib','/lib','--symlink','usr/lib64','/lib64','--proc','/proc','--dev','/dev',
-        '--dir','/toolchain','--ro-bind',str(args.node),'/toolchain/node','--ro-bind',str(args.runtime_modules),'/runtime/node_modules',
+        '--dir','/input','--chmod','0755','/input','--dir','/runtime','--chmod','0755','/runtime','--dir','/etc','--chmod','0755','/etc','--dir','/etc/ssl','--chmod','0755','/etc/ssl','--dir','/toolchain','--chmod','0755','/toolchain','--ro-bind',str(args.node),'/toolchain/node','--ro-bind',str(args.runtime_modules),'/runtime/node_modules',
         '--ro-bind',str(ROOT/'evaluation/runner'),'/driver','--ro-bind',str(root/'private-spec.json'),'/input/spec.json','--ro-bind',str(root/'peer'),'/peer','--bind',str(root/'evidence'),'/evidence',
         '--size',str(512*1024**2),'--tmpfs','/scratch','--chmod','0777','/scratch','--symlink','scratch/tmp','/tmp','--symlink','scratch/home','/root',
         '--setenv','PATH','/toolchain:/usr/bin:/bin','--setenv','HOME','/scratch/home','--setenv','TMPDIR','/scratch/tmp','--setenv','NODE_DISABLE_COMPILE_CACHE','1','--setenv','JITI_CACHE_DIR','/scratch/cache/jiti',
         '--setenv','OPENCLAW_SKIP_CHANNELS','1','--setenv','OPENCLAW_DISABLE_BUNDLED_PLUGINS','1']
-    for path in ['/etc/passwd','/etc/group','/etc/ssl/certs','/etc/localtime']:
+    for path in ['/etc/passwd','/etc/group','/etc/ssl/certs','/etc/localtime','/etc/resolv.conf','/etc/nsswitch.conf','/etc/hosts']:
         if Path(path).exists():command+=['--ro-bind',path,path]
     command+=['/usr/bin/setpriv','--reuid=65534','--regid=65534','--clear-groups','--bounding-set=-all','--inh-caps=-all','--ambient-caps=-all','/usr/bin/python3','/driver/multihost_'+('gateway' if args.role=='gateway' else 'node')+'.py']
     return command

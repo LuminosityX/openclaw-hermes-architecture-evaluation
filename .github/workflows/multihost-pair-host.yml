@@ -62,8 +62,10 @@ jobs:
             --output "$RUNNER_TEMP/openclaw-multihost-owned" --role "$EVAL_ROLE" --unit "$EVAL_UNIT" --phase stop
           mkdir -p "$RUNNER_TEMP/openclaw-multihost-evidence"
           if sudo test -d "$RUNNER_TEMP/openclaw-multihost-owned/evidence"; then
-            sudo cp -a "$RUNNER_TEMP/openclaw-multihost-owned/evidence/." "$RUNNER_TEMP/openclaw-multihost-evidence/"
+            sudo cp -r "$RUNNER_TEMP/openclaw-multihost-owned/evidence/." "$RUNNER_TEMP/openclaw-multihost-evidence/"
           fi
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-multihost-evidence"
+          sudo chmod 755 "$RUNNER_TEMP/openclaw-multihost-evidence"
           if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
             cp "$RUNNER_TEMP/openclaw-campaign-metadata/installation.json" "$RUNNER_TEMP/openclaw-multihost-evidence/"
           fi
