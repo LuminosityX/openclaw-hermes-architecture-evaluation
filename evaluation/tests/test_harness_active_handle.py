@@ -10,7 +10,8 @@ class HarnessActiveHandleTest(unittest.TestCase):
         source="""import assert from 'node:assert/strict';
 import {createOwnedActiveRun} from MODULE;
 let killed=0,noticed=0,running=true;
-const handle=createOwnedActiveRun({runId:'owned-run',onAttemptAbort(){noticed++;}},()=>{killed++;},()=>running);
+const handle=createOwnedActiveRun({runId:'owned-run',toolAuthorityFingerprint:'exact-host-attempt',onAttemptAbort(){noticed++;}},()=>{killed++;},()=>running);
+assert.equal(handle.toolAuthorityFingerprint,'exact-host-attempt');
 assert.equal(handle.isStreaming(),true);assert.equal(handle.isAborted(),false);
 handle.abort();handle.abort();assert.equal(killed,1);assert.equal(noticed,1);
 assert.equal(handle.isStreaming(),false);assert.equal(handle.isAborted(),true);

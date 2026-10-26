@@ -8,7 +8,7 @@ export const supportsOwnedHarness=ctx=>ctx.provider==='fixture'
  ?{supported:true,priority:100}:{supported:false,reason:'Owned fixture route only'};
 export function createOwnedActiveRun(params,onAbort,isRunning){
  let aborted=false;
- return {kind:'embedded',runId:params.runId,startedAtMs:Date.now(),
+ return {kind:'embedded',runId:params.runId,toolAuthorityFingerprint:params.toolAuthorityFingerprint,startedAtMs:Date.now(),
   async queueMessage(){throw new Error('OWNED_TOOL_FREE_HARNESS_DOES_NOT_ACCEPT_STEERING');},
   isStreaming:()=>isRunning()&&!aborted,isCompacting:()=>false,isAborted:()=>aborted,
   isStopped:()=>aborted||!isRunning(),isAbortable:()=>isRunning()&&!aborted,

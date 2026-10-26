@@ -19,6 +19,14 @@ from suite import load_matrix
 ROOT = Path(__file__).resolve().parents[2]
 
 
+def controller_source_hashes(case_id=None):
+    paths={Path(__file__),*[p for p in (ROOT/'evaluation/runner').iterdir() if p.suffix in {'.py','.mjs'}]}
+    if case_id:
+        from adapter_readiness import SOURCES
+        paths.update(ROOT/name for name in SOURCES.get(case_id,[]))
+    return {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(paths)}
+
+
 def runtime_role(build,target,allow_historical=False):
     matches=build.get('version')==target['version'] and build.get('commit')==target['source_commit']
     if matches:
@@ -191,8 +199,7 @@ def main():
         lock.bind('\0openclaw-architecture-pilot-'+str(os.getuid()))
     except OSError:
         parser.error('Another bounded pilot owns the host experiment lock; do not overlap measurements')
-    controller_hashes={str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest()
-                       for p in [Path(__file__), *sorted(p for p in (ROOT/'evaluation/runner').iterdir() if p.suffix in {'.py','.mjs'})]}
+    controller_hashes=controller_source_hashes(args.adapter_validation)
     group = Path('/sys/fs/cgroup/system.slice') / ('openclaw-evaluation-' + uuid.uuid4().hex[:12] + '.scope')
     process = None
     timed_out=False

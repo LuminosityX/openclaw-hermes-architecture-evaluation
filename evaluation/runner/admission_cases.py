@@ -43,7 +43,9 @@ def committed_matches(root,token):
 def admitted_run(probe,session,run_id):
     for response in probe.get('responses',[]):
         result=response.get('result',{});info=result.get('payload',{}).get('sessionInfo',{})
-        if result.get('ok') and info.get('key')==session and info.get('hasActiveRun') and run_id in info.get('activeRunIds',[]):return True
+        payload=result.get('payload',{})
+        matched=run_id in info.get('activeRunIds',[]) or payload.get('inFlightRun',{}).get('runId')==run_id
+        if result.get('ok') and info.get('key')==session and info.get('hasActiveRun') and matched:return True
     return False
 
 

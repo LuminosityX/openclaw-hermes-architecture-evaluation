@@ -26,3 +26,6 @@ class CommittedAdmissionTest(unittest.TestCase):
         self.assertTrue(admitted_run(probe,'agent:main:owned','native-ack-run'))
         self.assertFalse(admitted_run(probe,'agent:main:owned','other-run'))
         self.assertFalse(admitted_run(probe,'agent:main:other','native-ack-run'))
+        payload=probe['responses'][0]['result']['payload'];payload['sessionInfo'].pop('activeRunIds');payload['inFlightRun']={'runId':'native-ack-run'}
+        self.assertTrue(admitted_run(probe,'agent:main:owned','native-ack-run'))
+        self.assertFalse(admitted_run(probe,'agent:main:owned','other-run'))

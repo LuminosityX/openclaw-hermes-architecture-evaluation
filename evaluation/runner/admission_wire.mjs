@@ -19,8 +19,9 @@ const saved=JSON.parse(fs.readFileSync(spec.identity_path,'utf8'));const publicK
 const identity={publicKey,privateKey:createPrivateKey(saved.private),raw,id:hash(raw)};
 if(['before-append','before-client-ack'].includes(spec.mode)){
  server=new WebSocketServer({host:'127.0.0.1',port:18790,maxPayload:1024*1024});
- server.on('connection',downstream=>{
-  const upstream=new WebSocket('ws://127.0.0.1:18789');proxySockets.push(downstream,upstream);let targetId;
+ server.on('connection',(downstream,request)=>{
+  const headers=request.headers.origin?{Origin:request.headers.origin}:{};
+  const upstream=new WebSocket('ws://127.0.0.1:18789',{headers});proxySockets.push(downstream,upstream);let targetId;
   const forward=(socket,data)=>{if(socket.readyState===WebSocket.OPEN)socket.send(data);};
   downstream.on('message',async bytes=>{
    let frame;try{frame=JSON.parse(String(bytes));}catch{downstream.terminate();return;}

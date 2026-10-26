@@ -7,10 +7,15 @@ import sys
 import tempfile
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'tools'))
-from run_local import ROOT,sandbox_command
+from run_local import ROOT,controller_source_hashes,sandbox_command
 
 
 class PreviousCoreGuardTest(unittest.TestCase):
+    def test_native_proof_binds_historical_installer_and_pin_data(self):
+        hashes=controller_source_hashes('EXT-03')
+        for name in ['evaluation/tools/prepare_previous_core.py','evaluation/design/previous-core.json']:
+            self.assertIn(name,hashes);self.assertEqual(len(hashes[name]),64)
+
     def test_previous_mount_refuses_an_unpinned_comparison(self):
         with tempfile.TemporaryDirectory() as directory:
             root=Path(directory);previous=root/'openclaw-previous-runtime';previous.mkdir()
