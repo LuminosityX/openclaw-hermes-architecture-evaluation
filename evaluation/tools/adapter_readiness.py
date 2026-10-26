@@ -88,6 +88,8 @@ SOURCES['OBS-03']=list(dict.fromkeys([*SOURCES['REL-01'],*SOURCES['REL-05'],*SOU
 
 SOURCES['COST-05']=list(dict.fromkeys([*SOURCES['OBS-01'],*SOURCES['REL-13'],'evaluation/runner/budget_capability_cases.py','evaluation/tools/prepare_capability_contracts.py','evaluation/design/native-budget-contracts.json']))
 
+SOURCES['REL-08']=['evaluation/runner/portable_support.py','evaluation/runner/portable_core.py','evaluation/tools/run_cross_os.py','evaluation/tools/prepare_portable_runtime.py','evaluation/tools/download_cross_os_source.py','evaluation/tools/target.py','.github/workflows/cross-os-experiments.yml']
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""
@@ -99,6 +101,7 @@ def native_validation(plan,proofs):
         if identity.get('version')!=plan['target']['version'] or identity.get('commit')!=plan['target']['source_commit']: continue
         case=proof.get('case_id')
         if case not in SOURCES: continue
+        if case=='REL-08' and not (proof.get('actual_source_os')=='Linux' and proof.get('actual_target_os')=='Windows' and proof.get('target_node_platform')=='win32' and proof.get('native_windows_job_object') is True):continue
         hashes=proof.get('controller_sha256',{})
         if not all(hashes.get(p)==hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in SOURCES[case]): continue
         if proof.get('harness_error') or not proof.get('validation_complete') or not proof.get('fixture_and_invocation_valid'): continue

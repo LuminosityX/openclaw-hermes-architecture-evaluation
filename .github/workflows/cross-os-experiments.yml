@@ -1,0 +1,126 @@
+name: Native cross-OS experiments
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Native Linux/Windows calibration or complete paired formal execution
+        type: choice
+        options: [formal, calibration]
+        default: formal
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: openclaw-native-cross-os
+  cancel-in-progress: false
+
+jobs:
+  linux-source:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/evaluation-runtime
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Execute real Linux native semantics and verified source archives
+        env:
+          EVAL_CROSS_OS_MODE: ${{ inputs.mode }}
+        run: |
+          python3 - <<'PY'
+          import os,shutil,subprocess
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          command=['sudo','--preserve-env=GITHUB_ACTIONS,GITHUB_REPOSITORY,GITHUB_RUN_ID,GITHUB_SHA,RUNNER_TEMP,PYTHONUTF8',
+            'python3','evaluation/tools/run_cross_os.py','--phase','source','--runtime-modules',str(root/'openclaw-campaign-runtime/node_modules'),
+            '--node',shutil.which('node'),'--output',str(root/'cross-os-source')]
+          if os.environ['EVAL_CROSS_OS_MODE']=='calibration':command.append('--calibration-only')
+          subprocess.run(command,check=True)
+          PY
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/cross-os-source"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: cross-os-native-linux-source
+          path: ${{ runner.temp }}/cross-os-source/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove only this Linux job's owned installations and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/cross-os-source" "$RUNNER_TEMP/owned-cross-os-state"
+
+  windows-target:
+    needs: linux-source
+    runs-on: windows-2025
+    timeout-minutes: 70
+    env:
+      PYTHONUTF8: '1'
+    steps:
+      - name: Keep controller source bytes identical across actual hosts
+        shell: pwsh
+        run: git config --global core.autocrlf false
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Read the frozen Node version
+        shell: pwsh
+        run: |
+          @'
+          import json,os
+          from pathlib import Path
+          target=json.loads(Path('evaluation/design/evaluation-matrix.json').read_text(encoding='utf8'))['target']
+          with open(os.environ['GITHUB_ENV'],'a',encoding='utf8') as output:output.write('OPENCLAW_EVAL_NODE='+target['node_version']+'\n')
+          '@ | python -
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: ${{ env.OPENCLAW_EVAL_NODE }}
+      - name: Prepare one actual native Windows runtime
+        shell: pwsh
+        run: python evaluation/tools/prepare_portable_runtime.py --prefix "$env:RUNNER_TEMP/openclaw-portable-runtime"
+      - name: Transfer exact actual Linux evidence through GitHub
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python evaluation/tools/download_cross_os_source.py --output "$env:RUNNER_TEMP/cross-os-source-input"
+      - name: Execute real native Windows import, continuation and process semantics
+        shell: pwsh
+        env:
+          EVAL_CROSS_OS_MODE: ${{ inputs.mode }}
+        run: |
+          @'
+          import os,shutil,subprocess
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          command=['python','evaluation/tools/run_cross_os.py','--phase','target','--runtime-modules',str(root/'openclaw-portable-runtime/node_modules'),
+            '--node',shutil.which('node'),'--source',str(root/'cross-os-source-input'),'--output',str(root/'openclaw-cross-os-result')]
+          if os.environ['EVAL_CROSS_OS_MODE']=='calibration':command.append('--calibration-only')
+          subprocess.run(command,check=True)
+          '@ | python -
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: ${{ inputs.mode == 'formal' && 'campaign-REL-08' || 'native-cross-os-calibration' }}
+          path: ${{ runner.temp }}/openclaw-cross-os-result/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Remove only this Windows job's owned installations and state
+        if: always()
+        shell: pwsh
+        run: |
+          @'
+          import os,shutil
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])
+          for name in ['openclaw-portable-runtime','cross-os-source-input','openclaw-cross-os-result','owned-cross-os-state']:
+              shutil.rmtree(root/name,ignore_errors=True)
+          '@ | python -

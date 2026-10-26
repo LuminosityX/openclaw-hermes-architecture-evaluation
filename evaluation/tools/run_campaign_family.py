@@ -14,7 +14,7 @@ from provider_plugin import verify as verify_plugin
 from suite import ROOT, require
 from target import verify_installation
 
-NATIVE_FAMILIES = [family for family in SOURCES if family not in {'PERF-09','SEC-09','PERF-10','COST-03'}]
+NATIVE_FAMILIES = [family for family in SOURCES if family not in {'PERF-09','SEC-09','PERF-10','COST-03','REL-08','PERF-07'}]
 
 
 def bind_unit(plan, family, unit, native, run_id, controller_commit, native_reference, native_sha256, selected_scenarios=None):
@@ -25,6 +25,9 @@ def bind_unit(plan, family, unit, native, run_id, controller_commit, native_refe
     identity=native['runtime_identity']
     require(identity['version']==plan['target']['version'] and identity['commit']==plan['target']['source_commit'],'Native runtime pin mismatch')
     require(native.get('case_id')==family,'Native family mismatch')
+    if family=='REL-08':
+        require(native.get('actual_source_os')=='Linux' and native.get('actual_target_os')=='Windows' and native.get('target_node_platform')=='win32' and native.get('native_windows_job_object') is True,
+                'Cross-OS results require actual native Linux and Windows execution; generic Linux or syntax evidence cannot substitute')
     expected={sid for sid,(case,_) in scenario_index(plan).items() if case['id']==family}
     if selected_scenarios:
         require(len(selected_scenarios)==len(set(selected_scenarios)) and set(selected_scenarios)<=expected,
