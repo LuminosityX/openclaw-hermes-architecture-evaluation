@@ -135,6 +135,17 @@
       "correction": "Allow at most 30 seconds of evaluator polling only for independently undispatched HTTP 500 admission rejections; do not replay ambiguous or executed work. Preserve all admission attempts and native tails. Recalibrate the family and rerun only S01/S03.",
       "repair_run_id": null,
       "architecture_interpretation": "deferred"
+    },
+    {
+      "id": "COST07-INHERITED-EMPTY-CHILD-TOOL-POLICY",
+      "github_run_id": "40400560400",
+      "scenario_ids": [
+        "COST-07-S04"
+      ],
+      "excluded_units": 6,
+      "reason": "Inherited tools.allow contained only sessions_spawn, which is unavailable to the configured leaf child. Native child logs prove pre-model no-callable-tools rejection. No actual child inference was exercised; request-count-based success/failure scores for S04 are invalid fixture evidence.",
+      "original_compact_sha256": "9877a8aa56bffc30ee173623c72d537048c06008c7dcbfc8848fc76d5d787da3",
+      "preservation": "All 36 original normalized records and original manifest preserved under quarantined-results; permanent raw release ZIP and all paid usage remain unchanged. Only S04 is removed from accepted results and will be re-executed."
     }
   ]
 }

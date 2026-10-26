@@ -44,7 +44,7 @@ def unit(args,plan,installation,sid,index,calibration):
             if sid.endswith('03') and not discarded and record.get('upstream_status')==200 and metadata.usage is not None:
                 discarded=True;return 'discard-paid-reply-with-503'
             return 'forward-complete-real-reply'
-        relay=Relay(root/'provider.sock',key,max_output_tokens=2048,thinking=thinking,maximum_requests=24,response_interceptor=intercept)
+        relay=Relay(root/'provider.sock',key,max_output_tokens=2048,thinking=thinking,maximum_requests=24,response_interceptor=intercept,request_observer=lambda body:dict(owned_accounting_task_id=task['task_id']))
         key='';thread=threading.Thread(target=relay.serve_forever,daemon=True);thread.start()
         child_env=dict(os.environ);child_env.pop('DEEPSEEK_API_KEY',None)
         try:
@@ -65,6 +65,7 @@ def unit(args,plan,installation,sid,index,calibration):
     if sid.endswith('04'):
         native_text=json.dumps(turns)
         check('native-real-model-turn-actually-spawns-a-child','childSessionKey' in native_text and 'sessions_spawn' in native_text)
+        check('actual-paid-child-inference-is-observed-in-native-history',any(any(m.get('role')=='assistant' and m.get('provider')=='deepseek' for response in history.get('responses',[]) for m in response.get('result',{}).get('payload',{}).get('messages',[])) for history in native.get('billing_child_histories',{}).values()))
         check('delegated-and-parent-attempts-are-included',len(accounting['requests'])>=3)
     if sid.endswith('05'):
         check('two-fresh-native-sessions-exercise-identical-large-prefix',len(turns)==2 and turns[0]['session_key']!=turns[1]['session_key'])
@@ -87,11 +88,13 @@ def unit(args,plan,installation,sid,index,calibration):
 def main():
     parser=argparse.ArgumentParser()
     for name in ['runtime-modules','package-lock','node','output']:parser.add_argument('--'+name,type=Path,required=True)
-    parser.add_argument('--mode',choices=['calibration','formal'],required=True);args=parser.parse_args()
+    parser.add_argument('--mode',choices=['calibration','formal'],required=True);parser.add_argument('--scenarios-json',default='null');args=parser.parse_args()
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0,'Accounting execution is GitHub-only')
     plan=load_plan();installation=verify_installation(plan['target'],args.runtime_modules,args.package_lock);family=next(c for c in plan['cases'] if c['id']=='COST-07')
+    selected=json.loads(args.scenarios_json) or [s['id'] for s in family['scenarios']]
+    require(isinstance(selected,list) and len(selected)==len(set(selected)) and set(selected)<={s['id'] for s in family['scenarios']},'Invalid selected accounting scenarios')
     args.output.mkdir(parents=True,exist_ok=True);proofs=args.output/'provenance';proofs.mkdir(exist_ok=True)
-    require(not any(r['scenario_id'].startswith('COST-07-') and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')),'Accounting family already has accepted units')
+    require(not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')),'Accounting family already has accepted units')
     observations=[]
     for scenario in family['scenarios']:
         row=unit(args,plan,installation,scenario['id'],1,True);require(row['state']!='harness-error','Accounting calibration did not establish a real native intervention');observations.append(row)
@@ -102,6 +105,7 @@ def main():
     results=[]
     for index in range(1,family['required_independent_units']+1):
         for scenario in family['scenarios']:
+            if scenario['id'] not in selected:continue
             row=unit(args,plan,installation,scenario['id'],index,False);results.append(row)
             (args.output/'results.json').write_text(json.dumps(results,separators=(',',':'))+'\n')
             (args.output/'execution.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],case_id='COST-07',plan_sha256=plan['plan_sha256'],full_campaign_coverage=True,model_execution='real-deepseek-api',harness_failures=[dict(scenario_id=r['scenario_id'],unit=r['unit'],reason=r.get('reason')) for r in results if r['state']=='harness-error'],completed_records=len(results)))+'\n')

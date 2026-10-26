@@ -3,6 +3,7 @@ import concurrent.futures
 import hashlib
 import http.client
 import json
+import re
 from pathlib import Path
 import time
 
@@ -17,7 +18,7 @@ def configure(root,scenario):
     provider['apiKey']='synthetic-host-relay-placeholder';provider['models'][0].update(id='deepseek-flash',reasoning=scenario.endswith('06'),contextWindow=1000000,maxTokens=2048)
     config['models']['providers']={'deepseek':provider};config['agents']['defaults']['model']['primary']='deepseek/deepseek-flash'
     config['agents']['defaults'].update(thinkingDefault='high' if scenario.endswith('06') else 'off',timeoutSeconds=180)
-    config['tools']=dict(allow=['sessions_spawn'] if scenario.endswith('04') else [],toolSearch=False)
+    config['tools']=dict(allow=['sessions_spawn','read'] if scenario.endswith('04') else [],toolSearch=False)
     if scenario.endswith('04'):config['agents']['defaults']['subagents']=dict(maxConcurrent=2,maxSpawnDepth=1,runTimeoutSeconds=120)
     pilot.save(root/'config.json',config);return config
 
@@ -43,11 +44,19 @@ def execute(root,task,report):
             records.append(dict(session_key=key,response=result,native_history=history))
         # Child completions can return asynchronously to the retained parent.
         if scenario.endswith('04'):
-            deadline=time.monotonic()+125
+            deadline=time.monotonic()+125;children={};settled_since=None
             while time.monotonic()<deadline:
                 history=privacy_cases.history(root,records[0]['session_key']);records[0]['native_history']=history
-                text=json.dumps(history)
-                if 'subagent' in text and 'hasActiveSubagentRun": true' not in text and 'hasActiveRun": true' not in text:break
+                keys=set(re.findall(r'agent:main:subagent:[a-zA-Z0-9-]+',json.dumps(history)))
+                for key in keys:children[key]=privacy_cases.history(root,key)
+                def done(trace):
+                    payload=trace.get('responses',[{}])[0].get('result',{}).get('payload',{})
+                    return bool(payload.get('messages')) and any(m.get('role')=='assistant' for m in payload.get('messages',[])) and payload.get('sessionInfo',{}).get('hasActiveRun') is False
+                if children and all(done(v) for v in children.values()) and done(history):
+                    if settled_since is None:settled_since=time.monotonic()
+                    if time.monotonic()-settled_since>=3:break
+                else:settled_since=None
                 time.sleep(1)
+            report['billing_child_histories']=children
         report.update(fixture_selfcheck=dict(valid=True,task_visible_prompt_count=len(task['prompts']),credentials_in_guest=False),billing_native_turns=records,resources=gateway.sampler.summary(),native_gateway_tail=''.join(gateway.log_tail)[-3500:])
     finally:gateway.stop()
