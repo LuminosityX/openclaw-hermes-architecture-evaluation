@@ -57,6 +57,9 @@ jobs:
       - name: Copy only closed and sanitized evidence after endpoint shutdown
         if: always()
         run: |
+          sudo --preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_multihost_host.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" --node "$(command -v node)" \
+            --output "$RUNNER_TEMP/openclaw-multihost-owned" --role "$EVAL_ROLE" --unit "$EVAL_UNIT" --phase stop
           mkdir -p "$RUNNER_TEMP/openclaw-multihost-evidence"
           if sudo test -d "$RUNNER_TEMP/openclaw-multihost-owned/evidence"; then
             sudo cp "$RUNNER_TEMP/openclaw-multihost-owned/evidence/"* "$RUNNER_TEMP/openclaw-multihost-evidence/"

@@ -157,6 +157,8 @@ def guest_command(args,root,group):
 
 
 def daemon(args):
+    def stop_owned(signum,frame):raise RuntimeError('Owned cloud controller stopped; close endpoints before evidence publication')
+    signal.signal(signal.SIGTERM,stop_owned)
     root=args.output;output=root/'evidence';output.mkdir(exist_ok=True);os.chown(output,UID,UID);os.chmod(output,0o700)
     peer=root/'peer';peer.mkdir(exist_ok=True);os.chmod(peer,0o755)
     master=os.environ.pop('OPENCLAW_EVAL_TRANSPORT_FULL_20261026','');require(bool(master),'Dedicated campaign transport secret is required')
@@ -240,9 +242,23 @@ def main():
     parser=argparse.ArgumentParser()
     for name in ['runtime-modules','node','output']:parser.add_argument('--'+name,type=Path,required=True)
     parser.add_argument('--role',choices=['gateway','worker'],required=True);parser.add_argument('--unit',type=int,choices=range(7),required=True)
-    parser.add_argument('--phase',choices=['start','daemon','wait'],required=True);args=parser.parse_args()
+    parser.add_argument('--phase',choices=['start','daemon','wait','stop'],required=True);args=parser.parse_args()
     require(os.environ.get('GITHUB_ACTIONS')=='true' and os.geteuid()==0,'Actual multi-host infrastructure is GitHub-only')
     if args.phase=='daemon':return daemon(args)
+    if args.phase=='stop':
+        if not args.output.exists() or (args.output/'done.json').is_file():return
+        pid_path=args.output/'controller-pid.json'
+        if pid_path.is_file():
+            pid=json.loads(pid_path.read_text())['pid']
+            try:
+                command=Path('/proc',str(pid),'cmdline').read_bytes()
+                require(b'run_multihost_host.py' in command and b'--phase\x00daemon' in command,'Owned cleanup PID does not identify this controller')
+                os.kill(pid,signal.SIGTERM)
+            except FileNotFoundError:pass
+        deadline=time.monotonic()+30
+        while not (args.output/'done.json').is_file() and time.monotonic()<deadline:time.sleep(.2)
+        require((args.output/'done.json').is_file(),'Owned controller did not close/sanitize evidence before upload')
+        return
     if args.phase=='start':
         args.output.mkdir(parents=True,exist_ok=False);args.output.chmod(0o700)
         command=[sys.executable,__file__,'--runtime-modules',str(args.runtime_modules),'--node',str(args.node),'--output',str(args.output),'--role',args.role,'--unit',str(args.unit),'--phase','daemon']
