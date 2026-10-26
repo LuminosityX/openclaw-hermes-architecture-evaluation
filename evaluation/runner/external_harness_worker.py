@@ -41,6 +41,10 @@ def attempt(request):
         if request.get('fail_once'):
             announce('external-checkpoint-then-exit',task_id=task['task_id'],checkpoint_sha256=hashlib.sha256(path.read_bytes()).hexdigest(),exit_code=73)
             return 73
+        if task.get('pause_after_checkpoint'):
+            announce('external-checkpoint-wait',task_id=task['task_id'],checkpoint_sha256=hashlib.sha256(path.read_bytes()).hexdigest())
+            with urlopen(Request('http://127.0.0.1:18080/harness-pause',data=json.dumps(dict(pid=os.getpid(),task_id=task['task_id'])).encode(),headers={'Content-Type':'application/json'}),timeout=28) as response:
+                if response.status!=200:raise RuntimeError('Owned checkpoint pause failed')
     result=dict(value=state['value'],task_id=task['task_id'],resumed=resumed,calculation_count=state['calculation_count'],pid=os.getpid(),checkpoint_sha256=hashlib.sha256(path.read_bytes()).hexdigest())
     announce('external-attempt-result',**{k:v for k,v in result.items() if k!='pid'})
     print(json.dumps(result),flush=True);return 0

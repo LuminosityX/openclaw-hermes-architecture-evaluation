@@ -80,6 +80,8 @@ SOURCES['REL-01']=[*SOURCES['SEC-08'],'evaluation/runner/admission_cases.py','ev
 
 SOURCES['EXT-07']=list(dict.fromkeys([*SOURCES['EXT-02'],*SOURCES['REL-07'],'evaluation/runner/external_corpus_cases.py']))
 
+SOURCES['REL-05']=list(dict.fromkeys([*SOURCES['EXT-02'],*SOURCES['OBS-01'],*SOURCES['REL-13'],'evaluation/runner/cancellation_cases.py','evaluation/runner/cancellation_control.mjs','evaluation/runner/backup_cases.py']))
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""

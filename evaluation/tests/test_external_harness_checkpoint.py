@@ -6,7 +6,7 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
-from unittest.mock import patch
+from unittest.mock import MagicMock,patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'runner'))
 import external_harness_worker as worker
 
@@ -29,3 +29,14 @@ class ExternalHarnessCheckpointTest(unittest.TestCase):
     def test_tool_free_executor_rejects_unbounded_or_unsupported_work(self):
         for task in [dict(operation='shell',left=1,right=2),dict(operation='add',left=True,right=2),dict(operation='add',left=10**7,right=2)]:
             with self.assertRaises(ValueError):worker.calculate(task)
+
+    def test_explicit_resume_does_not_reenter_the_initial_checkpoint_pause(self):
+        response=MagicMock();response.__enter__.return_value.status=200
+        with tempfile.TemporaryDirectory() as directory,patch.object(worker,'announce'),patch.object(worker,'urlopen',return_value=response) as opened:
+            request=dict(task=dict(task_id='paused',operation='add',left=1,right=2,pause_after_checkpoint=True),state_directory=directory)
+            output=io.StringIO()
+            with contextlib.redirect_stdout(output):self.assertEqual(worker.attempt(request),0)
+            self.assertFalse(json.loads(output.getvalue())['resumed'])
+            output=io.StringIO()
+            with contextlib.redirect_stdout(output):self.assertEqual(worker.attempt(request),0)
+            self.assertTrue(json.loads(output.getvalue())['resumed']);self.assertEqual(opened.call_count,1)
