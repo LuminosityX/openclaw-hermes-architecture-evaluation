@@ -8,17 +8,18 @@ import mechanism_cases
 import pilot
 import service_path_cases
 import trace_access_cases
+import lifecycle_cases
 
 
 def main():
     parser=argparse.ArgumentParser()
-    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,'OBS-07'],required=True)
+    parser.add_argument('--case',choices=[*service_path_cases.FAMILIES,*lifecycle_cases.FAMILIES,'OBS-07'],required=True)
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7))
     args=parser.parse_args()
     resource.setrlimit(resource.RLIMIT_CORE,(0,0))
     resource.setrlimit(resource.RLIMIT_FSIZE,(16*1024**2,16*1024**2))
     for name in ['tmp','home','cache','run']:(pilot.BASE/name).mkdir(exist_ok=True)
-    module=trace_access_cases if args.case=='OBS-07' else service_path_cases
+    module=trace_access_cases if args.case=='OBS-07' else lifecycle_cases if args.case in lifecycle_cases.FAMILIES else service_path_cases
     report=dict(kind='native-campaign-family-unit' if args.campaign_unit else 'native-adapter-validation',
         product='openclaw',studies=[],case_id=args.case,full_campaign_coverage=bool(args.campaign_unit),observations=[],paid_model_calls=0)
     try:

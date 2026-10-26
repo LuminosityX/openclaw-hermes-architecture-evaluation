@@ -28,6 +28,8 @@ for _family in ['PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07']:
         'evaluation/runner/trace_access_cases.py','evaluation/runner/trace_access_probe.mjs',
         'evaluation/runner/public_gateway_client.mjs','evaluation/runner/mechanism_cases.py',
         'evaluation/runner/hook_cases.py','evaluation/runner/pilot.py','evaluation/tools/run_local.py']
+for _family in ['REL-09','EXT-01','PERF-08']:
+    SOURCES[_family]=[*SOURCES['PERF-01'],'evaluation/runner/lifecycle_cases.py']
 
 
 def native_validation(plan,proofs):
