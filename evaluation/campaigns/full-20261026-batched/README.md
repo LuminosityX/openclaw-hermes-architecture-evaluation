@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **172/257 scenarios completed**, with **696 independent observations**. 158 scenarios pass and 14 retain failure observations. Another 85 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **180/257 scenarios completed**, with **720 independent observations**. 166 scenarios pass and 14 retain failure observations. Another 77 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -9,8 +9,10 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | REL-02 External effects and lost acknowledgments | 3 | 9 | [40323072237](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323072237) |
 | REL-04 Recovery automation and service availability | 4 | 12 | [40315477743](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40315477743), [40322602646](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40322602646) |
 | REL-06 State identity under relocation | 4 | 12 | [40317319057](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40317319057) |
+| REL-07 Dependency reconstruction without host leakage | 4 | 12 | [40349097396](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40349097396) |
 | REL-09 Credential and endpoint rebind | 4 | 12 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
 | REL-10 Consistent backup during active work | 4 | 12 | [40311076074](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40311076074), [40312921492](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40312921492) |
+| REL-12 Dependency publication and repair | 4 | 12 | [40349097396](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40349097396) |
 | REL-13 MCP session and cancellation lifecycle | 4 | 12 | [40311646155](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40311646155), [40312916295](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40312916295) |
 | REL-14 Model streaming and reasoning payloads | 4 | 12 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | REL-15 Provider outages, timeouts and bounded retries | 5 | 15 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
@@ -48,7 +50,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
-| reliability | 32 / 58 |
+| reliability | 40 / 58 |
 | security | 37 / 54 |
 | performance | 37 / 41 |
 | resources_cost | 23 / 33 |
