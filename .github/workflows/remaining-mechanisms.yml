@@ -55,6 +55,26 @@ jobs:
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
+      - name: Resolve the executable and prepare owned UID-readable toolchain if needed
+        run: |
+          python3 - <<'PY'
+          import hashlib,json,os,shutil,stat
+          from pathlib import Path
+          source=Path(shutil.which('node')).resolve()
+          selected=source
+          if os.environ['EVAL_FAMILY']=='REL-06':
+              selected=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-runtime/owned-uid-node'
+              shutil.copyfile(source,selected)
+              selected.chmod(0o755)
+              source_hash=hashlib.sha256(source.read_bytes()).hexdigest()
+              selected_hash=hashlib.sha256(selected.read_bytes()).hexdigest()
+              assert source_hash==selected_hash
+              metadata=dict(scope='One Node executable clone on the disposable host only; OpenClaw installation is not copied',
+                  bytes=selected.stat().st_size,source_mode=oct(stat.S_IMODE(source.stat().st_mode)),clone_mode='0o755',sha256=selected_hash)
+              (Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-metadata/uid-node-clone.json').write_text(json.dumps(metadata)+'\n')
+          with open(os.environ['GITHUB_ENV'],'a') as output:output.write('EVAL_NODE_PATH='+str(selected)+'\n')
+          PY
+          test "$(du -sm "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" | awk '{s+=$1} END {print s}')" -le 4096
       - name: Prepare the owned SSH sandbox test backend
         if: matrix.family == 'SEC-03'
         run: test -x /usr/sbin/sshd || { sudo apt-get update -qq && sudo apt-get install -y --no-install-recommends openssh-server; }
@@ -62,7 +82,7 @@ jobs:
         run: |
           sudo python3 evaluation/tools/run_local.py \
             --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
-            --node "$(command -v node)" --adapter-validation "$EVAL_FAMILY" --hosted-profile --ssh-backend \
+            --node "$EVAL_NODE_PATH" --adapter-validation "$EVAL_FAMILY" --hosted-profile --ssh-backend \
             --memory-mib 3072 --tmpfs-mib "$EVAL_TMPFS_MIB" --timeout 600 --output "$RUNNER_TEMP/openclaw-campaign-validation"
           sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-proofs"
           sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" \
@@ -76,7 +96,7 @@ jobs:
           command=['sudo','--preserve-env=GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA','python3','evaluation/tools/run_campaign_family.py',
               '--runtime-modules',str(root/'openclaw-campaign-runtime/node_modules'),
               '--package-lock',str(root/'openclaw-campaign-runtime/package-lock.json'),
-              '--node',shutil.which('node'),'--case',os.environ['EVAL_FAMILY'],
+              '--node',os.environ['EVAL_NODE_PATH'],'--case',os.environ['EVAL_FAMILY'],
               '--proofs',str(root/'openclaw-campaign-proofs'),'--output',str(root/'openclaw-campaign-result')]
           selected=json.loads(os.environ['EVAL_SCENARIOS'])
           if selected:command+=['--scenarios',*selected]

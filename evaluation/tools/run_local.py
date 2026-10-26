@@ -70,10 +70,14 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
     if identity_migration:
         if not ssh_backend:raise ValueError('Owned identity migration requires the explicit hosted non-user-namespace profile')
         capabilities+=['--cap-add','CAP_CHOWN','--cap-add','CAP_KILL']
+    identity_directories=['--dir','/toolchain','--chmod','0755','/toolchain',
+        '--dir','/runtime','--chmod','0755','/runtime'] if identity_migration else []
     command = ['bwrap', *namespaces, '--die-with-parent', '--new-session', '--clearenv', '--cap-drop', 'ALL', *capabilities,
+               *identity_directories,
                '--ro-bind', '/usr', '/usr', '--symlink', 'usr/bin', '/bin',
                '--symlink', 'usr/lib', '/lib', '--symlink', 'usr/lib64', '/lib64',
                '--proc', '/proc', '--dev', '/dev', '--size', str(tmpfs_mib * 1024**2), '--tmpfs', '/scratch',
+               *(['--chmod','0755','/scratch'] if identity_migration else []),
                '--symlink', 'scratch/tmp', '/tmp', '--symlink', 'scratch/home', '/root',
                '--symlink', 'scratch/run', '/run',
                '--ro-bind', str(runtime_modules), '/runtime/node_modules',

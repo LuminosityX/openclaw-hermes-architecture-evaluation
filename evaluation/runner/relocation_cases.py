@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import stat
 
 import mechanism_cases as mechanism
 from operation_fixture import OperationFixture
@@ -64,6 +65,8 @@ def run_scenario(root,scenario,unit=1):
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['native-public-records','independent-plugin-receipts','ownership-and-path-manifest']))
     try:
+        metadata['namespace_executable_permissions']={str(path):dict(mode=oct(stat.S_IMODE(path.stat().st_mode)),uid=path.stat().st_uid,gid=path.stat().st_gid)
+            for path in [Path('/toolchain'),Path('/toolchain/node'),Path('/runtime'),pilot.BASE]}
         original=root/'original';gateway=pilot.Gateway(original,configurer=configure);gateway.ready()
         before=token+'_BEFORE';fixture.register(before);positive=gateway.request(before,session_key=session)
         if not positive['accepted'] or fixture.receipts.get(before)!=1:raise RuntimeError('Native pre-relocation task control failed')

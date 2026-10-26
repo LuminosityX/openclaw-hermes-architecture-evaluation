@@ -18,6 +18,13 @@ is added, and the immutable shared runtime stays read-only. Nonzero UID native
 children lose the controller's capabilities. This profile is unavailable to local
 execution and is not a claim of UID-namespace or hostile-tenant isolation.
 
+Hosted toolcache executable permissions can be private to the setup user. This
+family makes one byte-identical, SHA-checked Node executable clone with mode 0755
+inside its owned hosted runtime directory and explicitly traversable namespace
+parents. The OpenClaw installation is still shared read-only. The single clone is
+recorded, included in the same 4 GiB hosted installation/cache ceiling and deleted
+with the job. No executable or permission change occurs on the local machine.
+
 Public native RPC checks the same session identity/history and cron job identity.
 Independent plugin receipts report the actual native UID and counter continuation.
 Native read and exec/pwd check migrated workspace content and execution location.
