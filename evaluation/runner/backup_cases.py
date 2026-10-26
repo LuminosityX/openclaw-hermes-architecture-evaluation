@@ -128,11 +128,10 @@ def run_scenario(root,scenario,unit=1):
             inspection=inspect_archive(archive,output,control);metadata['independent_archive_inspection']=inspection
             check('canonical-sqlite-snapshots-are-independently-readable',bool(inspection['databases']) and all(d['quick_check']==[('ok',)] for d in inspection['databases']))
             check('acknowledged-pre-backup-transcript-is-retained',any(d['transcript_store'] and d['acknowledged_control_seen'] for d in inspection['databases']))
-            if mode=='idle':
-                restored=root/'restored-staging'
-                result=native_backup(root,'restore',archive,'--target',restored,'--json');metadata['native_staged_restore']=result
-                check('native-archive-restores-to-fresh-staging',result['returncode']==0 and restored.exists())
-                metadata['activation_scope']='Native restore stages state only; activation at a different path belongs to REL-06 and is not inferred here.'
+            restored=root/'restored-staging'
+            result=native_backup(root,'restore',archive,'--target',restored,'--json');metadata['native_staged_restore']=result
+            check('native-archive-restores-to-fresh-staging',result['returncode']==0 and restored.exists())
+            metadata['activation_scope']='Native restore stages state only; activation at a different path belongs to REL-06 and is not inferred here.'
             if mode=='interrupted-backup':
                 original_hash=inspection['archive_sha256']
                 (root/'workspace/owned-publication-payload.bin').write_bytes(os.urandom(2*1024**2))
@@ -161,7 +160,14 @@ def run_scenario(root,scenario,unit=1):
                 check('previous-valid-backup-survives-interruption',hashlib.sha256(archive.read_bytes()).hexdigest()==original_hash and verify['returncode']==0)
                 if interrupted.exists():
                     incomplete=native_backup(root,'verify',interrupted,'--json');metadata['interrupted_archive_verification']=incomplete
-                    check('partial-publication-not-accepted-as-valid-backup',incomplete['returncode']!=0)
+                    if incomplete['returncode']==0:
+                        survived=inspect_archive(interrupted,output,control)
+                        metadata['interruption_outcome']='complete-archive-published-before-cli-confirmation'
+                        metadata['surviving_generation_inspection']=survived
+                        check('surviving-complete-generation-is-independently-consistent',bool(survived['databases']) and all(d['quick_check']==[('ok',)] for d in survived['databases']) and any(d['acknowledged_control_seen'] for d in survived['databases']))
+                    else:
+                        metadata['interruption_outcome']='partial-archive-explicitly-rejected-by-native-verification'
+                else:metadata['interruption_outcome']='no-new-generation-published'
                 metadata['remaining_partial_state']=service.owned_inventory(output)
         writer_stop.set();fixture.release.set()
         after=token+'_AFTER';fixture.register(after);result=request(after)

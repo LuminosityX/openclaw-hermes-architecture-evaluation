@@ -78,6 +78,44 @@
       "correction": "Implement the bounded registered-task callback, add positive/negative HTTP regression controls, and require a successful native MCP receipt control before the canary operation. Recalibrate the family and rerun only SEC-01-S03.",
       "repair_run_id": "40309312751",
       "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40311646155",
+      "controller_commit": "47075e520ee94f2f7a964bb123ea82e5aa5f8e38",
+      "scenarios": [
+        "REL-13-S01"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "expiry-targeted-an-unused-session",
+      "reason": "The original intervention expired sessions after a completed control, but the next native request opened another session and never received an expiry rejection. The expired-session boundary was not exercised; these three observations cannot count as product failures.",
+      "preservation": "Original hosted records stay unchanged; exclude these units with original evidence hashes.",
+      "correction": "Expire the exact live native tools/call session immediately before dispatch, record the injection and 404, require the matched boundary, recalibrate and rerun only REL-13-S01.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40311076074",
+      "controller_commit": "a48b7b05ed0b5878e38f5672233f9bf3def0d9d3",
+      "scenarios": [
+        "REL-10-S02",
+        "REL-10-S03",
+        "REL-10-S04"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "restore-coverage-and-interrupted-publication-oracle",
+      "reason": "The first formal adapter independently inspected every archive but staged native restore only for idle. The other three scenarios need their own native staged restore. S04 also incorrectly required a surviving interrupted archive to be invalid, although the native contract permits a complete archive published before CLI confirmation. The original valid idle observations remain accepted.",
+      "preservation": "Original normalized rows and manifest remain under quarantined-results; native hosted evidence stays unchanged. Only S02-S04 are excluded and replaced.",
+      "correction": "Run native staged restore for every scenario, classify no publication / explicitly rejected partial / independently consistent complete publication, and rerun only S02-S04 after calibration.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
     }
   ]
 }

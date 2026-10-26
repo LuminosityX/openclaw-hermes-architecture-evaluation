@@ -45,6 +45,20 @@ class McpHTTPFixtureTests(unittest.TestCase):
             self.assertEqual(status,404)
         finally:connection.close();fixture.close()
 
+    def test_expiry_is_injected_on_the_actual_live_call_not_an_unused_old_session(self):
+        fixture=McpHTTPFixture();session=fixture.session();token='PILOT_LIVE_EXPIRY'
+        fixture.register(token);fixture.expire_on_tokens.add(token)
+        connection=http.client.HTTPConnection('127.0.0.1',18085,timeout=3)
+        try:
+            connection.request('POST','/mcp',json.dumps(dict(jsonrpc='2.0',id=2,method='tools/call',
+                params=dict(name='eval_probe',arguments=dict(token=token)))),{'Content-Type':'application/json','Mcp-Session-Id':session})
+            response=connection.getresponse();response.read()
+            self.assertEqual(response.status,404)
+            self.assertFalse(fixture.receipts)
+            self.assertTrue(any(e['kind']=='mcp-live-session-expiry-injected' and e['token']==token for e in fixture.events))
+            self.assertNotIn(token,fixture.expire_on_tokens)
+        finally:connection.close();fixture.close()
+
     def test_cancelled_cooperative_call_never_commits(self):
         fixture=McpHTTPFixture();session=fixture.session();token='PILOT_COOPERATIVE_CANCEL'
         fixture.register(token,gate=True);fixture.release.clear()

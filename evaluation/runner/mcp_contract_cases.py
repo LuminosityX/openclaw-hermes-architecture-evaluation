@@ -75,8 +75,10 @@ def run_scenario(root,scenario,unit=1):
             metadata['content_scope']='Actual public native MCP dispatch. Large is predeclared as 32 KiB, not an unbounded result or resource-fetch claim.'
         elif mode in {'expired','reconnect'}:
             plan(token,drop_after_commit=mode=='reconnect')
-            if mode=='expired':peer.expire()
+            if mode=='expired':peer.expire_on_tokens.add(token)
             result=request(token)
+            if mode=='expired' and not any(e['kind']=='mcp-live-session-expiry-injected' and e.get('token')==token for e in peer.events):
+                raise RuntimeError('Declared native session expiry was not injected on the actual live tool call')
             check('ambiguous-or-expired-call-not-falsely-completed',not result['accepted'])
             check('failed-call-not-replayed',receipt(token)==(1 if mode=='reconnect' else 0))
             after=token+'_NEXT_DISCOVERY';plan(after);next_result=request(after)

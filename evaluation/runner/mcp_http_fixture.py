@@ -24,6 +24,7 @@ class McpHTTPFixture:
     def __init__(self,transport='streamable-http'):
         self.transport=transport;self.events=[];self.sessions={};self.tasks={};self.calls={};self.receipts={}
         self.lock=threading.Lock();self.stop=threading.Event();self.release=threading.Event();self.release.set()
+        self.expire_on_tokens=set()
         self.server=ThreadingHTTPServer(('127.0.0.1',18085),self.handler());self.server.daemon_threads=True
         threading.Thread(target=self.server.serve_forever,daemon=True).start()
 
@@ -128,6 +129,10 @@ class McpHTTPFixture:
                 else:return self.send(404)
                 if body.get('method')=='initialize' and not legacy:
                     identifier=owner.session()
+                token=body.get('params',{}).get('arguments',{}).get('token')
+                if body.get('method')=='tools/call' and token in owner.expire_on_tokens and identifier in owner.sessions:
+                    owner.expire_on_tokens.remove(token);owner.sessions[identifier]['valid']=False
+                    owner.event('mcp-live-session-expiry-injected',token=token,generation=owner.sessions[identifier]['generation'])
                 if identifier not in owner.sessions or not owner.sessions[identifier]['valid']:
                     owner.event('mcp-session-rejected',method=body.get('method'),http_status=404)
                     return self.send(404,dict(error='Owned MCP session expired'))

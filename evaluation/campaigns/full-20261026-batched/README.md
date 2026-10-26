@@ -31,6 +31,7 @@ These are new formal executions, separate from the [development calibration](../
 | reliability | 9 / 58 |
 | security | 10 / 54 |
 | performance | 24 / 41 |
+| resources_cost | 19 / 33 |
 | extensibility | 15 / 39 |
 | observability | 6 / 32 |
 

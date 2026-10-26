@@ -18,8 +18,12 @@ For interruption, a previous verified generation is retained, and an owned 2 MiB
 workspace payload lengthens publication enough to observe real backup staging.
 The native process group is killed only after a new backup staging/work path is
 observed. A missed intervention remains a harness error. The prior generation is
-hash-checked and natively reverified; any published interrupted archive must fail
-native verification. Residual owned staging bytes are recorded before namespace
+hash-checked and natively reverified. A surviving new archive is classified
+explicitly: a partial artifact must be rejected by native verification, while a
+complete published artifact is independently checked even if CLI confirmation
+was interrupted. The public contract never promises that every interrupted CLI
+leaves an invalid archive. Every scenario restores its baseline into fresh native
+staging. Residual owned staging bytes are recorded before namespace
 cleanup. No shared installation or cache is copied.
 
 The consistency promise follows the pinned `docs/cli/backup.md` and
