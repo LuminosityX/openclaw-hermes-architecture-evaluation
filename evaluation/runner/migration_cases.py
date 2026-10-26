@@ -112,7 +112,13 @@ def run_scenario(root,scenario,unit=1):
             if at_cut['user_version']!=24:raise RuntimeError('Observed WAL boundary was not before the migration transaction commit')
             row.update(native_invoked=True,fixture_validated=True)
             check('interrupted-native-migration-preserves-readable-committed-old-schema',at_cut['quick_check']==[['ok']])
-            start(OLD);check('old-core-can-reopen-uncommitted-migration-state',probe('RECOVERED_BEFORE_SNAPSHOT'));stop()
+            try:
+                start(OLD);direct_reopen=probe('RECOVERED_BEFORE_SNAPSHOT');refusal=None
+            except RuntimeError as error:
+                direct_reopen=False;refusal=str(error)
+            metadata['direct_old_core_reopen_after_cut']=dict(success=direct_reopen,explicit_native_refusal=refusal)
+            check('interrupted-state-either-reopens-or-explicitly-refuses-maintenance',direct_reopen or bool(refusal and 'maintenance is in progress' in refusal.lower() and 'doctor' in refusal.lower()))
+            stop()
         else:
             migration=native(subject,'doctor','--fix','--non-interactive');native_freeze.kill();metadata['actual_native_migration']=migration
             advanced=schemas(subject);metadata['committed_new_schema']=advanced

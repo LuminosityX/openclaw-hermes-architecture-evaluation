@@ -15,7 +15,10 @@ that page reaches the WAL; S02 kills after its actual successful pwrite64 but
 before the commit marker. These are persistence boundaries, not claims about
 when in-memory SQL DDL begins. A missing real boundary invalidates calibration.
 The independently read committed database must remain version 24 at either cut.
-S03 commits actual migration, then kills a new native Gateway before readiness.
+A direct old-binary reopen is recorded separately: an explicit native maintenance
+refusal is an observed safe fence, not a harness exception or proof of automatic
+recovery. Recovery is independently required through the documented snapshot
+rollback below. S03 commits actual migration, then kills a new native Gateway before readiness.
 S04 uses an identical explicitly version-constrained owned extension, first
 proven on the historical core; registration on the new core is observed along
 with unrelated native work. This does not generalize to all third-party plugins.
