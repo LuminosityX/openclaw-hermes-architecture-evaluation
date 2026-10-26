@@ -20,6 +20,13 @@ import trace_access_cases
 SCENARIOS={f'REL-10-S{i:02}':name for i,name in enumerate(['idle','concurrent-writes','queued-work','interrupted-backup'],1)}
 
 
+def queued_admission(probe,session):
+    for response in probe.get('responses',[]):
+        result=response.get('result',{});info=result.get('payload',{}).get('sessionInfo',{})
+        if result.get('ok') is True and info.get('key')==session and info.get('status')=='queued' and info.get('hasActiveRun') is True:return True
+    return False
+
+
 def environment(root):
     return dict(os.environ,OPENCLAW_STATE_DIR=str(root/'state'),OPENCLAW_CONFIG_PATH=str(root/'config.json'),
         OPENCLAW_SKIP_CHANNELS='1',OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
@@ -106,7 +113,7 @@ def run_scenario(root,scenario,unit=1):
                 session='agent:main:pilot:'+(token+'_QUEUED0').lower()
                 admission=trace_access_cases.public_probe(root,session)
                 metadata['queued_native_admission']=admission
-                if token+'_QUEUED0' not in json.dumps(admission):
+                if not queued_admission(admission,session):
                     raise RuntimeError('Offered queued request has no native history/custody admission evidence')
                 if any(e['kind']=='provider-request' and e.get('token','').startswith(token+'_QUEUED') for e in fixture.events):
                     raise RuntimeError('Declared queued work already reached the provider before backup')

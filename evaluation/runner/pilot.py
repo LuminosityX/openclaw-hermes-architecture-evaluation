@@ -123,7 +123,9 @@ def storage_guard_check():
     try:
         chunk=b'\0'*(1024**2)
         try:
-            for index in range(17):
+            capacity=shutil.disk_usage(BASE).total
+            if capacity>512*1024**2:raise RuntimeError('Owned tmpfs exceeds the explicit hosted capacity guard')
+            for index in range(capacity//(8*1024**2)+2):
                 with (directory/str(index)).open('wb',buffering=0) as output:
                     for _ in range(8):
                         written+=output.write(chunk)

@@ -121,8 +121,9 @@ def main():
         parser.error('Choose a single validation driver')
     if args.task_input and (args.model_validation or args.adapter_validation or not args.relay_socket or not args.task_input.is_file()):
         parser.error('Native task requires its public input and a fixed-provider relay, with no other validation mode')
-    if not 16 <= args.tmpfs_mib <= 128 or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
-        parser.error('Bounded pilot limits: 16..128 MiB tmpfs, 1..4 blocks, 1..1200 seconds')
+    maximum_tmpfs=512 if args.hosted_profile and args.adapter_validation=='REL-10' else 128
+    if not 16 <= args.tmpfs_mib <= maximum_tmpfs or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
+        parser.error(f'Bounded pilot limits: 16..{maximum_tmpfs} MiB tmpfs, 1..4 blocks, 1..1200 seconds; larger tmpfs requires the hosted native backup family')
     maximum_memory=4096 if args.hosted_profile else 1536
     if not 512 <= args.memory_mib <= maximum_memory:
         parser.error(f'Pilot memory budget must be 512..{maximum_memory} MiB for this explicit profile')

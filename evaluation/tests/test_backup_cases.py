@@ -13,6 +13,14 @@ import backup_cases
 
 
 class BackupOracleTests(unittest.TestCase):
+    def test_queued_native_metadata_does_not_require_a_committed_user_message(self):
+        session='agent:main:pilot:owned-queued-task'
+        probe=dict(responses=[dict(result=dict(ok=True,payload=dict(messages=[],pendingInputs=dict(items=[]),
+            sessionInfo=dict(key=session,status='queued',hasActiveRun=True))))])
+        self.assertTrue(backup_cases.queued_admission(probe,session))
+        self.assertFalse(backup_cases.queued_admission(probe,session+'-other'))
+        probe['responses'][0]['result']['payload']['sessionInfo']['status']='done'
+        self.assertFalse(backup_cases.queued_admission(probe,session))
     def test_exact_frozen_scenario_scope(self):
         plan=json.loads((Path(__file__).resolve().parents[1]/'campaigns/full-20261026-batched/plan.json').read_text())
         expected={s['id'] for c in plan['cases'] if c['id']=='REL-10' for s in c['scenarios']}

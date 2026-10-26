@@ -30,3 +30,12 @@ individual synthetic databases at 4 MiB, and all state remains in the existing
 bounded hosted tmpfs. Raw archive payloads are never downloaded to the local
 workspace or uploaded as evidence; only metadata, hashes and independent checks
 are retained. Zero real provider calls; calibration precedes formal units.
+
+Native verification reserves 256 MiB of free scratch capacity. The first
+calibration (40310339841) correctly refused verification in the generic 64 MiB
+tmpfs; this is an environment precondition, not a formal product failure. REL-10
+therefore uses a separate hosted-only 384 MiB tmpfs ceiling with the same 3 GiB
+cgroup and zero swap. Capacity is virtual tmpfs, not a local disk allocation;
+actual state/payload bytes remain bounded and owned. Local execution and all
+other families retain their original small tmpfs profiles. The one-time capacity
+guard is kept separate from product hardware measurements.

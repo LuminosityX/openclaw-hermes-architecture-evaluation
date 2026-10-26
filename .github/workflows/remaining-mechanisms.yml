@@ -32,6 +32,7 @@ jobs:
     env:
       EVAL_FAMILY: ${{ matrix.family }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
+      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || 64 }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -62,7 +63,7 @@ jobs:
           sudo python3 evaluation/tools/run_local.py \
             --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
             --node "$(command -v node)" --adapter-validation "$EVAL_FAMILY" --hosted-profile --ssh-backend \
-            --memory-mib 3072 --timeout 600 --output "$RUNNER_TEMP/openclaw-campaign-validation"
+            --memory-mib 3072 --tmpfs-mib "$EVAL_TMPFS_MIB" --timeout 600 --output "$RUNNER_TEMP/openclaw-campaign-validation"
           sudo mkdir -p "$RUNNER_TEMP/openclaw-campaign-proofs"
           sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" \
             "$RUNNER_TEMP/openclaw-campaign-proofs/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"
