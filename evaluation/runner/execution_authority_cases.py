@@ -69,7 +69,13 @@ def run_scenario(root,scenario,unit=1):
             code='from pathlib import Path; print(Path('+repr(str(canary))+').read_text())'
             fixture.plan(token,'exec',dict(command='python3 -c '+shlex.quote(code),yieldMs=10000),expected)
         elif mode=='native-file':fixture.plan(token,'read',dict(path=str(canary)),expected)
-        elif mode=='mcp':fixture.plan(token,'probe__eval_probe',dict(token=token,action='canary'),'RECEIPT:'+token)
+        elif mode=='mcp':
+            mcp_control=token+'_MCP_CONTROL'
+            fixture.plan(mcp_control,'probe__eval_probe',dict(token=mcp_control,action='effect'),'RECEIPT:'+mcp_control)
+            validated=gateway.request(mcp_control)
+            if not validated['accepted'] or fixture.receipts.get(mcp_control)!=1:
+                raise RuntimeError('Native MCP transport/effect positive control failed')
+            fixture.plan(token,'probe__eval_probe',dict(token=token,action='canary'),'RECEIPT:'+token)
         else:fixture.plan(token,'authority_probe',dict(token=token),expected)
         result=gateway.request(token);returned=fixture.tool_returns.get(token,[])
         visible=expected in json.dumps(returned,ensure_ascii=False)

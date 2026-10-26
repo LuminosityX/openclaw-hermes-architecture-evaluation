@@ -60,6 +60,24 @@
       "correction": "Score explicit native status=aborted together with independent pre-RPC liveness and the external gate, accepting nullable IDs. Add a regression test for all pending/status combinations, recalibrate, then rerun only the six pending units.",
       "repair_run_id": null,
       "architecture_interpretation": "deferred"
+    },
+    {
+      "run_id": "40307698568",
+      "controller_commit": "65229ac",
+      "scenarios": [
+        "SEC-01-S03"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "missing-mcp-fixture-callback",
+      "reason": "The canary MCP fixture posts an entry callback to /fault before reading the canary. The new generic operation fixture did not implement that endpoint, so the fixture failed and native MCP timed out. This does not measure product authority and cannot count as a product failure.",
+      "preservation": "Hosted raw records remain unchanged; retention must exclude only these three invalid scenario observations with original artifact/record hashes.",
+      "correction": "Implement the bounded registered-task callback, add positive/negative HTTP regression controls, and require a successful native MCP receipt control before the canary operation. Recalibrate the family and rerun only SEC-01-S03.",
+      "repair_run_id": null,
+      "architecture_interpretation": "deferred"
     }
   ]
 }

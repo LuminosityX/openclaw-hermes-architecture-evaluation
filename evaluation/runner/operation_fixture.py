@@ -21,6 +21,13 @@ class OperationFixture(service_path_cases.InstrumentedFixture):
         base=super().handler();owner=self
         class Handler(base):
             def do_POST(self):
+                if self.path=='/fault':
+                    size=int(self.headers.get('Content-Length','0'))
+                    if not 0<size<=16384:return self.send(dict(error='fixture-bound'),413)
+                    body=json.loads(self.rfile.read(size))
+                    if body.get('token') not in owner.tasks:return self.send(dict(error='unregistered-task'),400)
+                    owner.event('fault-start',**body)
+                    return self.send(dict(observed=True))
                 if not self.path.endswith('/chat/completions'):return super().do_POST()
                 size=int(self.headers.get('Content-Length','0'))
                 if not 0<size<=4*1024**2:return self.send(dict(error='fixture-bound'),413)

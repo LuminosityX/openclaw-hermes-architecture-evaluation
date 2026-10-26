@@ -59,5 +59,20 @@ class AuthorityAndOperationsTests(unittest.TestCase):
             self.assertFalse(fixture.receipts)
         finally:fixture.close()
 
+    def test_mcp_canary_entry_callback_is_supported_and_registered(self):
+        fixture=OperationFixture();token='PILOT_MCP_CANARY_CALLBACK'
+        try:
+            fixture.register(token)
+            connection=http.client.HTTPConnection('127.0.0.1',18080,timeout=3)
+            for name,status in [(token,200),('PILOT_UNKNOWN_CALLBACK',400)]:
+                connection.request('POST','/fault',json.dumps(dict(token=name,action='canary',pid=123)),{'Content-Type':'application/json'})
+                response=connection.getresponse();response.read();self.assertEqual(response.status,status)
+            connection.close()
+            events=[e for e in fixture.events if e['kind']=='fault-start']
+            self.assertEqual(len(events),1)
+            self.assertEqual(events[0]['token'],token)
+            self.assertFalse(fixture.receipts)
+        finally:fixture.close()
+
 
 if __name__=='__main__':unittest.main()
