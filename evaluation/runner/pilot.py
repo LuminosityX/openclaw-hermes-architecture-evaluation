@@ -345,7 +345,7 @@ def configuration(root, concurrency=4, sandbox_scope=None, route='plugin', ssh_b
 
 
 class Gateway:
-    def __init__(self,root,configurer=configuration,process_uid=None,**options):
+    def __init__(self,root,configurer=configuration,process_uid=None,drop_capabilities=False,**options):
         self.root=root
         self.config=configurer(root,**options)
         print('[pilot] starting Gateway '+root.name,file=sys.stderr,flush=True)
@@ -354,7 +354,9 @@ class Gateway:
                  OPENCLAW_SKIP_CHANNELS='1',OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
         def change_identity():
             os.setgroups([]);os.setgid(process_uid);os.setuid(process_uid)
-        self.process=subprocess.Popen([NODE,CLI,'gateway','run','--bind','loopback','--port','18789'],
+        command=[NODE,CLI,'gateway','run','--bind','loopback','--port','18789']
+        if drop_capabilities:command=['/usr/bin/setpriv','--bounding-set=-all','--inh-caps=-all','--ambient-caps=-all',*command]
+        self.process=subprocess.Popen(command,
             stdout=subprocess.PIPE,stderr=subprocess.STDOUT,text=True,env=env,start_new_session=True,
             preexec_fn=change_identity if process_uid is not None else None)
         self.reader=threading.Thread(target=self.read_log,daemon=True)
