@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import re
 
-from campaign import DEFAULT_PLAN, load_plan, scenario_index
+from campaign import DEFAULT_PLAN, load_plan, scenario_index, audit, records_from
 from suite import ROOT, require
 
 SOURCES={
@@ -51,21 +51,25 @@ def native_validation(plan,proofs):
     return verified
 
 
-def readiness(plan,proofs=()):
+def readiness(plan,proofs=(),records=()):
     verified=native_validation(plan,proofs)
+    formal=audit(plan,records)
+    formal_rows={row['id']:row for row in formal['scenario_status']}
     rows=[]
     for sid,(case,scenario) in scenario_index(plan).items():
         family=case['id']
         state='native-validated-candidate' if sid in verified else 'candidate-awaiting-native-validation' if family in SOURCES else 'not-implemented'
         rows.append(dict(scenario_id=sid,case_id=family,dimension=case['dimension'],name=scenario['name'],
-                         preparation_state=state,full_campaign_executed=False,
+                         preparation_state=state,full_campaign_executed=formal_rows[sid]['state'] in {'pass','fail'},
+                         formal_execution_state=formal_rows[sid]['state'],formal_valid_units=formal_rows[sid]['valid_units'],
                          source_files=SOURCES.get(family,['evaluation/tools/task_workloads.py','evaluation/tools/task_acceptance.py'] if family=='PERF-09' else [])))
     counts=Counter(row['preparation_state'] for row in rows)
     missing=[row['scenario_id'] for row in rows if row['preparation_state']!='native-validated-candidate']
     return dict(kind='full-campaign-adapter-readiness',plan_sha256=plan['plan_sha256'],scenario_count=len(rows),
+                completed_formal_scenarios=formal['measured_scenarios'],accepted_formal_observations=formal['accepted_observation_count'],
                 preparation_counts=dict(counts),ready_for_full_execution=not missing,
                 scenarios_requiring_implementation_or_validation=missing,scenario_status=rows,
-                rule='A candidate must pass native fixture/invocation validation against its current controller hashes. Product failures remain valid observations. Development calibration never counts as full experiment coverage.')
+                rule='Preparation counts apply to new executions at current controller hashes. Recorded formal observations retain their original controller provenance. Product failures remain valid observations. Development calibration never counts as full experiment coverage.')
 
 
 def load_proofs(directory):
@@ -96,7 +100,7 @@ def main():
     parser.add_argument('--require-complete',action='store_true')
     args=parser.parse_args()
     plan=load_plan(args.plan)
-    report=readiness(plan,load_proofs(args.proofs or proof_directory(plan,args.plan)))
+    report=readiness(plan,load_proofs(args.proofs or proof_directory(plan,args.plan)),records_from(args.plan.parent/'results'))
     if not args.details: report={k:v for k,v in report.items() if k not in {'scenario_status','scenarios_requiring_implementation_or_validation'}}
     print(json.dumps(report,ensure_ascii=False,indent=2))
     if args.require_complete and not report['ready_for_full_execution']: parser.exit(1,'Full scope still has missing or unvalidated adapters; do not start a partial run as the full campaign\n')

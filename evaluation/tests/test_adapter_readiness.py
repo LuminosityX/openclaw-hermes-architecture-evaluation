@@ -14,6 +14,21 @@ from suite import ROOT
 
 
 class ReadinessTests(unittest.TestCase):
+    def test_stale_preparation_does_not_erase_recorded_formal_execution(self):
+        plan=load_plan()
+        rows=[dict(schema_version=1,plan_sha256=plan['plan_sha256'],product='openclaw',target_version=plan['target']['version'],
+            target_commit=plan['target']['source_commit'],scenario_id=f'REL-14-S{scenario:02}',unit=unit,state='pass',
+            native_invoked=True,fixture_validated=True,run_id='synthetic-unit-test',evidence=['recorded-native-evidence'],
+            assertions=[dict(name='receipt',verdict='pass',evidence=['receipt'])],full_campaign_coverage=True)
+            for scenario in range(1,5) for unit in range(1,4)]
+        report=readiness(plan,[],rows)
+        self.assertEqual(report['completed_formal_scenarios'],4)
+        self.assertEqual(report['accepted_formal_observations'],12)
+        selected=[r for r in report['scenario_status'] if r['case_id']=='REL-14']
+        self.assertTrue(all(r['full_campaign_executed'] for r in selected))
+        self.assertTrue(all(r['preparation_state']=='candidate-awaiting-native-validation' for r in selected))
+        with self.assertRaisesRegex(ValueError,'Selected family'):
+            require_execution_ready(plan,'REL-14',[])
     def proof(self,plan):
         return dict(kind='native-adapter-validation',full_campaign_coverage=False,case_id='REL-14',
             runtime_identity=dict(version=plan['target']['version'],commit=plan['target']['source_commit']),

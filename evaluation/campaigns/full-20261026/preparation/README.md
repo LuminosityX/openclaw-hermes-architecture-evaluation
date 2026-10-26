@@ -11,7 +11,9 @@ These records validate configuration, native adapter wiring and independent acce
 
 The latest native cohort is [hosted run 40289234512](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289234512): REL-14, REL-15, EXT-08, PERF-05, PERF-06, COST-01, COST-06 and EXT-09, covering 39 candidate scenarios. Native product failures remain in the original records and do not invalidate a correctly exercised fixture. The current [golden task proof](adapter-validation-40290494698-PERF-09.json) verifies five task adapters including formal-purpose/deadline checks, with zero real provider calls.
 
-The current cohort validates 44 candidate scenarios against matching controller hashes; 213 still require implementation. New [formal batches](../../full-20261026-batched/README.md) separately complete those 44 scenarios and 204 independent observations, including 30 real-model task runs. None of the preparation records here is promoted into formal coverage.
+The [SEC-11 proof](adapter-validation-40295242483-SEC-11.json) validates five public HTTP/WebSocket security scenarios using fresh synthetic device identities, native token issuance/revocation, origin checks and scoped administrative actions. The [registered security protocol](../../full-20261026-batched/security-protocol.md) records the exact boundaries. No real provider key is bound to those jobs.
+
+Retained cohorts validated 44 candidate scenarios against their recorded controller hashes. New [formal batches](../../full-20261026-batched/README.md) separately complete those 44 scenarios and 204 independent observations, including 30 real-model task runs. Further wrapper/adapter changes require matching preparation proofs before new execution; completed formal records retain the controller provenance under which they ran. None of the preparation records here is promoted into formal coverage.
 
 The real-provider plumbing check returned 4,613 inclusive input tokens, 74 output tokens and 2,176 cache-hit input tokens across its two calls. Cache tokens are part of input, not additional input. Provider-reported USD and invoice reconciliation remain unknown. The selected model alias does not establish immutable model weights.
 
@@ -24,6 +26,7 @@ The task golden controls intentionally supply correct deliverables. They prove t
 - `40282384451` EXT-08-S03 used an invalid acceptance assumption: a persistence hook was required to rewrite the current live provider request. The corrected adapter checks the native persisted transcript separately.
 - `40282384451` REL-14-S04 applied DeepSeek-specific reasoning replay expectations to a generic provider. The corrected adapter loads the pinned official DeepSeek plugin and its documented reasoning-enabled condition.
 - `40289960625` reached native task completion but the new deadline assertion read a public-spec field from the host workload's wrong level, raising `KeyError`. Commit `231d7a4` reads the actual host workload schema; `40290494698` revalidated all five golden scenarios before paid formal execution.
+- `40294355452` SEC-11 first reached valid credential/expiry controls, but used a Control UI client without the current advertised build identifier and tried to obtain a durable device token from a reserved local backend helper. The corrected fixture uses the public hello build metadata and explicit pairable client identity; `40295242483` validates all five scenarios. These are fixture admission mismatches, excluded from formal results.
 
 These are preparation issues, not completed full-campaign product failures. The original records remain auditable. Newer calibration evidence does not retroactively change those records or count them toward the frozen campaign.
 
