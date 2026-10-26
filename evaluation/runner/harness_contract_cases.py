@@ -76,7 +76,7 @@ def run_scenario(root,scenario,unit=1):
         else:
             key=token.lower();session='agent:main:pilot:'+key;c=token+'_SESSION_CONTROL';fixture.register(c)
             if not gateway.request(c,session_key=key)['accepted']:raise RuntimeError('Native target-session initialization failed')
-            patch=privacy_cases.wire(root,[dict(method='sessions.patch',params=dict(key=session,permissionMode='full',agentRuntime=HARNESS)),dict(method='sessions.get',params=dict(key=session))])
+            patch=privacy_cases.wire(root,[dict(method='sessions.patch',params=dict(key=session,permissionMode='full',model='fixture/fixture-model',agentRuntime=HARNESS)),dict(method='sessions.get',params=dict(key=session))])
             metadata['native_runtime_selection']=patch
             if not patch['responses'][0]['result'].get('ok'):raise RuntimeError('Public native harness selection failed: '+json.dumps(patch)[:1800])
             if mode=='resume':task['fail_once']=True
