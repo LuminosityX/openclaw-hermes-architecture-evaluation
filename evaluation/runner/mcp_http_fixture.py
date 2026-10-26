@@ -21,11 +21,12 @@ def content_result(token,format='text'):
 
 
 class McpHTTPFixture:
-    def __init__(self,transport='streamable-http',port=18085):
+    def __init__(self,transport='streamable-http',port=18085,tls_context=None,bind_host='127.0.0.1'):
         self.transport=transport;self.events=[];self.sessions={};self.tasks={};self.calls={};self.receipts={}
         self.lock=threading.Lock();self.stop=threading.Event();self.release=threading.Event();self.release.set()
         self.expire_on_tokens=set()
-        self.server=ThreadingHTTPServer(('127.0.0.1',port),self.handler());self.server.daemon_threads=True
+        self.server=ThreadingHTTPServer((bind_host,port),self.handler());self.server.daemon_threads=True
+        if tls_context is not None:self.server.socket=tls_context.wrap_socket(self.server.socket,server_side=True)
         threading.Thread(target=self.server.serve_forever,daemon=True).start()
 
     def event(self,kind,**values):

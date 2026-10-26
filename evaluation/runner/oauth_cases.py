@@ -8,17 +8,58 @@ import re
 import shutil
 import signal
 import stat
+import ssl
 import subprocess
 import threading
 import time
 import urllib.request
 
+import oauth_fixture
 from oauth_fixture import OAuthPeer,ISSUER,RESOURCE
 from operation_fixture import OperationFixture
 import pilot
 import service_path_cases as service
 
 SCENARIOS={f'SEC-07-S{i:02}':name for i,name in enumerate(['initial','refresh','revoked','scope'],1)}
+TLS_DIRECTORY=pilot.BASE/'oauth-tls'
+
+
+def make_tls_fixture(directory):
+    directory.mkdir(parents=True)
+    ca=directory/'ca.cnf';server=directory/'server.cnf'
+    ca.write_text('[req]\ndistinguished_name=dn\nx509_extensions=ca\nprompt=no\n[dn]\nCN=Owned OpenClaw Evaluation CA\n[ca]\nbasicConstraints=critical,CA:TRUE\nkeyUsage=critical,keyCertSign,cRLSign\nsubjectKeyIdentifier=hash\n')
+    server.write_text('[req]\ndistinguished_name=dn\nreq_extensions=req_ext\nprompt=no\n[dn]\nCN=mcp.evaluation.test\n[req_ext]\nsubjectAltName=DNS:mcp.evaluation.test\n[server_ext]\nbasicConstraints=critical,CA:FALSE\nkeyUsage=critical,digitalSignature,keyEncipherment\nextendedKeyUsage=serverAuth\nsubjectAltName=DNS:mcp.evaluation.test\nauthorityKeyIdentifier=keyid,issuer\n')
+    openssl=shutil.which('openssl',path='/usr/bin:/bin')
+    if not openssl:raise RuntimeError('Owned OAuth TLS fixture requires the system openssl executable')
+    commands=[['req','-x509','-newkey','rsa:2048','-nodes','-keyout',str(directory/'ca.key'),'-out',str(directory/'ca.crt'),'-days','1','-config',str(ca)],
+        ['req','-new','-newkey','rsa:2048','-nodes','-keyout',str(directory/'server.key'),'-out',str(directory/'server.csr'),'-config',str(server)],
+        ['x509','-req','-in',str(directory/'server.csr'),'-CA',str(directory/'ca.crt'),'-CAkey',str(directory/'ca.key'),'-CAcreateserial','-out',str(directory/'server.crt'),'-days','1','-extfile',str(server),'-extensions','server_ext']]
+    for command in commands:
+        result=subprocess.run([openssl,*command],env=dict(os.environ,OPENSSL_CONF=str(ca)),capture_output=True,text=True,timeout=15)
+        if result.returncode:raise RuntimeError('Owned TLS certificate construction failed: '+result.stderr[-1000:])
+    for name in ['ca.key','server.key']:(directory/name).chmod(0o600)
+    return dict(ca_certificate_sha256=hashlib.sha256((directory/'ca.crt').read_bytes()).hexdigest(),
+        server_certificate_sha256=hashlib.sha256((directory/'server.crt').read_bytes()).hexdigest(),
+        tls_verification_disabled=False,private_key_material_retained=False)
+
+
+def environment_selfcheck():
+    global ISSUER,RESOURCE
+    if not Path('/measurement/cgroup').is_dir() or not Path('/toolchain/node').is_file():raise RuntimeError('OAuth network preparation requires the explicit owned hosted namespace')
+    ip=shutil.which('ip',path='/usr/sbin:/usr/bin:/sbin:/bin')
+    if not ip:raise RuntimeError('Owned OAuth fixture requires the system ip executable')
+    routes=json.loads(subprocess.check_output([ip,'-j','route','show'],text=True,timeout=5))
+    if any(r.get('dst')=='default' for r in routes):raise RuntimeError('OAuth stand-in namespace must have no outward default route')
+    result=subprocess.run([ip,'address','add','93.184.216.34/32','dev','lo'],capture_output=True,text=True,timeout=5)
+    if result.returncode:raise RuntimeError('Owned public-range loopback stand-in setup failed: '+result.stderr[:500])
+    Path('/etc/hosts').write_text('127.0.0.1 localhost\n::1 localhost\n93.184.216.34 mcp.evaluation.test\n')
+    metadata=make_tls_fixture(TLS_DIRECTORY)
+    ISSUER='https://mcp.evaluation.test:18089';RESOURCE='https://mcp.evaluation.test:18085/mcp'
+    oauth_fixture.ISSUER=ISSUER;oauth_fixture.RESOURCE=RESOURCE
+    os.environ['NODE_EXTRA_CA_CERTS']=str(TLS_DIRECTORY/'ca.crt')
+    metadata.update(issuer=ISSUER,resource=RESOURCE,network='Namespace-only public-range address on loopback, no default route or real external host',
+        native_ssrf_checks_disabled=False,certificate_trust='Only an additive owned CA; hostname and chain verification stay enabled')
+    return metadata
 
 
 def configure(root):
@@ -45,10 +86,11 @@ def native_login(root):
                 if process.poll() is not None:break
                 continue
             lines.append(line)
-            matches=re.findall(r'http://127\.0\.0\.1:18089/authorize[^\s\x1b]+',line)
+            matches=re.findall(re.escape(ISSUER)+r'/authorize[^\s\x1b]+',line)
             if matches and not seen:
                 seen=True;url=matches[0].rstrip('"\'<>')
-                with urllib.request.urlopen(url,timeout=10) as response:
+                context=ssl.create_default_context(cafile=str(TLS_DIRECTORY/'ca.crt')) if TLS_DIRECTORY.is_dir() else None
+                with urllib.request.urlopen(url,timeout=10,context=context) as response:
                     response.read(32768)
                     if response.status!=200:raise RuntimeError('Synthetic OAuth callback did not complete')
             if seen and process.poll() is not None:break
@@ -67,7 +109,7 @@ def native_login(root):
 
 
 def run_scenario(root,scenario,unit=1):
-    mode=SCENARIOS[scenario];fixture=OperationFixture();peer=OAuthPeer(short_expiry=mode=='refresh',read_only=mode=='scope');gateway=None;assertions=[];requests=[];metadata={}
+    mode=SCENARIOS[scenario];fixture=OperationFixture();peer=OAuthPeer(short_expiry=mode=='refresh',read_only=mode=='scope',tls_directory=TLS_DIRECTORY if TLS_DIRECTORY.is_dir() else None);gateway=None;assertions=[];requests=[];metadata={}
     token='PILOT_OAUTH_'+scenario.replace('-','_')+'_U'+str(unit)
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['native-shared-operator-login','independent-pkce-token-and-scope-events','actual-native-mcp-effects']))
@@ -109,12 +151,13 @@ def run_scenario(root,scenario,unit=1):
         metadata.update(mode=mode,authorization_profile='Native shared operator OAuth, dynamic client registration, authorization code with S256 PKCE, rotating refresh and declared scopes',
             sqlite_credential_store_mode=oct(stat.S_IMODE(database.stat().st_mode)) if database.exists() else None,
             client_scope='Resource server independently enforces mcp.read/mcp.write. A server-side grant boundary is not mislabeled as a new client-side sandbox.',
-            per_requester_identity_tested=False,credentials_retained=False)
+            per_requester_identity_tested=False,credential_database_retained=False,real_credentials_used=False)
         row.update(state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',assertions=assertions,
             metadata=metadata,requests=requests,native_tool_returns=fixture.tool_returns,independent_oauth_events=peer.events,
             independent_effects=peer.receipts,resources=gateway.sampler.summary(),paid_model_calls=0)
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:3000],metadata=metadata)
     finally:
+        row['independent_oauth_events']=peer.events
         if gateway:gateway.stop();row['native_gateway_tail']=''.join(gateway.log_tail)[-4000:]
         peer.close();fixture.close();shutil.rmtree(root,ignore_errors=True);row['owned_state_retained']=root.exists()
     return row

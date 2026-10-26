@@ -137,6 +137,7 @@ def main():
     args = parser.parse_args()
     if args.adapter_validation=='REL-06' and not (args.hosted_profile and args.ssh_backend):parser.error('UID relocation is restricted to the explicit disposable hosted profile')
     if args.adapter_validation=='SEC-10' and not (args.hosted_profile and args.ssh_backend):parser.error('Network fixtures are restricted to the explicit disposable hosted profile')
+    if args.adapter_validation=='SEC-07' and not (args.hosted_profile and args.ssh_backend):parser.error('OAuth TLS stand-ins require the explicit disposable hosted network profile')
     if args.native_scenario and not args.campaign_unit:parser.error('Scenario selection requires a formal unit; calibration remains whole-family')
     if args.campaign_unit and (not args.adapter_validation or not args.hosted_profile or args.allow_historical_bootstrap):
         parser.error('Formal family units require the pinned hosted native-family adapter')
@@ -196,7 +197,7 @@ def main():
             for scenario in args.native_scenario:driver_args+=['--scenario',scenario]
         command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
                                   measurement_group=group if driver in {'mechanism_validation.py','service_path_validation.py'} else None,
-                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation=='SEC-10',official_addon=args.adapter_validation=='OBS-02')
+                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02')
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,

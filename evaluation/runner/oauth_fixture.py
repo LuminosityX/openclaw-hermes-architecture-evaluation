@@ -4,6 +4,7 @@ import hashlib
 from http.server import BaseHTTPRequestHandler,ThreadingHTTPServer
 import io
 import json
+import ssl
 import threading
 import time
 from urllib.parse import parse_qs,urlencode,urlsplit
@@ -19,11 +20,16 @@ def pkce(verifier):return base64.urlsafe_b64encode(hashlib.sha256(verifier.encod
 
 
 class OAuthPeer(McpHTTPFixture):
-    def __init__(self,short_expiry=False,read_only=False):
+    def __init__(self,short_expiry=False,read_only=False,tls_directory=None):
         self.clients={};self.codes={};self.access={};self.refresh={};self.generation=0
         self.short_expiry=short_expiry;self.read_only=read_only;self.revoked=False
-        super().__init__()
-        self.authorization_server=ThreadingHTTPServer(('127.0.0.1',18089),self.authorization_handler());self.authorization_server.daemon_threads=True
+        context=None
+        if tls_directory is not None:
+            context=ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER);context.load_cert_chain(str(tls_directory/'server.crt'),str(tls_directory/'server.key'))
+        bind='0.0.0.0' if context else '127.0.0.1'
+        super().__init__(tls_context=context,bind_host=bind)
+        self.authorization_server=ThreadingHTTPServer((bind,18089),self.authorization_handler());self.authorization_server.daemon_threads=True
+        if context:self.authorization_server.socket=context.wrap_socket(self.authorization_server.socket,server_side=True)
         threading.Thread(target=self.authorization_server.serve_forever,daemon=True).start()
 
     def tokens(self,scope):
@@ -46,6 +52,7 @@ class OAuthPeer(McpHTTPFixture):
             def do_GET(self):
                 parsed=urlsplit(self.path)
                 if parsed.path=='/.well-known/oauth-authorization-server':
+                    owner.event('oauth-metadata-request',authority='authorization-server',path=parsed.path)
                     return self.send(200,dict(issuer=ISSUER,authorization_endpoint=ISSUER+'/authorize',token_endpoint=ISSUER+'/token',registration_endpoint=ISSUER+'/register',
                         response_types_supported=['code'],grant_types_supported=['authorization_code','refresh_token'],code_challenge_methods_supported=['S256'],
                         token_endpoint_auth_methods_supported=['none'],scopes_supported=['mcp.read','mcp.write']))
@@ -103,6 +110,7 @@ class OAuthPeer(McpHTTPFixture):
 
             def do_GET(self):
                 if self.path.startswith('/.well-known/oauth-protected-resource'):
+                    owner.event('oauth-metadata-request',authority='protected-resource',path=urlsplit(self.path).path)
                     return self.send(200,dict(resource=RESOURCE,authorization_servers=[ISSUER],scopes_supported=['mcp.read','mcp.write'],bearer_methods_supported=['header']))
                 if self.path=='/mcp' and not self.headers.get('Authorization'):return self.challenge()
                 return super().do_GET()

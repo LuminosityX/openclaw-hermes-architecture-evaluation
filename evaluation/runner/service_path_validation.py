@@ -62,6 +62,7 @@ def main():
         report['fixture_selfcheck']=mechanism_cases.selfcheck()
         if args.case=='REL-06':report['uid_environment_preflight']=relocation_cases.environment_selfcheck()
         if args.case=='SEC-10':report['network_environment_preflight']=network_boundary_cases.environment_selfcheck()
+        if args.case=='SEC-07':report['oauth_environment_preflight']=oauth_cases.environment_selfcheck()
         for sid in selected:
             row=module.run_scenario(pilot.BASE/sid.lower(),sid,args.campaign_unit or 1)
             report['observations'].append(row)
