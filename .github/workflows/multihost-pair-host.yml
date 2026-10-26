@@ -25,6 +25,16 @@ jobs:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           persist-credentials: false
+      - name: Reject already accepted formal pairs before installing a runtime
+        run: |
+          python3 - <<'PYCODE'
+          import os,sys
+          sys.path.insert(0,'evaluation/tools')
+          from campaign import DEFAULT_PLAN,records_from
+          unit=int(os.environ['EVAL_UNIT'])
+          if unit:
+              assert not any(r['scenario_id'].startswith('PERF-07-') and r['unit']==unit and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')), 'This formal multi-host unit is already accepted'
+          PYCODE
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
       - name: Make verified runtime readable by the isolated native UID

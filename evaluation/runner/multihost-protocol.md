@@ -37,3 +37,11 @@ Native state uses the actual GitHub VM disk, preserving the native 4 GiB free-sp
 All private native state and credentials are destroyed and endpoints closed
 before bounded sanitized final evidence is uploaded. Real independent-host
 calibration must pass fixture validation before the six formal pairs can start.
+
+
+The campaign-owned `OPENCLAW_EVAL_TRANSPORT_FULL_20261026` repository Secret is
+deleted after all paired jobs finish and their permanent evidence is verified.
+Repeating this mechanism requires setting that name to a fresh cryptographically
+random value through GitHub Secrets or `gh secret set` on standard input. Never
+reuse `DEEPSEEK_API_KEY` for transport; that pre-existing user Secret is unchanged.
+Accepted formal pairs are rejected before another runtime is installed.
