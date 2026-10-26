@@ -223,7 +223,7 @@ def daemon(args):
             native=json.loads((output/'gateway-report.json').read_text())
             require(not native.get('harness_error'),native.get('harness_error','Native multi-host fixture failed'))
         else:require(effects.destroyed.is_set(),'Native worker was not destroyed at the declared live execution boundary')
-        result.update(resources=bounds.summary(),host_scratch=dict(backing='Actual disposable GitHub VM disk with native free-space reserve checks unchanged',maximum_actual_bytes=1024**3,observed_peak_bytes=peak_scratch),kernel_io_stat=(bounds.group/'io.stat').read_text(),kernel_native_execution_group=dict(cpu_max=(group/'cpu.max').read_text(),memory_peak_bytes=int((group/'memory.peak').read_text())),execution_host_destroyed=effects.destroyed.is_set())
+        result.update(resources=bounds.summary(),host_scratch=dict(backing='Actual disposable GitHub VM disk with native free-space reserve checks unchanged',maximum_actual_bytes=1024**3,observed_peak_bytes=peak_scratch),kernel_io_stat=(bounds.group/'io.stat').read_text(),kernel_native_execution_group=dict(effective_parent_cpu_max=(bounds.group/'cpu.max').read_text(),effective_parent_memory_limit_bytes=int((bounds.group/'memory.max').read_text()),leaf_cpu_max=(group/'cpu.max').read_text() if (group/'cpu.max').is_file() else None,leaf_memory_peak_bytes=int((group/'memory.peak').read_text()) if (group/'memory.peak').is_file() else None,scope='Native leaf has only explicitly available accounting files; enforced limits and whole-host accounting belong to its bounded parent cgroup'),execution_host_destroyed=effects.destroyed.is_set())
     except Exception as error:result['harness_error']=type(error).__name__+': '+str(error)[:7000]
     finally:
         if effects:effects.close()
@@ -244,7 +244,7 @@ def daemon(args):
         if not live and scratch.exists():shutil.rmtree(scratch)
         result['native_execution_state_removed_after_shutdown']=not scratch.exists()
         # Publish only after the native endpoint has been stopped. Private
-        # configs/identities live in destroyed tmpfs and never enter artifacts.
+        # configs/identities live in removed owned disposable storage and never enter artifacts.
         save(output/'host-provenance.json',result)
         for path in output.iterdir():
             if not path.is_file():continue
