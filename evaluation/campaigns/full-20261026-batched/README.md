@@ -1,11 +1,12 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **123/257 scenarios completed**, with **510 independent observations**. 116 scenarios pass and 7 retain failure observations. Another 134 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **130/257 scenarios completed**, with **543 independent observations**. 123 scenarios pass and 7 retain failure observations. Another 127 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
 | Family | Completed scenarios | Independent observations | Hosted runs |
 | --- | ---: | ---: | --- |
+| REL-02 External effects and lost acknowledgments | 3 | 9 | [40323072237](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323072237) |
 | REL-04 Recovery automation and service availability | 4 | 12 | [40315477743](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40315477743), [40322602646](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40322602646) |
 | REL-06 State identity under relocation | 4 | 12 | [40317319057](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40317319057) |
 | REL-09 Credential and endpoint rebind | 4 | 12 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
@@ -18,6 +19,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | SEC-11 Gateway and control-plane authentication | 5 | 15 | [40296866652](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40296866652) |
 | PERF-01 Request preparation on the service path | 3 | 18 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
 | PERF-02 CPU work versus asynchronous waiting | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
+| PERF-03 Tool scheduling and connection locks | 4 | 24 | [40323072237](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323072237) |
 | PERF-04 Fairness during a slow task | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535), [40309012602](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40309012602) |
 | PERF-05 Admission and overload behavior | 4 | 24 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | PERF-06 State contention under parallel sessions | 4 | 24 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
@@ -37,9 +39,9 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
-| reliability | 29 / 58 |
+| reliability | 32 / 58 |
 | security | 14 / 54 |
-| performance | 28 / 41 |
+| performance | 32 / 41 |
 | resources_cost | 19 / 33 |
 | extensibility | 23 / 39 |
 | observability | 10 / 32 |
