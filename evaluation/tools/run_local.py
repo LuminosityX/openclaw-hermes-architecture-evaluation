@@ -14,7 +14,18 @@ import sys
 import time
 import uuid
 
+from suite import load_matrix
+
 ROOT = Path(__file__).resolve().parents[2]
+
+
+def runtime_role(build,target,allow_historical=False):
+    matches=build.get('version')==target['version'] and build.get('commit')==target['source_commit']
+    if matches:
+        return 'current-stable-pilot'
+    if allow_historical:
+        return 'historical-bootstrap-only'
+    raise ValueError('Runtime differs from the pinned current stable release '+target['version']+'; use --allow-historical-bootstrap only for historical harness checks')
 
 
 def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False):
@@ -50,6 +61,7 @@ def main():
     parser.add_argument('--memory-mib', type=int, default=1024)
     parser.add_argument('--timeout', type=int, default=600)
     parser.add_argument('--ssh-backend', action='store_true', help='Use an owned ephemeral loopback SSH backend; no Docker images')
+    parser.add_argument('--allow-historical-bootstrap',action='store_true',help='Explicitly label a non-current runtime as harness bootstrap only')
     args = parser.parse_args()
     if not 16 <= args.tmpfs_mib <= 128 or not 1 <= args.blocks <= 4 or not 1 <= args.timeout <= 1200:
         parser.error('Bounded pilot limits: 16..128 MiB tmpfs, 1..4 blocks, 1..1200 seconds')
@@ -63,6 +75,11 @@ def main():
     if args.output.exists():
         parser.error('Output path already exists; preserve it and select a new path')
     build = json.loads(build_path.read_text())
+    target=load_matrix()['target']
+    try:
+        role=runtime_role(build,target,args.allow_historical_bootstrap)
+    except ValueError as error:
+        parser.error(str(error))
     lock=socket.socket(socket.AF_UNIX,socket.SOCK_STREAM)
     try:
         lock.bind('\0openclaw-architecture-pilot-'+str(os.getuid()))
@@ -97,6 +114,7 @@ def main():
         except ValueError:
             raise RuntimeError('Pilot failed before JSON report: ' + stderr[-2000:] + stdout[-2000:]) from None
         report.update(runtime_identity=build, runtime_build_info_sha256=hashlib.sha256(build_path.read_bytes()).hexdigest(),
+                      evaluation_role=role,campaign_target=target,
                       controller_sha256=controller_hashes,
                       wrapper_exit_code=process.returncode, whole_run_seconds=round(time.monotonic()-started,3),
                       storage_policy=dict(shared_installation_copied=False, downloads=0,

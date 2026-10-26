@@ -11,6 +11,7 @@ This directory evaluates OpenClaw task execution on `main` across exactly six di
 5. [Historical review](../docs/history/v6-evidence-review.md): limits of the previous evidence; its grades are not current results.
 6. [Architecture tradeoff studies](architecture-studies.md): seven cross-dimensional studies, a three-study first wave, and preregistration requirements for explaining benefits, costs and design intent.
 7. [First-wave pilot evidence](evidence/README.md): actual bounded execution on the installed OpenClaw build, retained observations and inference limits.
+8. [Current stable campaign](current-version.md): resolve and pin the latest stable release, run it on a disposable hosted machine, and keep old harness-bootstrap evidence separate.
 
 ## Tooling
 

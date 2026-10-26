@@ -76,6 +76,12 @@ def validate(matrix):
     require(matrix['scope']['products'] == ['openclaw'], 'Current evaluation must target OpenClaw only')
     require(matrix['scope']['comparison_enabled'] is False, 'Cross-product comparison is out of scope')
     require(matrix['target']['product'] == 'openclaw', 'Target must be OpenClaw')
+    target=matrix['target']
+    require(target['selection_policy']=='latest-stable-at-campaign-start','Current-release campaign policy required')
+    require(isinstance(target['version'],str) and re.fullmatch(r'[0-9]{4}\.[0-9]+\.[0-9]+(?:-[0-9]+)?',target['version']),'Exact stable version required')
+    require(isinstance(target['source_commit'],str) and re.fullmatch(r'[0-9a-f]{40}',target['source_commit']),'Full current-release source pin required')
+    require(target['release_tag']=='v'+target['version'] and target['release_url']=='https://github.com/openclaw/openclaw/releases/tag/'+target['release_tag'],'Release tag/version pin mismatch')
+    require(target['npm_integrity'].startswith('sha512-') and target['npm_tarball']=='https://registry.npmjs.org/openclaw/-/openclaw-'+target['version']+'.tgz','Pinned published package integrity required')
     reference = matrix['historical_reference']
     require(reference['branch'] == 'archive/v6', 'Historical branch must remain archive/v6')
     require(reference['commit'] == 'a33644efc9490ff771d058ebf047f08550e4ccb3', 'Historical reference changed')

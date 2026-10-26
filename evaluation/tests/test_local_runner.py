@@ -6,6 +6,7 @@ import sys
 import unittest
 
 TOOLS=Path(__file__).resolve().parents[1]/'tools'
+sys.path.insert(0,str(TOOLS))
 spec=importlib.util.spec_from_file_location('local_runner',TOOLS/'run_local.py')
 runner=importlib.util.module_from_spec(spec)
 spec.loader.exec_module(runner)
@@ -51,6 +52,14 @@ class LocalRunnerTests(unittest.TestCase):
         capabilities=[command[i+1] for i,arg in enumerate(command) if arg=='--cap-add']
         self.assertEqual(set(capabilities),{'CAP_SETUID','CAP_SETGID','CAP_SYS_CHROOT'})
         self.assertNotIn('CAP_SYS_ADMIN',capabilities)
+
+    def test_old_runtime_cannot_become_current_release_evidence(self):
+        target=dict(version='2026.10.7',source_commit='a'*40)
+        old=dict(version='2026.9.2',commit='b'*40)
+        with self.assertRaisesRegex(ValueError,'pinned current stable'):
+            runner.runtime_role(old,target)
+        self.assertEqual(runner.runtime_role(old,target,allow_historical=True),'historical-bootstrap-only')
+        self.assertEqual(runner.runtime_role(dict(version=target['version'],commit=target['source_commit']),target),'current-stable-pilot')
 
 
 if __name__=='__main__':
