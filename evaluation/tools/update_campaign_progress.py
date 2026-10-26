@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Regenerate public progress from accepted, provenance-bound observations."""
 from collections import Counter
+import json
 import re
 
 from campaign import DEFAULT_PLAN, audit, load_plan, records_from
@@ -25,6 +26,16 @@ def update():
     progress=DEFAULT_PLAN.parent/'README.md'
     text=progress.read_text()
     suffix=text[text.index('Passing conditions apply'):]
+    usage_path=DEFAULT_PLAN.parent/'provider-usage-totals.json'
+    if usage_path.exists():
+        usage=json.loads(usage_path.read_text());sums=usage['known_provider_usage_sums']
+        paragraph=('The [provider accounting totals](provider-usage-totals.json) retain '
+            f'{usage["formal_task_units"]} real-provider task attempts and {usage["real_provider_requests"]} requests, '
+            f'with {sums["prompt_tokens"]:,} known inclusive input tokens and {sums["completion_tokens"]:,} known output tokens. '
+            f'Known cache-hit input is {sums["prompt_cache_hit_tokens"]:,} and cache-miss input is {sums["prompt_cache_miss_tokens"]:,}; '
+            'these partition input rather than add to it. Missing counters remain explicit in the accounting record. '
+            'Actual invoiced charges remain unknown; no campaign monetary ceiling is set. These counters do not complete COST-07.')
+        suffix=re.sub(r'The \[provider accounting (?:record|totals)\].*?(?=\n\n)',paragraph,suffix,flags=re.S)
     header=('# Formal OpenClaw campaign progress\n\n'
         f'The [active frozen plan](plan.json) has **{done}/257 scenarios completed**, with '
         f'**{observations} independent observations**. {counts.get("pass",0)} scenarios pass and '

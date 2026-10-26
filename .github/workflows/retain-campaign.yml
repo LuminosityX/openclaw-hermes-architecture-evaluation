@@ -53,6 +53,7 @@ jobs:
                   assert isinstance(item.get('exclusion_reason'),str) and item['exclusion_reason']
                   command+=['--exclude-scenarios',*excluded,'--exclusion-reason',item['exclusion_reason']]
               subprocess.run(command,check=True)
+              subprocess.run(['python3','evaluation/tools/retain_provider_usage.py','--run-id',str(item['run_id'])],check=True)
           PY
           python3 evaluation/tools/update_campaign_progress.py
           python3 evaluation/tools/campaign.py status
