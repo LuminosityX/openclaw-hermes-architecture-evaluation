@@ -2,6 +2,17 @@ name: Current stable OpenClaw pilot
 
 on:
   workflow_dispatch:
+    inputs:
+      study:
+        description: Native study to execute; reuse valid evidence from other studies
+        type: choice
+        required: true
+        default: first-wave
+        options:
+          - first-wave
+          - ARC-01
+          - ARC-02
+          - ARC-03
 
 permissions:
   contents: read
@@ -14,6 +25,8 @@ jobs:
   pilot:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
+    env:
+      OPENCLAW_EVAL_STUDY: ${{ inputs.study }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
@@ -67,7 +80,7 @@ jobs:
             --runtime-modules "$RUNNER_TEMP/openclaw-eval-runtime/node_modules" \
             --node "$(command -v node)" \
             --output "$RUNNER_TEMP/openclaw-eval-output" \
-            --study first-wave --ssh-backend --blocks 2 --hosted-profile --memory-mib 3072 --timeout 600
+            --study "$OPENCLAW_EVAL_STUDY" --ssh-backend --blocks 2 --hosted-profile --memory-mib 3072 --timeout 600
       - name: Prepare bounded evidence only
         if: always()
         run: |
@@ -79,7 +92,7 @@ jobs:
           import json, os
           from pathlib import Path
           root=Path(os.environ['RUNNER_TEMP'])/'openclaw-eval-artifact'
-          (root/'execution.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],host='github-hosted-ubuntu-24.04',local_runtime_installation=False),indent=2)+'\n')
+          (root/'execution.json').write_text(json.dumps(dict(github_run_id=os.environ['GITHUB_RUN_ID'],controller_commit=os.environ['GITHUB_SHA'],host='github-hosted-ubuntu-24.04',study=os.environ['OPENCLAW_EVAL_STUDY'],local_runtime_installation=False),indent=2)+'\n')
           assert sum(p.stat().st_size for p in root.iterdir() if p.is_file())<=2*1024**2, 'Evidence exceeds 2 MiB; do not upload runtime state'
           PY
       - name: Upload compact evidence
