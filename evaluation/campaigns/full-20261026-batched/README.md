@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) currently has **44/257 scenarios completed**, with **204 independent observations**. Forty-two scenarios pass and two have failure observations. Another 213 scenarios still need implementation and execution. The entire campaign is incomplete and architecture interpretation remains deferred.
+The [active frozen plan](plan.json) currently has **49/257 scenarios completed**, with **219 independent observations**. Forty-seven scenarios pass and two have failure observations. Another 208 scenarios still need implementation and execution. The entire campaign is incomplete and architecture interpretation remains deferred.
 
 These are new formal executions, separate from the [development calibration](../full-20261026/preparation/README.md). Each scenario completed its prescribed three or six independent units. Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, with one full dependency lock shared across formal shards. Every hosted job deletes its owned installation, cache and runtime state.
 
@@ -8,6 +8,7 @@ These are new formal executions, separate from the [development calibration](../
 | --- | ---: | ---: | --- |
 | REL-14 streaming/reasoning payloads | 4 | 12 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | REL-15 provider errors/timeouts/retries | 5 | 15 | same native batch |
+| SEC-11 Gateway credentials/origins/revocation/scopes | 5 | 15 | [40296866652](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40296866652) |
 | PERF-05 admission and bounded queueing load | 4 | 24 | same native batch |
 | PERF-06 parallel-session state contention | 4 | 24 | same native batch |
 | COST-01 baseline/session memory | 5 | 30 | same native batch |
@@ -19,13 +20,15 @@ These are new formal executions, separate from the [development calibration](../
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
 | Reliability | 9 / 58 |
-| Security/privacy/network | 0 / 54 |
+| Security/privacy/network | 5 / 54 |
 | Performance/task ability | 13 / 41 |
 | Resources/cost | 11 / 33 |
 | Extensibility | 11 / 39 |
 | Observability | 0 / 32 |
 
 PERF-06-S02 and PERF-06-S03 each retain failure observations across all six units. This is an execution status, not a source-backed architectural diagnosis. Passing conditions apply only to the declared fixtures, workload sizes, deadlines and hardware bounds. In particular, PERF-09 uses five synthetic task types with six variants each; it does not establish general task-solving ability.
+
+SEC-11 follows its [registered wire protocol](security-protocol.md). It uses synthetic shared secrets and explicitly paired read-scoped device tokens, authenticating against the actual Gateway. All five scenarios complete three formal units with no real provider calls. The expiry condition specifically measures a stale signed device proof on reconnection. Origin and scope observations apply to the declared client paths and grants.
 
 PERF-09 uses real `deepseek-flash` API calls with the official pinned provider plugin, thinking enabled, a 16,384 output-token ceiling per request, 16 protocol requests per task and a 180-second task deadline. Functional answers, citations and external effects are accepted independently of the model's final text. Correct artifacts alone cannot hide a missed deadline or native HTTP failure. Provider usage is recorded separately; actual invoiced charges remain unknown. The user has not set a campaign monetary ceiling.
 
