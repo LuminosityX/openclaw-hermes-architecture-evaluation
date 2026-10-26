@@ -32,7 +32,7 @@ def main():
             result=subprocess.run([sys.executable,str(ROOT/'evaluation/tools/run_local.py'),
                 '--runtime-modules',str(args.runtime_modules),'--node',str(args.node),
                 '--output',str(args.output/'native'),'--hosted-profile','--memory-mib','3072',
-                '--timeout','300','--model-validation','--relay-socket',str(relay.path)],
+                '--timeout','300','--ssh-backend','--model-validation','--relay-socket',str(relay.path)],
                 env=dict(os.environ),timeout=330,check=False)
         finally:
             relay.shutdown()

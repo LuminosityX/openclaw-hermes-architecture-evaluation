@@ -3,6 +3,7 @@ import hashlib
 import http.client
 import json
 from pathlib import Path
+import resource
 import sys
 import time
 
@@ -21,6 +22,8 @@ def configure(root):
 
 
 def main():
+    resource.setrlimit(resource.RLIMIT_CORE,(0,0))
+    resource.setrlimit(resource.RLIMIT_FSIZE,(16*1024**2,16*1024**2))
     for name in ['tmp','home','cache','run']:
         (Path('/scratch')/name).mkdir(exist_ok=True)
     pilot.storage_guard_check()
@@ -29,7 +32,8 @@ def main():
     gateway=None
     report=dict(kind='real-model-harness-validation',product='openclaw',studies=[],full_campaign_coverage=False,
                 purpose='Verify native Gateway/provider/tool/receipt/usage plumbing before the full campaign',
-                model='deepseek-flash',provider='deepseek',credentials_inside_namespace=False)
+                model='deepseek-flash',provider='deepseek',credentials_inside_namespace=False,
+                namespace_profile='Owned SSH-compatible root UID profile: separate network/PID/mount namespaces; no user namespace')
     try:
         gateway=pilot.Gateway(Path('/scratch/model-validation'),configurer=configure)
         gateway.ready()
