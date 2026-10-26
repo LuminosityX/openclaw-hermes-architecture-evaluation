@@ -62,6 +62,37 @@ jobs:
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
+      - name: Install the official pinned OTLP addon only for collector experiments
+        if: matrix.family == 'OBS-02'
+        env:
+          npm_config_cache: ${{ runner.temp }}/openclaw-campaign-cache
+          npm_config_update_notifier: 'false'
+          npm_config_fund: 'false'
+          npm_config_audit: 'false'
+          npm_config_ignore_scripts: 'true'
+        run: |
+          npm install --prefix "$RUNNER_TEMP/openclaw-campaign-runtime" --save-exact '@openclaw/diagnostics-otel@2026.10.7'
+          python3 - <<'PY'
+          import hashlib,json,os,sys
+          from pathlib import Path
+          sys.path.insert(0,'evaluation/tools')
+          from campaign import load_plan
+          from target import fetch,verify_installation
+          from provider_plugin import verify
+          root=Path(os.environ['RUNNER_TEMP']);runtime=root/'openclaw-campaign-runtime';metadata=root/'openclaw-campaign-metadata'
+          modules=runtime/'node_modules';lock=runtime/'package-lock.json'
+          package=json.loads((modules/'@openclaw/diagnostics-otel/package.json').read_text())
+          assert package['name']=='@openclaw/diagnostics-otel' and package['version']=='2026.10.7'
+          inventory=json.loads(lock.read_text());entry=inventory['packages']['node_modules/@openclaw/diagnostics-otel']
+          official=fetch('https://registry.npmjs.org/@openclaw%2fdiagnostics-otel/2026.10.7')
+          assert entry['integrity']==official['dist']['integrity']
+          installed=verify_installation(load_plan()['target'],modules,lock)
+          (metadata/'installation.json').write_text(json.dumps(installed)+'\n')
+          (metadata/'provider-plugin.json').write_text(json.dumps(verify(modules,lock))+'\n')
+          (metadata/'package-lock.json').write_text(json.dumps(inventory,separators=(',',':'))+'\n')
+          (metadata/'observability-addon.json').write_text(json.dumps(dict(name=package['name'],version=package['version'],registry_integrity=entry['integrity'],package_sha256=hashlib.sha256((modules/'@openclaw/diagnostics-otel/package.json').read_bytes()).hexdigest(),purpose='Official optional addon required for native OTLP collection; installed once on this disposable hosted runner only'))+'\n')
+          PY
+          test "$(du -sm "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" | awk '{s+=$1} END {print s}')" -le 4096
       - name: Resolve the executable and prepare owned UID-readable toolchain if needed
         run: |
           python3 - <<'PY'
