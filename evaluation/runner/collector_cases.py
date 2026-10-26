@@ -91,7 +91,7 @@ class Collector:
     def close(self):self.server.shutdown();self.server.server_close()
 
 
-def configure(root,count):
+def configure(root,count,target):
     package=json.loads((ADDON/'package.json').read_text())
     if package['version']!='2026.10.7':raise RuntimeError('Official diagnostics addon version differs from campaign')
     config=service.configure(root)
@@ -99,7 +99,7 @@ def configure(root,count):
     config['diagnostics']=dict(enabled=True,otel=dict(enabled=True,endpoint='http://127.0.0.1:18088',protocol='http/protobuf',
         serviceName='owned-openclaw-evaluation',traces=False,metrics=False,logs=True,logsExporter='otlp',flushIntervalMs=1000,captureContent=True))
     plugin=root/'composition-a/index.js';source=plugin.read_text().replace('  await announce(\'entered\');',
-        "  await announce('entered');\n  for(let index=0;index<"+str(count)+";index++)api.logger.info('EVAL_OBS_EVENT_'+args.token+'_N'+String(index).padStart(5,'0')); ")
+        "  await announce('entered');\n  for(let index=0;index<(args.token==="+json.dumps(target)+"?"+str(count)+":8);index++)api.logger.info('EVAL_OBS_EVENT_'+args.token+'_N'+String(index).padStart(5,'0')); ")
     plugin.write_text(source);pilot.save(root/'config.json',config);return config
 
 
@@ -112,11 +112,11 @@ def wait_delivered(collector,prefix,seconds=12):
 
 
 def run_scenario(root,scenario,unit=1):
-    mode=SCENARIOS[scenario];count=256 if mode=='overflow' else 8
+    mode=SCENARIOS[scenario];count=4096 if mode=='overflow' else 8
     fixture=service.InstrumentedFixture();collector=Collector();gateway=None;assertions=[];metadata={};requests=[]
     token='PILOT_COLLECTOR_'+scenario.replace('-','_')+'_U'+str(unit);prefix='EVAL_OBS_EVENT_'+token+'_N'
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
-    settings=dict(OTEL_BLRP_MAX_QUEUE_SIZE='64',OTEL_BLRP_MAX_EXPORT_BATCH_SIZE='8',OTEL_BLRP_SCHEDULE_DELAY='1000',OTEL_BLRP_EXPORT_TIMEOUT='1000',OTEL_EXPORTER_OTLP_TIMEOUT='1000')
+    settings=dict(OTEL_EXPORTER_OTLP_TIMEOUT='1000')
     previous={key:os.environ.get(key) for key in settings};os.environ.update(settings)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['native-local-log-event-ids','independent-otlp-protobuf-deliveries','actual-collector-failures','native-task-receipts']))
     try:
@@ -127,14 +127,14 @@ def run_scenario(root,scenario,unit=1):
             for source in sdk.rglob('*.js'):
                 if source.stat().st_size>1024**2:continue
                 data=source.read_bytes()
-                if b'OTEL_BLRP_MAX_QUEUE_SIZE' in data:sources.append(dict(path=str(source),sha256=hashlib.sha256(data).hexdigest(),version=json.loads((sdk/'package.json').read_text())['version']))
-        if not sources:raise RuntimeError('Installed official log SDK does not expose the declared queue environment control')
+                if b'maxQueueSize' in data and b'2048' in data and b'maxExportBatchSize' in data and b'512' in data:sources.append(dict(path=str(source),sha256=hashlib.sha256(data).hexdigest(),version=json.loads((sdk/'package.json').read_text())['version']))
+        if not sources:raise RuntimeError('Installed official log SDK does not expose the registered default queue/batch limits')
         metadata['sdk_queue_contract_sources']=sources
-        gateway=pilot.Gateway(root,configurer=lambda p:configure(p,count));gateway.ready()
+        gateway=pilot.Gateway(root,configurer=lambda p:configure(p,count,token));gateway.ready()
         control=token+'_CONTROL';fixture.register(control);result=gateway.request(control);requests.append(result)
         if not result['accepted'] or fixture.receipts.get(control)!=1:raise RuntimeError('Native task control failed')
-        # The overflow arm emits 256 records even for its control; one actual
-        # matching exported ID is sufficient to validate the complete pipeline.
+        # Controls emit only eight events; only the matched S04 target emits
+        # the 4096-event burst against the unchanged native SDK defaults.
         if not wait_delivered(collector,'EVAL_OBS_EVENT_'+control+'_N'):raise RuntimeError('Official OTLP log publication positive control failed')
         row.update(native_invoked=True,fixture_validated=True)
         collector.fail=True;boundary=time.monotonic_ns();fixture.register(token)
@@ -162,14 +162,25 @@ def run_scenario(root,scenario,unit=1):
         check('all-native-local-events-eventually-exported',not missing)
         check('no-duplicate-successful-collector-deliveries',duplicates==0)
         metadata.update(mode=mode,matching_failure_boundary_ns=boundary,offered_unique_events=count,
-            missing_event_count=len(missing),duplicate_successful_deliveries=duplicates,native_local_event_ids=sorted(expected),
-            successful_deliveries=delivered,missing_event_ids=missing,declared_sdk_environment=settings,
+            missing_event_count=len(missing),duplicate_successful_deliveries=duplicates,event_id_prefix=prefix,
+            native_local_event_indices=sorted(int(k.rsplit('_N',1)[1]) for k in expected),
+            native_event_set_sha256=hashlib.sha256(json.dumps(sorted(expected)).encode()).hexdigest(),
+            native_local_file_sha256=hashlib.sha256(native.encode()).hexdigest(),
+            successful_deliveries_by_index={k.rsplit('_N',1)[1]:v for k,v in delivered.items()},
+            missing_event_indices=[int(k.rsplit('_N',1)[1]) for k in missing],declared_sdk_environment=settings,
+            sdk_default_queue_capacity=2048,sdk_default_batch_capacity=512,
             native_overflow_log_signal=bool(re.search(r'dropped|drop count|queue.*full|buffer.*full',native,re.I)),
             signal_scope='Native local file logs only; absence here does not prove absence from other diagnostic interfaces.',
             acceptance_scope='Lossless, nonduplicating delivery is the evaluation criterion, not an assumed durable-spool guarantee from the product. Synthetic content capture is explicitly enabled to independently join exact event IDs.',
-            addon_version='2026.10.7',buffer_intervention='256 synchronous native log events offered against the SDK configured 64-entry queue in S04; actual native local IDs and failed collector batches establish the offered load.')
+            addon_version='2026.10.7',buffer_intervention='4096 synchronous target native log events offered against the unchanged SDK default 2048-entry queue in S04; controls emit eight. Native IDs and failed collector batches independently establish offered load.')
+        attempts=[]
+        for attempt in collector.attempts:
+            groups={}
+            for identifier in attempt.get('ids',[]):
+                name,index=identifier.rsplit('_N',1);groups.setdefault(name,[]).append(int(index))
+            attempts.append({**{k:v for k,v in attempt.items() if k!='ids'},'event_groups':groups})
         row.update(state='pass' if all(a['verdict']=='pass' for a in assertions) else 'fail',assertions=assertions,
-            metadata=metadata,requests=requests,collector_attempts=collector.attempts,independent_receipts=fixture.receipts,
+            metadata=metadata,requests=requests,collector_attempts=attempts,independent_receipts=fixture.receipts,
             resources=gateway.sampler.summary(),paid_model_calls=0)
     except Exception as error:row.update(state='harness-error',reason=type(error).__name__+': '+str(error)[:2500],metadata=metadata)
     finally:
