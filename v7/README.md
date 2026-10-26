@@ -2,7 +2,7 @@
 
 **Status: design draft. No V7 product experiments have been executed.**
 
-The frozen `archive/v6` branch preserves the V6 source archive at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`. The default maintenance branch, `research/v7-evaluation-design`, adds a separate evaluation design without modifying any file under `v6/`. All ongoing maintenance belongs on this default branch; the historical branch remains unchanged.
+The frozen `archive/v6` branch preserves the V6 source archive at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`. The default maintenance branch, `main`, adds a separate evaluation design without modifying any file under `v6/`. All ongoing maintenance belongs on this default branch; the historical branch remains unchanged.
 
 ## Start here
 

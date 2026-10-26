@@ -1,6 +1,6 @@
 # Contributing
 
-Submit ongoing maintenance and V7 evaluation work to the default branch, `research/v7-evaluation-design`. The `archive/v6` branch is a frozen historical snapshot at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`; do not push changes or target pull requests to it.
+Submit ongoing maintenance and V7 evaluation work to the default branch, `main`. The `archive/v6` branch is a frozen historical snapshot at commit `a33644efc9490ff771d058ebf047f08550e4ccb3`; do not push changes or target pull requests to it.
 
 Use English for repository documentation, issue descriptions, and pull request descriptions. Preserve multilingual inputs and upstream quotations where they are part of the experiment.
 
