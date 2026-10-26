@@ -1,0 +1,83 @@
+name: Native independent multi-host experiments
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        options: [formal, calibration]
+        default: formal
+        description: Validate actual full worker session dispatch on independent VMs first
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: openclaw-perf07-independent-hosts
+  cancel-in-progress: false
+jobs:
+  calibrate-hosts:
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [gateway, worker]
+    uses: ./.github/workflows/multihost-pair-host.yml
+    with:
+      role: ${{ matrix.role }}
+      unit: 0
+    secrets: inherit
+  validate-calibration:
+    needs: calibrate-hosts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: multihost-native-*-0
+          path: ${{ runner.temp }}/multihost-input
+      - name: Validate actual independent host placement and kernel fault evidence
+        run: python3 evaluation/tools/join_multihost.py --input "$RUNNER_TEMP/multihost-input" --output "$RUNNER_TEMP/multihost-calibration" --mode calibration
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: multihost-calibration-proof
+          path: ${{ runner.temp }}/multihost-calibration/
+          retention-days: 30
+  formal-hosts:
+    needs: validate-calibration
+    if: inputs.mode == 'formal'
+    strategy:
+      fail-fast: false
+      max-parallel: 6
+      matrix:
+        unit: [1, 2, 3, 4, 5, 6]
+        role: [gateway, worker]
+    uses: ./.github/workflows/multihost-pair-host.yml
+    with:
+      role: ${{ matrix.role }}
+      unit: ${{ matrix.unit }}
+    secrets: inherit
+  retain-formal:
+    needs: formal-hosts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          pattern: multihost-*
+          path: ${{ runner.temp }}/multihost-input
+      - name: Bind all six actual independent-host units to frozen campaign
+        run: |
+          python3 evaluation/tools/join_multihost.py --input "$RUNNER_TEMP/multihost-input" --output "$RUNNER_TEMP/multihost-result" --mode formal
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'multihost-result'
+          assert sum(f.stat().st_size for f in p.rglob('*') if f.is_file())<=8*1024**2
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: campaign-PERF-07
+          path: ${{ runner.temp }}/multihost-result/
+          retention-days: 30

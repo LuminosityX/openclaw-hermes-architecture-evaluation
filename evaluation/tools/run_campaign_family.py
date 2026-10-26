@@ -28,6 +28,7 @@ def bind_unit(plan, family, unit, native, run_id, controller_commit, native_refe
     if family=='REL-08':
         require(native.get('actual_source_os')=='Linux' and native.get('actual_target_os')=='Windows' and native.get('target_node_platform')=='win32' and native.get('native_windows_job_object') is True,
                 'Cross-OS results require actual native Linux and Windows execution; generic Linux or syntax evidence cannot substitute')
+    if family=='PERF-07':require(native.get('actual_independent_hosts') is True and native.get('native_full_worker_session_dispatch') is True and len(set(native.get('actual_kernel_boot_ids',[])))==2,'Actual full native session hosting on independent VM kernels is required')
     expected={sid for sid,(case,_) in scenario_index(plan).items() if case['id']==family}
     if selected_scenarios:
         require(len(selected_scenarios)==len(set(selected_scenarios)) and set(selected_scenarios)<=expected,

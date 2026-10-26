@@ -1,0 +1,83 @@
+name: One independent native session-host VM
+on:
+  workflow_call:
+    inputs:
+      role:
+        type: string
+        required: true
+      unit:
+        type: number
+        required: true
+    secrets:
+      OPENCLAW_EVAL_TRANSPORT_FULL_20261026:
+        required: true
+permissions:
+  contents: read
+  actions: read
+jobs:
+  host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      EVAL_ROLE: ${{ inputs.role }}
+      EVAL_UNIT: ${{ inputs.unit }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Prepare one disposable pinned runtime
+        uses: ./.github/actions/evaluation-runtime
+      - name: Make verified runtime readable by the isolated native UID
+        run: sudo chmod -R a+rX "$RUNNER_TEMP/openclaw-campaign-runtime"
+      - name: Start this actual VM's bounded root observer and unprivileged native execution host
+        env:
+          OPENCLAW_EVAL_TRANSPORT_FULL_20261026: ${{ secrets.OPENCLAW_EVAL_TRANSPORT_FULL_20261026 }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo --preserve-env=OPENCLAW_EVAL_TRANSPORT_FULL_20261026,GH_TOKEN,GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_multihost_host.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" --node "$(command -v node)" \
+            --output "$RUNNER_TEMP/openclaw-multihost-owned" --role "$EVAL_ROLE" --unit "$EVAL_UNIT" --phase start
+          mkdir -p "$RUNNER_TEMP/openclaw-multihost-rendezvous"
+          sudo cp "$RUNNER_TEMP/openclaw-multihost-owned/rendezvous/rendezvous.json" "$RUNNER_TEMP/openclaw-multihost-rendezvous/"
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-multihost-rendezvous"
+      - name: Publish only the public TLS hostname or cryptographic device identity
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: multihost-rendezvous-${{ inputs.role }}-${{ inputs.unit }}
+          path: ${{ runner.temp }}/openclaw-multihost-rendezvous/
+          retention-days: 1
+          if-no-files-found: error
+      - name: Wait for actual native placement, live transport faults and cleanup
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          sudo --preserve-env=GH_TOKEN,GITHUB_ACTIONS,GITHUB_RUN_ID,GITHUB_SHA python3 evaluation/tools/run_multihost_host.py \
+            --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" --node "$(command -v node)" \
+            --output "$RUNNER_TEMP/openclaw-multihost-owned" --role "$EVAL_ROLE" --unit "$EVAL_UNIT" --phase wait
+      - name: Copy only closed and sanitized evidence after endpoint shutdown
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/openclaw-multihost-evidence"
+          if sudo test -d "$RUNNER_TEMP/openclaw-multihost-owned/evidence"; then
+            sudo cp "$RUNNER_TEMP/openclaw-multihost-owned/evidence/"* "$RUNNER_TEMP/openclaw-multihost-evidence/"
+          fi
+          if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
+            cp "$RUNNER_TEMP/openclaw-campaign-metadata/installation.json" "$RUNNER_TEMP/openclaw-multihost-evidence/"
+          fi
+          sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-multihost-evidence"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          p=Path(os.environ['RUNNER_TEMP'])/'openclaw-multihost-evidence'
+          assert sum(f.stat().st_size for f in p.rglob('*') if f.is_file())<=1024**2
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        if: always()
+        with:
+          name: multihost-native-${{ inputs.role }}-${{ inputs.unit }}
+          path: ${{ runner.temp }}/openclaw-multihost-evidence/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove this job's owned installation, cache and evidence
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" "$RUNNER_TEMP/openclaw-campaign-metadata" "$RUNNER_TEMP/openclaw-multihost-owned" "$RUNNER_TEMP/openclaw-multihost-rendezvous" "$RUNNER_TEMP/openclaw-multihost-evidence"

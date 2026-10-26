@@ -96,6 +96,8 @@ SOURCES['REL-11']=list(dict.fromkeys([*SOURCES['REL-03'],*SOURCES['REL-10'],*SOU
 
 SOURCES['COST-07']=list(dict.fromkeys([*SOURCES['PERF-09'],'evaluation/runner/billing_cases.py','evaluation/runner/provider_bridge.py','evaluation/runner/privacy_cases.py','evaluation/runner/trace_access_probe.mjs','evaluation/runner/public_gateway_client.mjs','evaluation/tools/billing_accounting.py','evaluation/tools/run_billing_family.py']))
 
+SOURCES['PERF-07']=list(dict.fromkeys([*SOURCES['SEC-01'],'evaluation/runner/multihost_gateway.py','evaluation/runner/multihost_node.py','evaluation/runner/multihost_wire.mjs','evaluation/runner/multihost_workload.py','evaluation/runner/portable_support.py','evaluation/tools/run_multihost_host.py','evaluation/tools/join_multihost.py','evaluation/design/multihost-transport.json','.github/workflows/multihost-experiments.yml','.github/workflows/multihost-pair-host.yml']))
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""
@@ -108,6 +110,7 @@ def native_validation(plan,proofs):
         case=proof.get('case_id')
         if case not in SOURCES: continue
         if case=='REL-08' and not (proof.get('actual_source_os')=='Linux' and proof.get('actual_target_os')=='Windows' and proof.get('target_node_platform')=='win32' and proof.get('native_windows_job_object') is True):continue
+        if case=='PERF-07' and not (proof.get('actual_independent_hosts') is True and proof.get('native_full_worker_session_dispatch') is True and len(set(proof.get('actual_kernel_boot_ids',[])))==2):continue
         hashes=proof.get('controller_sha256',{})
         if not all(hashes.get(p)==hashlib.sha256((ROOT/p).read_bytes()).hexdigest() for p in SOURCES[case]): continue
         if proof.get('harness_error') or not proof.get('validation_complete') or not proof.get('fixture_and_invocation_valid'): continue
