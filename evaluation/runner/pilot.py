@@ -97,8 +97,8 @@ def planned_tool_call(names,token,action,results,strategy='conservative'):
         return name,arguments
     dispatch=next((n for n in ['tool_call','dispatch_action'] if n in names),None)
     if dispatch and 'tool_search' in names and 'tool_describe' in names:
-        if strategy=='known' and not results:
-            return dispatch,dict(id=name,args=arguments)
+        if strategy=='known':
+            return (dispatch,dict(id=name,args=arguments)) if not results else None
         if not results:
             return 'tool_search',dict(query=name,limit=3)
         identifier=catalog_id(results,name)

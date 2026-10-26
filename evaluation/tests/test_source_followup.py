@@ -27,6 +27,8 @@ class SourceFollowupTests(unittest.TestCase):
         self.assertEqual(pilot.planned_tool_call(controls,token,'effect',[],strategy='known'),
                          ('tool_call',dict(id='eval_probe',args=dict(token=token,action='effect'))))
         self.assertEqual(pilot.planned_tool_call(controls,token,'effect',[],strategy='conservative')[0],'tool_search')
+        failed=[dict(content=json.dumps(dict(tool=dict(id='plugin:pilot-probe:eval_probe',name='eval_probe'),error='controlled')))]
+        self.assertIsNone(pilot.planned_tool_call(controls,token,'throw',failed,strategy='known'))
 
     def test_denied_control_really_requests_the_excluded_tool(self):
         token='PILOT_DENIED_SOURCE'
