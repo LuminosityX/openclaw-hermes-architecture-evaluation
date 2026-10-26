@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **130/257 scenarios completed**, with **543 independent observations**. 123 scenarios pass and 7 retain failure observations. Another 127 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **135/257 scenarios completed**, with **558 independent observations**. 128 scenarios pass and 7 retain failure observations. Another 122 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -16,6 +16,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | REL-15 Provider outages, timeouts and bounded retries | 5 | 15 | [40289957217](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40289957217) |
 | SEC-01 Execution-surface authority | 5 | 15 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568), [40309312751](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40309312751) |
 | SEC-03 Isolation setup and path races | 4 | 12 | [40308702865](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40308702865) |
+| SEC-10 Network egress, SSRF and redirect boundaries | 5 | 15 | [40323668721](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40323668721) |
 | SEC-11 Gateway and control-plane authentication | 5 | 15 | [40296866652](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40296866652) |
 | PERF-01 Request preparation on the service path | 3 | 18 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
 | PERF-02 CPU work versus asynchronous waiting | 4 | 24 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535) |
@@ -40,7 +41,7 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | Required dimension | Formal scenarios completed / planned |
 | --- | ---: |
 | reliability | 32 / 58 |
-| security | 14 / 54 |
+| security | 19 / 54 |
 | performance | 32 / 41 |
 | resources_cost | 19 / 33 |
 | extensibility | 23 / 39 |
