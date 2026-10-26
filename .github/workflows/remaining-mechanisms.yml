@@ -38,7 +38,7 @@ jobs:
       EVAL_FAMILY: ${{ matrix.family }}
       EVAL_MODE: ${{ inputs.mode }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
-      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04' || matrix.family == 'REL-07' || matrix.family == 'REL-12' || matrix.family == 'SEC-12' || matrix.family == 'OBS-01' || matrix.family == 'EXT-04' || matrix.family == 'SEC-04' || matrix.family == 'EXT-02' || matrix.family == 'SEC-02' || matrix.family == 'SEC-06' || matrix.family == 'REL-01' || matrix.family == 'EXT-07' || matrix.family == 'REL-05' || matrix.family == 'EXT-03' || matrix.family == 'OBS-03' || matrix.family == 'COST-05' || matrix.family == 'REL-03') && 128 || 64 }}
+      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04' || matrix.family == 'REL-07' || matrix.family == 'REL-12' || matrix.family == 'SEC-12' || matrix.family == 'OBS-01' || matrix.family == 'EXT-04' || matrix.family == 'SEC-04' || matrix.family == 'EXT-02' || matrix.family == 'SEC-02' || matrix.family == 'SEC-06' || matrix.family == 'REL-01' || matrix.family == 'EXT-07' || matrix.family == 'REL-05' || matrix.family == 'EXT-03' || matrix.family == 'OBS-03' || matrix.family == 'COST-05' || matrix.family == 'REL-03' || matrix.family == 'REL-11') && 128 || 64 }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -81,14 +81,16 @@ jobs:
           (Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-metadata/npm-toolchain.json').write_text(json.dumps(metadata)+'\n')
           PYCODE
       - name: Prepare one verified previous core only for version comparison
-        if: matrix.family == 'EXT-03'
+        if: matrix.family == 'EXT-03' || matrix.family == 'REL-11'
         env:
           npm_config_cache: ${{ runner.temp }}/openclaw-campaign-cache
           npm_config_update_notifier: 'false'
           npm_config_fund: 'false'
           npm_config_audit: 'false'
         run: |
-          python3 evaluation/tools/prepare_previous_core.py --prefix "$RUNNER_TEMP/openclaw-previous-runtime" --metadata "$RUNNER_TEMP/openclaw-campaign-metadata"
+          purpose=extension
+          if [ "$EVAL_FAMILY" = "REL-11" ]; then purpose=migration; fi
+          python3 evaluation/tools/prepare_previous_core.py --purpose "$purpose" --prefix "$RUNNER_TEMP/openclaw-previous-runtime" --metadata "$RUNNER_TEMP/openclaw-campaign-metadata"
       - name: Install official OTLP addon through native OpenClaw only for collector experiments
         if: matrix.family == 'OBS-02'
         env:

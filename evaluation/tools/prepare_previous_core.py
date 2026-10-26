@@ -13,11 +13,12 @@ from target import verify_installation
 def main():
     if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/openclaw-hermes-architecture-evaluation':
         raise SystemExit('Historical runtime preparation is permitted only in this repository GitHub Actions job')
-    parser=argparse.ArgumentParser();parser.add_argument('--prefix',type=Path,required=True);parser.add_argument('--metadata',type=Path,required=True);args=parser.parse_args()
+    parser=argparse.ArgumentParser();parser.add_argument('--purpose',choices=['extension','migration'],default='extension');parser.add_argument('--prefix',type=Path,required=True);parser.add_argument('--metadata',type=Path,required=True);args=parser.parse_args()
     temporary=Path(os.environ['RUNNER_TEMP']).resolve();prefix=args.prefix.resolve()
     if prefix!=temporary/'openclaw-previous-runtime' or args.metadata.resolve()!=temporary/'openclaw-campaign-metadata':
         raise SystemExit('Historical control must stay in the exact owned disposable prefix')
-    target=json.loads(Path('evaluation/design/previous-core.json').read_text());prefix.mkdir()
+    pin='migration-source-core.json' if args.purpose=='migration' else 'previous-core.json'
+    target=json.loads((Path('evaluation/design')/pin).read_text());prefix.mkdir()
     (prefix/'package.json').write_text(json.dumps(dict(name='owned-previous-openclaw-control',private=True,dependencies=dict(openclaw=target['version'])))+'\n')
     subprocess.run(['npm','install','--prefix',str(prefix),'--ignore-scripts=false','--no-audit','--no-fund'],check=True,timeout=240)
     # The published core requires its verified package lifecycle before a

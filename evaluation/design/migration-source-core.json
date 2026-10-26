@@ -1,0 +1,12 @@
+{
+  "product": "openclaw",
+  "version": "2026.10.4",
+  "source_commit": "383c124cc32ffee3f8e56f549b88da94d269a4af",
+  "release_tag": "v2026.10.4",
+  "release_published_at": "2026-10-16T00:36:19Z",
+  "npm_integrity": "sha512-+FH0StZF1tlTazM7JJGY6JePeJmhFNSRByi2Q3jXPRiLO7o4dJh2xa9Vy4Dk8Cd2ic8B7Zkf5NfEaCCWUkgqnQ==",
+  "node_version": "24.22.1",
+  "agent_schema_version": 24,
+  "target_agent_schema_version": 25,
+  "role": "Actual older schema source for explicitly registered migration/rollback comparisons; never the current campaign target"
+}

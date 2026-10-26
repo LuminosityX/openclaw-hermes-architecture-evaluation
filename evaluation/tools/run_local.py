@@ -72,7 +72,7 @@ def decode_report(stdout):
                 harness_error='Inner namespace exited before publishing a final report; complete arm checkpoints are retained')
 
 
-def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False,official_addon=False,dependency_installation=False,permission_gate=False,previous_core=False,capability_contracts=False,native_control_group=None):
+def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=False,driver='pilot.py',relay_socket=None,task_input=None,measurement_group=None,identity_migration=False,network_fixture=False,official_addon=False,dependency_installation=False,permission_gate=False,previous_core=False,capability_contracts=False,native_control_group=None,migration=False):
     namespaces=['--unshare-pid','--unshare-net','--unshare-ipc','--unshare-uts','--unshare-cgroup'] if ssh_backend else ['--unshare-all']
     capabilities=['--cap-add','CAP_SETUID','--cap-add','CAP_SETGID','--cap-add','CAP_SYS_CHROOT'] if ssh_backend else []
     if identity_migration:
@@ -81,6 +81,9 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
     if network_fixture:
         if not ssh_backend:raise ValueError('Owned network addresses require the explicit hosted non-user-namespace profile')
         capabilities+=['--cap-add','CAP_NET_ADMIN','--cap-add','CAP_NET_BIND_SERVICE']
+    if migration:
+        if not ssh_backend:raise ValueError('Migration tracing requires the explicit hosted profile')
+        capabilities+=['--cap-add','CAP_SYS_PTRACE','--cap-add','CAP_SETPCAP']
     if permission_gate:
         if not ssh_backend:raise ValueError('Owned inode permission gates require the explicit hosted non-user-namespace profile')
         # Only the evaluator needs this permission. Its Gateway launcher drops
@@ -115,10 +118,11 @@ def sandbox_command(runtime_modules, node, tmpfs_mib, driver_args, ssh_backend=F
         command += ['--ro-bind',str(relay_socket),'/relay/provider.sock']
     if previous_core:
         previous=runtime_modules.parent.parent/'openclaw-previous-runtime'
-        expected=json.loads((ROOT/'evaluation/design/previous-core.json').read_text())
+        pin=ROOT/'evaluation/design'/('migration-source-core.json' if migration else 'previous-core.json')
+        expected=json.loads(pin.read_text())
         identity=json.loads((previous/'identity.json').read_text())
         if identity.get('current_campaign_target') is not False or identity.get('target')!=expected:raise ValueError('Historical runtime does not match its declared comparison identity')
-        command+=['--ro-bind',str(previous),'/previous','--ro-bind',str(ROOT/'evaluation/design/previous-core.json'),'/previous-target.json']
+        command+=['--ro-bind',str(previous),'/previous','--ro-bind',str(pin),'/previous-target.json']
     if capability_contracts:
         contracts=runtime_modules.parent/'native-capability-contracts'
         if json.loads((contracts/'manifest.json').read_text())!=json.loads((ROOT/'evaluation/design/native-budget-contracts.json').read_text()):raise ValueError('Capability contracts differ from the pinned native support surface')
@@ -167,7 +171,7 @@ def main():
     parser.add_argument('--hosted-profile',action='store_true',help='Allow an explicit larger-memory profile on disposable hosted workers')
     parser.add_argument('--model-validation',action='store_true',help='Validate real-provider plumbing; contributes no full-campaign coverage')
     parser.add_argument('--relay-socket',type=Path,help='Host-only fixed-provider Unix relay; no key enters the namespace')
-    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05','REL-03'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
+    parser.add_argument('--adapter-validation','--native-case',dest='adapter_validation',choices=['REL-14','REL-15','EXT-08','PERF-05','PERF-06','COST-01','COST-06','EXT-09','SEC-11','PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05','REL-03','REL-11'],help='Native family adapter; development calibration unless --campaign-unit is explicitly supplied')
     parser.add_argument('--campaign-unit',type=int,choices=range(1,7),help='Formal independent unit, invoked by the readiness-checked hosted campaign controller')
     parser.add_argument('--native-scenario',action='append',help='Selected pending formal scenario, passed to the family driver')
     parser.add_argument('--task-input',type=Path,help='Public task specification only; hidden oracle remains on the host')
@@ -219,13 +223,13 @@ def main():
         for field, value in {'memory.max':args.memory_mib*1024**2, 'memory.swap.max':0,
                              'pids.max':128, 'cpu.max':'200000 100000', 'memory.oom.group':1}.items():
             (group / field).write_text(str(value))
-        if args.adapter_validation=='REL-03':native_group=group/'native-runtime';native_group.mkdir()
+        if args.adapter_validation in {'REL-03','REL-11'}:native_group=group/'native-runtime';native_group.mkdir()
         driver='task_unit.py' if args.task_input else 'model_validation.py' if args.model_validation else 'adapter_validation.py' if args.adapter_validation else 'pilot.py'
         if args.adapter_validation in {'PERF-05','PERF-06','COST-01','COST-06','EXT-09'}:
             driver='mechanism_validation.py'
         if args.adapter_validation=='SEC-11':
             driver='gateway_auth_cases.py'
-        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05','REL-03'}:
+        if args.adapter_validation in {'PERF-01','PERF-02','PERF-04','COST-02','COST-04','OBS-07','REL-09','EXT-01','PERF-08','SEC-01','OBS-05','SEC-03','EXT-06','REL-10','REL-13','EXT-05','REL-06','REL-04','PERF-03','REL-02','SEC-05','SEC-10','SEC-08','OBS-02','SEC-07','OBS-04','OBS-06','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05','REL-03','REL-11'}:
             driver='service_path_validation.py'
         driver_args=[] if args.model_validation or args.task_input else ['--case',args.adapter_validation] if args.adapter_validation else ['--study',args.study,'--blocks',str(args.blocks),*(['--ssh-backend'] if args.ssh_backend else [])]
         if args.campaign_unit:
@@ -235,7 +239,7 @@ def main():
             for scenario in args.native_scenario:driver_args+=['--scenario',scenario]
         command = sandbox_command(modules,node,args.tmpfs_mib,driver_args,args.ssh_backend,driver=driver,relay_socket=args.relay_socket,task_input=args.task_input,
                                   measurement_group=group if driver in {'mechanism_validation.py','service_path_validation.py'} else None,
-                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02',dependency_installation=args.adapter_validation in {'REL-07','REL-12','SEC-12','EXT-07','EXT-03'},permission_gate=args.adapter_validation in {'SEC-06','OBS-03'},previous_core=args.adapter_validation in {'EXT-03','REL-11'},capability_contracts=args.adapter_validation=='COST-05',native_control_group=native_group)
+                                  identity_migration=args.adapter_validation=='REL-06',network_fixture=args.adapter_validation in {'SEC-10','SEC-07'},official_addon=args.adapter_validation=='OBS-02',dependency_installation=args.adapter_validation in {'REL-07','REL-12','SEC-12','EXT-07','EXT-03'},permission_gate=args.adapter_validation in {'SEC-06','OBS-03'},previous_core=args.adapter_validation in {'EXT-03','REL-11'},capability_contracts=args.adapter_validation=='COST-05',native_control_group=native_group,migration=args.adapter_validation=='REL-11')
         def enter_group():
             (group / 'cgroup.procs').write_text(str(os.getpid()))
         process = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
