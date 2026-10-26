@@ -2,7 +2,7 @@
 
 REL-06 implements state-path-only, workspace-path-only, UID-only and combined
 relocation. A native task first commits a transcript and an owned reference
-extension counter. A disabled native cron job scheduled in 2099 supplies a real
+extension counter. A disabled native cron job scheduled one day ahead supplies a real
 scheduled-state identity without running any model call. The Gateway stops before
 the owned state/workspace trees move. Configuration paths are explicitly rebased,
 and native `doctor --fix --non-interactive` runs as the intended new owner before

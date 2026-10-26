@@ -1,5 +1,6 @@
 """Actual state/workspace relocation and native process UID migration, all owned."""
 import hashlib
+from datetime import datetime,timedelta,timezone
 import json
 import os
 from pathlib import Path
@@ -63,8 +64,9 @@ def run_scenario(root,scenario,unit=1):
         if not positive['accepted'] or fixture.receipts.get(before)!=1:raise RuntimeError('Native pre-relocation task control failed')
         before_events=[e for e in fixture.events if e['kind']=='effect-commit' and e.get('token')==before]
         if len(before_events)!=1 or before_events[0].get('persisted_counter')!=1:raise RuntimeError('Owned persistent-extension fixture did not initialize')
+        scheduled_at=(datetime.now(timezone.utc)+timedelta(days=1)).isoformat(timespec='milliseconds').replace('+00:00','Z')
         cron=query([dict(method='cron.add',params=dict(name='Owned migration schedule '+token,enabled=False,
-            schedule=dict(kind='at',at='2099-01-01T00:00:00Z'),sessionTarget='main',wakeMode='next-heartbeat',
+            schedule=dict(kind='at',at=scheduled_at),sessionTarget='main',wakeMode='next-heartbeat',
             payload=dict(kind='systemEvent',text='SCHEDULED_RELOCATION_CANARY_'+token)))])
         created=cron['responses'][0]['result']
         if not created.get('ok'):raise RuntimeError('Native scheduled-state control failed: '+json.dumps(created)[:1500])
