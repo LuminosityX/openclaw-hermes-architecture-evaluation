@@ -36,6 +36,8 @@ SOURCES['OBS-05']=[*SOURCES['PERF-01'],'evaluation/runner/operational_diagnosis_
 SOURCES['SEC-03']=[*SOURCES['SEC-01'],'evaluation/runner/isolation_setup_cases.py']
 SOURCES['EXT-06']=[*SOURCES['SEC-01'],'evaluation/runner/instruction_input_cases.py']
 SOURCES['REL-10']=[*SOURCES['PERF-01'],'evaluation/runner/backup_cases.py']
+for _family in ['REL-13','EXT-05']:
+    SOURCES[_family]=[*SOURCES['SEC-01'],'evaluation/runner/mcp_http_fixture.py','evaluation/runner/mcp_contract_cases.py']
 
 
 def native_validation(plan,proofs):
