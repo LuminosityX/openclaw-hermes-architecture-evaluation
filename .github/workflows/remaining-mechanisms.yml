@@ -38,7 +38,7 @@ jobs:
       EVAL_FAMILY: ${{ matrix.family }}
       EVAL_MODE: ${{ inputs.mode }}
       EVAL_SCENARIOS: ${{ inputs.scenario_ids }}
-      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04' || matrix.family == 'REL-07' || matrix.family == 'REL-12' || matrix.family == 'SEC-12' || matrix.family == 'OBS-01' || matrix.family == 'EXT-04' || matrix.family == 'SEC-04' || matrix.family == 'EXT-02' || matrix.family == 'SEC-02' || matrix.family == 'SEC-06' || matrix.family == 'REL-01' || matrix.family == 'EXT-07' || matrix.family == 'REL-05' || matrix.family == 'EXT-03' || matrix.family == 'OBS-03') && 128 || 64 }}
+      EVAL_TMPFS_MIB: ${{ matrix.family == 'REL-10' && 384 || (matrix.family == 'OBS-02' || matrix.family == 'OBS-04' || matrix.family == 'REL-07' || matrix.family == 'REL-12' || matrix.family == 'SEC-12' || matrix.family == 'OBS-01' || matrix.family == 'EXT-04' || matrix.family == 'SEC-04' || matrix.family == 'EXT-02' || matrix.family == 'SEC-02' || matrix.family == 'SEC-06' || matrix.family == 'REL-01' || matrix.family == 'EXT-07' || matrix.family == 'REL-05' || matrix.family == 'EXT-03' || matrix.family == 'OBS-03' || matrix.family == 'COST-05') && 128 || 64 }}
     steps:
       - name: Check out evaluation sources
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
@@ -58,7 +58,7 @@ jobs:
           selected=json.loads(os.environ['EVAL_SCENARIOS']) or [s['id'] for s in case['scenarios']]
           assert len(selected)==len(set(selected)) and set(selected)<={s['id'] for s in case['scenarios']}
           if os.environ['EVAL_MODE']=='formal':
-              assert not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units already exist; select only pending work'
+              assert not any(r['scenario_id'] in selected and r['state'] in {'pass','fail','unsupported'} for r in records_from(DEFAULT_PLAN.parent/'results')), 'Accepted formal units or verified nonapplicability already exist; select only pending work'
           PY
       - name: Prepare one disposable pinned runtime
         uses: ./.github/actions/evaluation-runtime
@@ -101,6 +101,9 @@ jobs:
             --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" \
             --node "$(command -v node)" --metadata "$RUNNER_TEMP/openclaw-campaign-metadata"
           test "$(du -sm "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" | awk '{s+=$1} END {print s}')" -le 4096
+      - name: Fetch exact native support contracts only for budget capability probes
+        if: matrix.family == 'COST-05'
+        run: python3 evaluation/tools/prepare_capability_contracts.py --prefix "$RUNNER_TEMP/openclaw-campaign-runtime/native-capability-contracts"
       - name: Resolve the executable and prepare owned UID-readable toolchain if needed
         run: |
           python3 - <<'PY'
@@ -156,6 +159,9 @@ jobs:
           sudo chown -R "$(id -u):$(id -g)" "$RUNNER_TEMP/openclaw-campaign-result"
           if test -d "$RUNNER_TEMP/openclaw-campaign-metadata"; then
             cp "$RUNNER_TEMP/openclaw-campaign-metadata/"*.json "$RUNNER_TEMP/openclaw-campaign-result/provenance/"
+          fi
+          if test -d "$RUNNER_TEMP/openclaw-campaign-runtime/native-capability-contracts"; then
+            cp -r "$RUNNER_TEMP/openclaw-campaign-runtime/native-capability-contracts" "$RUNNER_TEMP/openclaw-campaign-result/provenance/native-capability-contracts"
           fi
           if sudo test -f "$RUNNER_TEMP/openclaw-campaign-validation/summary.json"; then
             sudo cp "$RUNNER_TEMP/openclaw-campaign-validation/summary.json" "$RUNNER_TEMP/openclaw-campaign-result/provenance/adapter-validation-$GITHUB_RUN_ID-$EVAL_FAMILY.json"

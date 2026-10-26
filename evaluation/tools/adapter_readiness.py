@@ -7,7 +7,7 @@ import json
 from pathlib import Path
 import re
 
-from campaign import DEFAULT_PLAN, load_plan, scenario_index, audit, records_from
+from campaign import DEFAULT_PLAN, load_plan, scenario_index, audit, records_from,validate_nonapplicability
 from suite import ROOT, require
 
 SOURCES={
@@ -86,6 +86,8 @@ SOURCES['EXT-03']=list(dict.fromkeys([*SOURCES['REL-07'],'evaluation/runner/vers
 
 SOURCES['OBS-03']=list(dict.fromkeys([*SOURCES['REL-01'],*SOURCES['REL-05'],*SOURCES['SEC-06'],*SOURCES['REL-02'],'evaluation/runner/blind_diagnosis_cases.py','evaluation/runner/blind_native_reader.py']))
 
+SOURCES['COST-05']=list(dict.fromkeys([*SOURCES['OBS-01'],*SOURCES['REL-13'],'evaluation/runner/budget_capability_cases.py','evaluation/tools/prepare_capability_contracts.py','evaluation/design/native-budget-contracts.json']))
+
 
 def native_validation(plan,proofs):
     """A native product failure can validate an adapter; fixture failure cannot."""
@@ -105,6 +107,12 @@ def native_validation(plan,proofs):
         actual=[row.get('scenario_id') for row in observations]
         if len(actual)!=len(expected) or set(actual)!=expected: continue
         for observation in observations:
+            if observation.get('state')=='unsupported':
+                try:validate_nonapplicability(observation,plan)
+                except ValueError:continue
+                if observation.get('native_invoked') is True and observation.get('fixture_validated') is True:
+                    verified[observation['scenario_id']]=observation
+                continue
             assertions=observation.get('assertions',[])
             valid_assertions=bool(assertions) and all(a.get('verdict') in {'pass','fail'} and a.get('evidence') for a in assertions)
             consistent=valid_assertions and (observation.get('state')=='pass')==all(a['verdict']=='pass' for a in assertions)

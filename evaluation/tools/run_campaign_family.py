@@ -46,6 +46,9 @@ def bind_unit(plan, family, unit, native, run_id, controller_commit, native_refe
             assertions=row.get('assertions',[]),full_campaign_coverage=True,model_execution='deterministic-local-fixture')
         if result['state'] in {'harness-error','blocked'}:
             result['reason']=row.get('reason','Native unit did not produce a valid observation')
+        elif result['state']=='unsupported':
+            for field in ['native_capability_absent','capability_evidence','probe_attempted','native_contract','exclusion_reason']:
+                result[field]=row.get(field)
         validate_result(result,plan)
         results.append(result)
     return results
@@ -70,7 +73,7 @@ def main():
     selected=args.scenarios or [s['id'] for s in case['scenarios']]
     require(len(selected)==len(set(selected)) and set(selected)<={s['id'] for s in case['scenarios']},'Invalid pending scenario selection')
     accepted=records_from(DEFAULT_PLAN.parent/'results')
-    require(not any(r['scenario_id'] in selected and r['state'] in {'pass','fail'} for r in accepted),
+    require(not any(r['scenario_id'] in selected and r['state'] in {'pass','fail','unsupported'} for r in accepted),
             'Selected scenarios already have accepted formal observations; do not repeat valid work')
     args.output.mkdir(parents=True,exist_ok=False)
     results=[]
@@ -83,7 +86,7 @@ def main():
             execution=subprocess.run([sys.executable,str(ROOT/'evaluation/tools/run_local.py'),
                 '--runtime-modules',str(args.runtime_modules),'--node',str(args.node),'--output',str(directory),
                 '--native-case',args.case,'--campaign-unit',str(unit),'--hosted-profile','--ssh-backend',
-                '--memory-mib','3072','--timeout','600','--tmpfs-mib','384' if args.case=='REL-10' else '128' if args.case in {'OBS-02','OBS-04','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03'} else '64',
+                '--memory-mib','3072','--timeout','600','--tmpfs-mib','384' if args.case=='REL-10' else '128' if args.case in {'OBS-02','OBS-04','REL-07','REL-12','SEC-12','OBS-01','EXT-04','SEC-04','EXT-02','SEC-02','SEC-06','REL-01','EXT-07','REL-05','EXT-03','OBS-03','COST-05'} else '64',
                 *[value for sid in (args.scenarios or []) for value in ['--native-scenario',sid]]],timeout=640,check=False)
             require(execution.returncode==0,'Native unit controller did not finish successfully')
             path=directory/'summary.json'

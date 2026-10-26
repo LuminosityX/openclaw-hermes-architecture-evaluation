@@ -61,6 +61,18 @@ def scenario_index(plan):
     return {s['id']:(case,s) for case in plan['cases'] for s in case['scenarios']}
 
 
+def validate_nonapplicability(result,plan):
+    require(result.get('native_invoked') is True and result.get('fixture_validated') is True,
+            'Unsupported requires actual native invocation and a validated capability probe')
+    require(result.get('native_capability_absent') is True and result.get('capability_evidence') and result.get('probe_attempted') is True,
+            'Unsupported needs a native capability probe and versioned support-contract evidence; missing adapters are not unsupported features')
+    contract=result.get('native_contract',{})
+    require(contract.get('target_commit')==plan['target']['source_commit'] and contract.get('reference') and contract.get('sha256'),
+            'Unsupported requires the pinned native contract, reference and SHA256')
+    require(result.get('exclusion_reason')=='capability-not-provided',
+            'Environment failures and missing implementations cannot establish nonapplicability')
+
+
 def validate_result(result,plan,allow_development=False):
     require(result['schema_version']==1 and result['plan_sha256']==plan['plan_sha256'],'Result must bind the frozen full campaign')
     require(result['product']=='openclaw','Result must target OpenClaw')
@@ -80,13 +92,7 @@ def validate_result(result,plan,allow_development=False):
         require(assertions and all(a['verdict'] in {'pass','fail'} and a.get('evidence') for a in assertions),'Acceptance assertions need their own evidence')
         require((state=='pass')==all(a['verdict']=='pass' for a in assertions),'Result disagrees with acceptance assertions')
     elif state=='unsupported':
-        require(result.get('native_capability_absent') is True and result.get('capability_evidence') and result.get('probe_attempted') is True,
-                'Unsupported needs a native capability probe and versioned support-contract evidence; missing adapters are not unsupported features')
-        contract=result.get('native_contract',{})
-        require(contract.get('target_commit')==plan['target']['source_commit'] and contract.get('reference') and contract.get('sha256'),
-                'Unsupported requires the pinned native contract, reference and SHA256')
-        require(result.get('exclusion_reason')=='capability-not-provided',
-                'Environment failures and missing implementations cannot establish nonapplicability')
+        validate_nonapplicability(result,plan)
     else:
         require(result.get('reason'),'Blocked/harness failures need an explicit reason')
     return result

@@ -1,0 +1,30 @@
+{
+  "target_commit": "157d8c2bc3ea2fa183afdc11088e69690bf8e64e",
+  "contracts": [
+    {
+      "path": "docs/tools/goal.md",
+      "sha256": "28714ebc93804678dc1b46e6aff703bfc1c27664f3dcc45c147bc551ee6dfea2",
+      "bytes": 17830,
+      "reference": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/tools/goal.md"
+    },
+    {
+      "path": "src/agents/tools/goal-tools.ts",
+      "sha256": "bb97378d5d2931ffc666e95191ac7fdbb1b99a3bf092afa134653e06eabf50e5",
+      "bytes": 6163,
+      "reference": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/src/agents/tools/goal-tools.ts"
+    },
+    {
+      "path": "docs/tools/subagents.md",
+      "sha256": "31718e71d6f5e35d52280e1fa56ff0d011cb4d159fe7ef3a0316bf70ac013f35",
+      "bytes": 12916,
+      "reference": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/docs/tools/subagents.md"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "9efd316ecf1c4c60f6fd5d26433142fff2b6794d7d328e9bc6179b29bf9c82a4",
+      "bytes": 1076,
+      "reference": "https://github.com/openclaw/openclaw/blob/157d8c2bc3ea2fa183afdc11088e69690bf8e64e/LICENSE"
+    }
+  ],
+  "scope": "Pinned native session-goal API and separate child-session scope; capability probes must not substitute a custom global budget manager"
+}

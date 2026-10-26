@@ -41,6 +41,9 @@ def compact_results(plan,metadata,artifact,payload,excluded_scenarios=(),exclusi
     rows=[];exclusions=[]
     for row in original:
         validate_result(row,plan)
+        if row['state']=='unsupported':
+            require(any(hashlib.sha256(data).hexdigest()==row['native_contract']['sha256'] for data in files.values()),
+                    'Verified nonapplicability must retain the exact pinned native support-contract bytes')
         require(row.get('full_campaign_coverage') is True,'Development output cannot enter formal retention')
         require(str(row['run_id'])==str(metadata['id']),'Formal record run mismatch')
         references=row['evidence']
