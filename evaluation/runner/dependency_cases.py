@@ -57,8 +57,8 @@ def configure(root):
     config=service.configure(root);config['tools']['allow'].append('dependency_probe');pilot.save(root/'config.json',config);return config
 
 
-def run_scenario(root,scenario,unit=1):
-    mode=SCENARIOS[scenario];registry=PackageRegistry();fixture=OperationFixture();gateway=None;child=None;assertions=[];metadata={};commands=[]
+def run_scenario(root,scenario,unit=1,mode_override=None):
+    mode=mode_override or SCENARIOS[scenario];registry=PackageRegistry();fixture=OperationFixture();gateway=None;child=None;assertions=[];metadata={};commands=[]
     token='PILOT_DEPENDENCY_'+scenario.replace('-','_')+'_U'+str(unit)
     row=dict(scenario_id=scenario,unit=unit,native_invoked=False,fixture_validated=False)
     def check(name,condition):assertions.append(dict(name=name,verdict='pass' if condition else 'fail',evidence=['native-plugin-install-inspect-and-enable','independent-owned-registry-events-and-integrity','actual-native-imported-dependency-and-tool-effect','bounded-owned-filesystem']))
@@ -73,7 +73,7 @@ def run_scenario(root,scenario,unit=1):
             metadata['cache_seed_tarball_fetched']=registry.tarball_started.is_set()
             if not metadata['cache_seed_tarball_fetched']:raise RuntimeError('Cache seed did not fetch the independently verified owned tarball')
             shutil.rmtree(seed);registry.mode='offline'
-        elif mode in {'missing','checksum','partial'}:registry.mode=mode
+        elif mode in {'missing','checksum','partial','substitution'}:registry.mode=mode
         elif mode=='cache-unavailable':cache=Path('/runtime/node_modules/owned-readonly-evaluation-cache')
         event_start=len(registry.events)
         if mode=='interrupted':
@@ -94,7 +94,7 @@ def run_scenario(root,scenario,unit=1):
             initial=dict(returncode=execution.returncode,stdout=execution.stdout[-8000:],stderr=execution.stderr[-4000:],started_monotonic_ns=begin,ended_monotonic_ns=time.monotonic_ns())
         commands.append(initial);initial_inspection=inspect(root,cache);metadata['initial_inspection']=initial_inspection
         intervention_events=registry.events[event_start:];metadata['fault_phase_registry_events']=intervention_events
-        if mode in {'missing','checksum','partial','interrupted'} and not any(e['mode']==('gate' if mode=='interrupted' else mode) for e in intervention_events):
+        if mode in {'missing','checksum','partial','interrupted','substitution'} and not any(e['mode']==('gate' if mode=='interrupted' else mode) for e in intervention_events):
             raise RuntimeError('Declared native dependency fault was not independently reached')
         if mode in {'empty','verified-cache'}:
             check('native-reconstruction-succeeds-in-declared-cache-condition',initial['returncode']==0 and installed(initial_inspection))
@@ -102,6 +102,8 @@ def run_scenario(root,scenario,unit=1):
         else:
             check('faulted-install-not-reported-successful',initial['returncode']!=0)
             check('incomplete-dependency-generation-not-published',not installed(initial_inspection))
+        if mode=='substitution':
+            check('substituted-dependency-bytes-actually-served',any(e.get('kind')=='tarball-response' and e.get('mode')=='substitution' and e.get('sha256')!=hashlib.sha256(registry.raw).hexdigest() for e in intervention_events))
         # Repair is always native: restore the owned server/cache, then retry the
         # same immutable archive. No copied module tree or hand-edited registry.
         registry.mode='healthy';registry.release.set();cache=root/'owned-npm-cache'

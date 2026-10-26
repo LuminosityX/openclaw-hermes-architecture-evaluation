@@ -43,7 +43,7 @@ export default {id:'eval-owned-reconstruction',name:'Owned dependency reconstruc
 
 class PackageRegistry:
     def __init__(self):
-        self.raw=dependency_archive();self.mode='healthy';self.events=[];self.lock=threading.Lock();self.tarball_started=threading.Event();self.release=threading.Event();self.release.set()
+        self.raw=dependency_archive();self.substituted=archive({'package.json':json.dumps(dict(name=DEPENDENCY,version=VERSION,type='module',exports='./index.js')),'index.js':"export const dependencyVersion='OWNED_SUBSTITUTED_DEPENDENCY';\n"});self.mode='healthy';self.events=[];self.lock=threading.Lock();self.tarball_started=threading.Event();self.release=threading.Event();self.release.set()
         self.server=ThreadingHTTPServer(('127.0.0.1',18091),self.handler());self.server.daemon_threads=True
         threading.Thread(target=self.server.serve_forever,daemon=True).start()
 
@@ -70,7 +70,9 @@ class PackageRegistry:
                     if mode=='gate':owner.release.wait(timeout=45)
                     if mode=='partial':
                         self.send_response(200);self.send_header('Content-Type','application/octet-stream');self.send_header('Content-Length',str(len(owner.raw)));self.end_headers();self.wfile.write(owner.raw[:len(owner.raw)//2]);self.wfile.flush();self.close_connection=True;return
-                    try:return self.send(200,owner.raw,'application/octet-stream')
+                    payload=owner.substituted if mode=='substitution' else owner.raw
+                    owner.event(kind='tarball-response',mode=mode,sha256=hashlib.sha256(payload).hexdigest(),bytes=len(payload))
+                    try:return self.send(200,payload,'application/octet-stream')
                     except (BrokenPipeError,ConnectionResetError):return
                 return self.send(404,b'{"error":"ONLY_OWNED_FIXTURE_PACKAGE_EXISTS"}')
         return Handler
