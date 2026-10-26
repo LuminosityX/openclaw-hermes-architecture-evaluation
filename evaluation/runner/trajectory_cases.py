@@ -61,6 +61,7 @@ class TrajectoryFixture(OperationFixture):
 def configure(root,mode,canary):
     config=privacy_cases.configure(root,'redaction',canary) if mode=='redaction' else service.configure(root)
     config['logging']['level']='info'
+    if mode=='redaction':(root/'workspace/private-memory.txt').write_text('PUBLIC_REDACTION_CONTROL '+canary+'\n')
     config['tools']['allow'].append('sessions_spawn')
     config['agents']['defaults']['subagents']=dict(maxConcurrent=2,maxSpawnDepth=1)
     plugin=root/'composition-a/index.js';source=plugin.read_text().replace(' const owner="composition-a";', ' const owner="composition-a";\n'+HOOKS)
@@ -121,7 +122,7 @@ def run_scenario(root,scenario,unit=1):
             check('actual-active-cancellation-acknowledged',service.active_abort_acknowledged(cancelled,boundary))
             check('retry-task-eventually-returns-one-effect',retried['accepted'] and fixture.receipts.get(fixture.retry_token)==1)
         elif mode=='redaction':
-            fixture.plan(token,'read',dict(path=str(root/'workspace/private-memory.txt')),canary)
+            fixture.plan(token,'read',dict(path=str(root/'workspace/private-memory.txt')),'PUBLIC_REDACTION_CONTROL')
             result=privacy_cases.request(gateway,token,session,canary);requests.append(result)
             if canary not in json.dumps(fixture.native_inputs.get(token,[])):raise RuntimeError('Synthetic private prompt did not reach the model')
         else:
@@ -166,7 +167,9 @@ def run_scenario(root,scenario,unit=1):
         else:
             logs=privacy_cases.wire(root,[dict(method='logs.tail',params=dict(limit=200,maxBytes=262144))]);exports.append(logs)
             check('configured-secret-redacted-from-history-and-hook-log-export',canary not in history and canary not in observed and canary not in json.dumps(logs))
-            check('full-sensitive-text-present-in-live-model-tool-result',canary in json.dumps(fixture.tool_returns.get(token,[])))
+            model_result=json.dumps(fixture.tool_returns.get(token,[]))
+            check('configured-plaintext-source-read-is-observed-through-the-live-model-result',canary in (root/'workspace/private-memory.txt').read_text() and 'PUBLIC_REDACTION_CONTROL' in model_result)
+            metadata.update(full_private_prompt_seen_by_model=canary in json.dumps(fixture.native_inputs.get(token,[])),full_secret_visible_in_live_tool_result=canary in model_result,public_read_control_seen_by_model='PUBLIC_REDACTION_CONTROL' in model_result)
         metadata.update(native_record_count=len(target),reference_observer_record_count=len(independent),native_run_ids=sorted(run_ids),
             observer_scope='Reference plugin uses documented api.on hooks and writes their supplied fields to the native logger; chat.history/logs.tail are native public RPCs. Hook fields are native provenance, but logging them requires this explicit observer plugin. Independent fixture events are truth, not injected native records.',
             model_scope='Deterministic provider transcripts measure trajectory visibility, not model quality, reasoning or real token cost.',

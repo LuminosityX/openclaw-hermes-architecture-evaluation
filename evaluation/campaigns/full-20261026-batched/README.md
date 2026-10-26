@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **253/257 scenarios completed**, with **969 independent observations**. 220 scenarios pass and 33 retain failure observations. Another 0 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. The completed audit now permits unified source-backed architecture analysis.
+The [active frozen plan](plan.json) has **250/257 scenarios completed**, with **960 independent observations**. 220 scenarios pass and 30 retain failure observations. Another 3 remain incomplete. **4 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Unified architecture analysis remains locked until the complete execution audit passes.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
@@ -61,9 +61,9 @@ Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69
 | OBS-01 Authorization decision reconstruction | 4 | 12 | [40359237907](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40359237907) |
 | OBS-02 Collector failure and publisher durability | 4 | 12 | [40353547591](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40353547591) |
 | OBS-03 Blind diagnosis of known faults | 4 | 12 | [40375678607](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40375678607) |
-| OBS-04 Retention, export, and tamper boundaries | 4 | 12 | [40344112988](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40344112988) |
+| OBS-04 Retention, export, and tamper boundaries | 2 | 6 | [40344112988](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40344112988) |
 | OBS-05 Diagnosis and operational burden | 4 | 12 | [40307698568](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40307698568) |
-| OBS-06 Open task trajectories and causal linkage | 6 | 18 | [40345210655](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40345210655) |
+| OBS-06 Open task trajectories and causal linkage | 5 | 15 | [40345210655](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40345210655) |
 | OBS-07 Practical trace access, export and defect diagnosis | 6 | 18 | [40306085535](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40306085535), [40308089179](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40308089179) |
 
 Verified nonapplicability requires an actual native capability probe and pinned support-contract evidence; missing implementations and unavailable environments never qualify. These are not measured performance samples.
@@ -79,9 +79,9 @@ Verified nonapplicability requires an actual native capability probe and pinned 
 | performance | 41 | 0 | 0 | 41 |
 | resources_cost | 29 | 4 | 0 | 33 |
 | extensibility | 39 | 0 | 0 | 39 |
-| observability | 32 | 0 | 0 | 32 |
+| observability | 29 | 0 | 3 | 32 |
 
-Scenarios retaining failed acceptance observations: REL-05-S01, REL-05-S02, REL-06-S01, REL-06-S04, REL-08-S01, SEC-02-S02, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-03-S03, OBS-03-S04, OBS-04-S02, OBS-04-S03, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03, OBS-06-S06. These are execution results. The completed audit now permits unified source-backed architecture analysis.
+Scenarios retaining failed acceptance observations: REL-05-S01, REL-05-S02, REL-06-S01, REL-06-S04, REL-08-S01, SEC-02-S02, SEC-04-S03, SEC-06-S01, SEC-06-S02, SEC-06-S03, SEC-06-S04, PERF-06-S02, PERF-06-S03, PERF-10-S04, COST-03-S03, EXT-04-S02, EXT-05-S04, OBS-01-S02, OBS-01-S03, OBS-01-S04, OBS-02-S01, OBS-02-S02, OBS-02-S03, OBS-02-S04, OBS-03-S03, OBS-03-S04, OBS-05-S02, OBS-05-S04, OBS-06-S01, OBS-06-S03. These are execution results. Unified architecture analysis remains locked until the complete execution audit passes.
 
 Passing conditions apply only to the declared fixtures, workload sizes, deadlines and hardware bounds. In particular, PERF-09 uses five synthetic task types with six variants each; it does not establish general task-solving ability.
 

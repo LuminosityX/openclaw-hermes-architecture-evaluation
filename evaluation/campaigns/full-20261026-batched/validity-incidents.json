@@ -176,6 +176,23 @@
       "preservation": "Original compact records and manifest preserved under quarantined-results; immutable hosted raw evidence stays unchanged.",
       "correction": "Use documented native sessions.send and verify real child continuation after a fresh full-family calibration. Rerun S02 only.",
       "architecture_interpretation": "deferred"
+    },
+    {
+      "scenarios": [
+        "OBS-04-S02",
+        "OBS-04-S03",
+        "OBS-06-S06"
+      ],
+      "units": [
+        1,
+        2,
+        3
+      ],
+      "classification": "hosted-space-precondition-and-live-redaction-oracle",
+      "reason": "Final source/fixture review: OBS-04-S02 had only 128 MiB tmpfs although native verification reserves 256 MiB, preventing the intended archive/reimport boundary. OBS-04-S03 and OBS-06-S06 incorrectly required a full synthetic secret in live tool output; native read returned a masked value (SYNTHE…suffix), so the scripted model falsely refused a successful read. Fix the hosted backup space and use an independent plaintext source plus a benign model-visible read marker, retaining whether the live secret is already masked. These records do not establish architecture defects.",
+      "preservation": "Original normalized records and manifests preserved under quarantined-results; immutable raw hosted evidence is unchanged.",
+      "correction": "Recalibrate native OBS-04/OBS-06 and rerun only these three scenarios.",
+      "architecture_interpretation": "deferred"
     }
   ]
 }

@@ -41,6 +41,7 @@ def transcript_inventory(root):
 def configure(root,mode,token,canary):
     config=privacy_cases.configure(root,'redaction',canary) if mode=='redaction' else service.configure(root)
     config['logging']['level']='info'
+    if mode=='redaction':(root/'workspace/private-memory.txt').write_text('PUBLIC_REDACTION_CONTROL '+canary+'\n')
     if mode=='retention':config['logging']['maxFileBytes']=ROTATION_BYTES
     # Parent access is an explicit run-owner filesystem boundary, recorded below.
     root.chmod(0o700)
@@ -70,7 +71,7 @@ def run_scenario(root,scenario,unit=1):
         if not positive['accepted'] or fixture.receipts.get(control)!=1:raise RuntimeError('Native retention baseline control failed')
         row.update(native_invoked=True,fixture_validated=True)
         session='agent:main:pilot:'+token.lower()
-        if mode=='redaction':fixture.plan(token,'read',dict(path=str(root/'workspace/private-memory.txt')),canary)
+        if mode=='redaction':fixture.plan(token,'read',dict(path=str(root/'workspace/private-memory.txt')),'PUBLIC_REDACTION_CONTROL')
         else:fixture.register(token)
         result=gateway.request(token);requests.append(result)
         exported=privacy_cases.history(root,session);exports.append(exported)
@@ -110,7 +111,10 @@ def run_scenario(root,scenario,unit=1):
         elif mode=='redaction':
             native=(root/'gateway-native.log').read_text(errors='replace')
             logs=privacy_cases.wire(root,[dict(method='logs.tail',params=dict(limit=200,maxBytes=262144))]);exports.append(logs)
-            check('synthetic-secret-actually-reached-native-model-context',canary in json.dumps(fixture.tool_returns.get(token,[])))
+            source_plaintext=(root/'workspace/private-memory.txt').read_text()
+            model_result=json.dumps(fixture.tool_returns.get(token,[]))
+            check('plaintext-source-and-model-visible-read-control-established',canary in source_plaintext and 'PUBLIC_REDACTION_CONTROL' in model_result)
+            metadata.update(owned_source_contains_full_canary=canary in source_plaintext,live_model_tool_result_contains_full_canary=canary in model_result,live_model_tool_result_contains_public_control='PUBLIC_REDACTION_CONTROL' in model_result)
             check('redaction-control-actually-logged','PRIVACY_LOG_CONTROL' in native)
             check('exact-configured-secret-absent-from-file-and-public-exports',canary not in native and canary not in json.dumps(exports))
             metadata['redaction_scope']='Exact full configured synthetic pattern in file, logs.tail and chat.history. Masked fragments, unconfigured sensitive formats, encoded attachments and model provider privacy are separate questions.'
