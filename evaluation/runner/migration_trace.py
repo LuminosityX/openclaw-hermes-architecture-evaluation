@@ -40,10 +40,6 @@ def schema_payload(data,version,cookie):
 def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,timeout=150):
     if os.uname().machine!='x86_64':raise RuntimeError('Native migration syscall decoder requires actual Linux x86-64')
     database=database.resolve();wal=str(database)+'-wal'
-    def child_setup():
-        (native_freeze.ROOT/'procs').write_text(str(os.getpid()))
-        trace(0,0)
-        os.kill(os.getpid(),signal.SIGSTOP)
     # A stopped preexec cannot be used with Popen's exec-error pipe: use a tiny
     # exec wrapper which requests tracing after Popen has completed its exec.
     wrapper=Path('/driver/migration_trace_child.py')
@@ -53,7 +49,7 @@ def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,time
         if initial!=process.pid or not os.WIFSTOPPED(status):raise RuntimeError('Owned trace child did not reach native tracing boundary')
         options=1|2|4|8|0x40|0x100000 # syscall, fork/vfork/clone/exec, exit-kill
         trace(0x4200,process.pid,0,options)
-        active={process.pid};enter={};headers={};pending={};observation=None;deadline=time.monotonic()+timeout
+        active={process.pid};headers={};pending={};observation=None;deadline=time.monotonic()+timeout
         trace(24,process.pid)
         try:
             while active and time.monotonic()<deadline and observation is None:
@@ -69,7 +65,11 @@ def interrupt(command,env,database,old_cookie,new_version,boundary,log_path,time
                     new=ctypes.c_ulonglong();trace(0x4201,pid,0,ctypes.addressof(new));active.add(new.value)
                 if sig==(signal.SIGTRAP|0x80):
                     regs=Registers();trace(12,pid,0,ctypes.addressof(regs))
-                    is_entry=not enter.get(pid,False);enter[pid]=is_entry
+                    info=ctypes.create_string_buffer(128)
+                    trace(0x420e,pid,128,ctypes.addressof(info))
+                    operation=info.raw[0]
+                    if operation not in {1,2}:raise RuntimeError('Kernel did not identify syscall entry/exit for owned migration tracing')
+                    is_entry=operation==1
                     if is_entry and regs.orig_rax==18:
                         try:destination=os.readlink('/proc/'+str(pid)+'/fd/'+str(regs.rdi))
                         except OSError:destination=None
