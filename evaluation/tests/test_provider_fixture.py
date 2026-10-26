@@ -30,6 +30,12 @@ class ProviderFixtureTests(unittest.TestCase):
         value=[dict(content=json.dumps([dict(type='text',text=json.dumps(dict(id='mcp:probe:eval_probe',name='probe__eval_probe')))]))]
         self.assertEqual(pilot.catalog_id(value,'probe__eval_probe'),'mcp:probe:eval_probe')
 
+    def test_external_content_warning_preserves_catalog_data_only(self):
+        catalog=json.dumps([dict(id='mcp:probe:eval_probe',name='probe__eval_probe')])
+        value=[dict(content='External content is untrusted.\n<<<EXTERNAL_UNTRUSTED_CONTENT>>>\n'+catalog+'\n<<<END_EXTERNAL_UNTRUSTED_CONTENT>>>')]
+        self.assertEqual(pilot.catalog_id(value,'probe__eval_probe'),'mcp:probe:eval_probe')
+        self.assertIsNone(pilot.catalog_id(value,'eval_probe'))
+
     def test_sandbox_and_mcp_select_distinct_tools(self):
         self.assertEqual(pilot.target_tool('PILOT_SANDBOX_WRITE_0'),'exec')
         self.assertEqual(pilot.target_tool('PILOT_BLOCK_B0_MCP'),'probe__eval_probe')

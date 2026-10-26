@@ -63,6 +63,20 @@ def catalog_id(results,name):
             try:
                 parsed=json.loads(value)
             except ValueError:
+                # Native MCP catalog output may wrap its JSON in an external-
+                # content warning. Only extract catalog data, never instructions.
+                decoder=json.JSONDecoder()
+                for index,match in enumerate(re.finditer(r'[\[{]',value[:50000])):
+                    if index>=64:
+                        break
+                    try:
+                        parsed,_=decoder.raw_decode(value[match.start():])
+                    except ValueError:
+                        continue
+                    if isinstance(parsed,(dict,list)):
+                        found=visit(parsed,depth+1)
+                        if found:
+                            return found
                 return None
             if isinstance(parsed,(dict,list)):
                 return visit(parsed,depth+1)
@@ -700,6 +714,7 @@ def main():
                 report['studies'].append(functions[identifier]())
     except Exception as error:
         report['harness_error']=str(error)
+        report['fixture_failure_events']=fixture.events[-20:]
     finally:
         fixture.close()
         report['scratch_used_bytes']=shutil.disk_usage(BASE).used
