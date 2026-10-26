@@ -25,6 +25,11 @@ from task_workloads import judge, workload
 from task_transcripts import provider_for
 
 
+def native_completion_assertion(native,task):
+    completed=native.get('native_http_status')==200 and not native.get('task_transport_error') and type(native.get('completion_ms')) in {int,float} and 0<=native['completion_ms']<=task['resource_limits']['timeout_seconds']*1000
+    return dict(name='native-task-finished-within-deadline',verdict='pass' if completed else 'fail',evidence=['native/summary.json:native_http_status,completion_ms,task_transport_error'])
+
+
 def main():
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--runtime-modules',type=Path,required=True)
@@ -58,7 +63,7 @@ def main():
         public=dict(task['public'])
         if 'service_fixture' in task: public['service_fixture']=task['service_fixture']
         input_path=root/'input.json'
-        input_path.write_text(json.dumps(dict(task=public,thinking=args.thinking),ensure_ascii=False))
+        input_path.write_text(json.dumps(dict(task=public,thinking=args.thinking,full_campaign_coverage=not args.validate_adapter),ensure_ascii=False))
         relay=Relay(root/'provider.sock',key,thinking=args.thinking,
                     max_output_tokens=task['maximum_output_tokens_per_request'],maximum_requests=task['maximum_model_requests'],
                     open_request=provider_for(task) if args.scripted_provider else None,scripted_fixture=args.scripted_provider)
@@ -83,6 +88,10 @@ def main():
     intact=set(integrity)==expected_immutable and all(value is True for value in integrity.values())
     verdict['assertions'].append(dict(name='immutable-inputs-unchanged',verdict='pass' if intact else 'fail',evidence=['native/summary.json:input_integrity']))
     verdict['accepted']=verdict['accepted'] and intact
+    completion=native_completion_assertion(native,task)
+    verdict['assertions'].append(completion)
+    verdict['accepted']=verdict['accepted'] and completion['verdict']=='pass'
+    require(native.get('full_campaign_coverage') is (not args.validate_adapter),'Native execution purpose disagrees with the host controller')
     fixture_validated=native.get('fixture_selfcheck',{}).get('valid') is True
     harness_failure=execution.returncode!=0 or bool(native.get('harness_error')) or not ledger['forwarded_request_count'] or not fixture_validated
     result=dict(schema_version=1,plan_sha256=plan['plan_sha256'],product='openclaw',target_version=plan['target']['version'],

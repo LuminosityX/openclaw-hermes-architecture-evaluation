@@ -20,7 +20,7 @@ def main():
     task=spec['task']
     root=pilot.BASE/'task-unit'
     report=dict(kind='native-task-unit',product='openclaw',studies=[],task_id=task['task_id'],
-                full_campaign_coverage=False,artifacts={},independent_events=[])
+                full_campaign_coverage=spec.get('full_campaign_coverage') is True,artifacts={},independent_events=[])
     fixture=None;gateway=None;server=None
     try:
         report['storage_guard_check']=pilot.storage_guard_check()

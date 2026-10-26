@@ -33,7 +33,19 @@ runs:
         npm_config_fund: 'false'
         npm_config_audit: 'false'
       run: |
-        npm install --prefix "$RUNNER_TEMP/openclaw-campaign-runtime" --save-exact "openclaw@$OPENCLAW_EVAL_VERSION" '@openclaw/deepseek-provider@2026.10.7'
+        python3 - <<'PY'
+        import hashlib,json,os
+        from pathlib import Path
+        source=Path('evaluation/campaigns/full-20261026/preparation/package-lock-d145b4db4bce.json')
+        data=source.read_bytes()
+        assert hashlib.sha256(data).hexdigest()=='d145b4db4bce891044af6d2a45819d5cb965160856873858e6c124f249f8ac8a'
+        lock=json.loads(data)
+        root=Path(os.environ['RUNNER_TEMP'])/'openclaw-campaign-runtime'
+        root.mkdir()
+        (root/'package-lock.json').write_bytes(data)
+        (root/'package.json').write_text(json.dumps(dict(name=lock['name'],private=True,dependencies=lock['packages']['']['dependencies'])))
+        PY
+        npm ci --prefix "$RUNNER_TEMP/openclaw-campaign-runtime"
         test "$(du -sm "$RUNNER_TEMP/openclaw-campaign-runtime" "$RUNNER_TEMP/openclaw-campaign-cache" | awk '{s+=$1} END {print s}')" -le 4096
         mkdir -p "$RUNNER_TEMP/openclaw-campaign-metadata"
         python3 evaluation/tools/target.py verify-installation --runtime-modules "$RUNNER_TEMP/openclaw-campaign-runtime/node_modules" --package-lock "$RUNNER_TEMP/openclaw-campaign-runtime/package-lock.json" > "$RUNNER_TEMP/openclaw-campaign-metadata/installation.json"

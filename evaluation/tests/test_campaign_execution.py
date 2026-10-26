@@ -10,9 +10,16 @@ from campaign import audit,load_plan
 from run_campaign_family import bind_unit
 from adapter_readiness import SOURCES
 from suite import ROOT
+from run_task_unit import native_completion_assertion
 
 
 class CampaignExecutionTests(unittest.TestCase):
+    def test_correct_artifact_does_not_hide_task_timeout_or_native_http_failure(self):
+        task=dict(resource_limits=dict(timeout_seconds=180))
+        good=dict(native_http_status=200,completion_ms=100)
+        self.assertEqual(native_completion_assertion(good,task)['verdict'],'pass')
+        for bad in [dict(good,task_transport_error='TimeoutError'),dict(good,completion_ms=181000),dict(good,native_http_status=500),{}]:
+            self.assertEqual(native_completion_assertion(bad,task)['verdict'],'fail')
     def fixture(self):
         plan=load_plan()
         native=dict(kind='native-campaign-family-unit',full_campaign_coverage=True,case_id='REL-14',
