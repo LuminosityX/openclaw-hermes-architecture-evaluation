@@ -15,6 +15,7 @@ export default {id:'eval-external-harness',register(api){
   autoSelection:{providerIds:[]},
   executionEnvironment:'host-only',supportsTurnScopedToolRestrictions:true,conversationToolPolicySupport:'exact',
   supports:supportsOwnedHarness,
+  async loadModelCatalog(){return [{id:'fixture-model',name:'Owned deterministic arithmetic fixture',provider:'fixture',nativeRuntime:'eval-external-harness',contextWindow:128000,reasoning:false,input:['text']}];},
   async runAttempt(params){
    const started=Date.now();const host=params.hostCapabilities;
    host.assertActive();
