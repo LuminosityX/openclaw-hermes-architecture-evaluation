@@ -1,6 +1,6 @@
 # Formal OpenClaw campaign progress
 
-The [active frozen plan](plan.json) has **232/257 scenarios completed**, with **876 independent observations**. 200 scenarios pass and 32 retain failure observations. Another 25 remain incomplete. Only accepted formal records count. Architecture interpretation remains deferred.
+The [active frozen plan](plan.json) has **232/257 scenarios completed**, with **876 independent observations**. 200 scenarios pass and 32 retain failure observations. Another 25 remain incomplete. **0 scenarios have verified native nonapplicability**, separately from measured coverage. Only accepted formal records count. Architecture interpretation remains deferred.
 
 Native OpenClaw is pinned to `2026.10.7`, source `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Each scenario completes its prescribed three or six independent units on disposable GitHub-hosted runners.
 
