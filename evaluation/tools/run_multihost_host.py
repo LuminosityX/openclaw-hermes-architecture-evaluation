@@ -168,7 +168,9 @@ def daemon(args):
     try:
         target=json.loads((ROOT/'evaluation/design/evaluation-matrix.json').read_text())['target']
         # Finish package lifecycle before read-only unprivileged native use.
-        lifecycle=subprocess.run([str(args.node),str(args.runtime_modules/'openclaw/openclaw.mjs'),'--version'],capture_output=True,text=True,timeout=60)
+        lifecycle_env={k:v for k,v in os.environ.items() if k in {'PATH','LANG','LC_ALL','HTTP_PROXY','HTTPS_PROXY','NO_PROXY','SSL_CERT_FILE','SSL_CERT_DIR','NODE_EXTRA_CA_CERTS'}}
+        lifecycle_env.update(OPENCLAW_STATE_DIR=str(root/'private-lifecycle-state'),OPENCLAW_CONFIG_PATH=str(root/'private-lifecycle-config.json'),OPENCLAW_SKIP_CHANNELS='1',OPENCLAW_DISABLE_BUNDLED_PLUGINS='1')
+        lifecycle=subprocess.run([str(args.node),str(args.runtime_modules/'openclaw/openclaw.mjs'),'--version'],env=lifecycle_env,capture_output=True,text=True,timeout=60)
         require(lifecycle.returncode==0 and target['version'] in lifecycle.stdout,'Native package lifecycle control failed')
         spec=dict(unit=args.unit,native_token=native_token)
         if args.role=='worker':
