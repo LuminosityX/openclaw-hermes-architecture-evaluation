@@ -20,6 +20,8 @@ No third-party Python packages, OpenClaw installation, network access or model c
 
 ## Preparing a product run
 
+For the initial architecture studies, start with `python3 evaluation/tools/architecture.py plan --wave 1` and the [architecture preregistration guide](../evaluation/architecture-studies.md). Its template/check commands declare the installed revision, contrasts, independent paired units, margins, budgets and hashed evidence. The checker verifies metadata/artifact consistency only and leaves product execution disabled.
+
 Select cases from the [matrix](../evaluation/design/evaluation-matrix.json). Implement and validate their OpenClaw adapter and independent acceptance fixtures. Record the exact installed revision, effective config, plugin/hook revisions, model/provider, host topology, supported capabilities, task acceptance checks, fault triggers and independent event/effect ledger. Do not inherit historical pins or credentials.
 
 Predeclare whole-run and per-case time, CPU, memory, disk/inode, process and connection limits, owned paths, cleanup behavior, repetition counts and required evidence. Keep one immutable dependency installation shared when compatible; writable copies are only for cases requiring mutation. Model-dependent task quality, prompt injection and billing require a separately defined real-usage budget. Validate fixtures before executing workloads; unknown capabilities remain unsupported or inconclusive rather than passes.

@@ -41,6 +41,8 @@ The default plan contains deterministic mechanism tests. Actual task capability,
 
 Start with the [evaluation guide](evaluation/README.md), [experiment catalogue](evaluation/experiment-catalogue.md), [measurement contract](evaluation/measurement-contract.md) and [methodology](docs/methodology.md). The [matrix](evaluation/design/evaluation-matrix.json) defines the current six dimensions and required metrics. The [reproduction guide](docs/reproduction.md) explains validation, selection and execution prerequisites.
 
+To explain architecture rather than collect isolated scores, follow the [architecture tradeoff studies](evaluation/architecture-studies.md). Seven studies compose the existing cases around mechanisms; the first wave covers session concurrency, sandbox ownership and plugin authority/failure. Each explicitly records benefit/cost hypotheses, six-axis observations, confounders and inference limits.
+
 Measure actual task outcomes and independently observed effects. Keep failed, cancelled and incomplete attempts in denominators; missing counters or prices remain unknown. A passing CI check validates repository tooling, not OpenClaw reliability, safety or task quality.
 
 ## Historical materials

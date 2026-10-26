@@ -1,0 +1,910 @@
+{
+  "schema_version": 1,
+  "product": "openclaw",
+  "status": "planned-not-executed",
+  "execution_enabled": false,
+  "first_wave": [
+    "ARC-01",
+    "ARC-03",
+    "ARC-02"
+  ],
+  "interpretation_policy": {
+    "classifications": [
+      "configuration-problem",
+      "implementation-defect",
+      "architectural-constraint",
+      "measured-tradeoff",
+      "workload-mismatch",
+      "inconclusive"
+    ],
+    "tradeoff_rule": "A measured tradeoff requires independently supported benefit and cost; intent needs separate documentary evidence.",
+    "dominance_rule": "An improvement without meaningful harm in the other measured axes is a candidate implementation improvement, not an unavoidable sacrifice.",
+    "uncertainty_rule": "No observed effect is not proof of equivalence; use preregistered margins and sufficient independent units.",
+    "trust_rule": "Evaluate advertised boundaries and deployment requirements separately; neither grants an excuse for violations of promised controls."
+  },
+  "studies": [
+    {
+      "id": "ARC-01",
+      "title": "Session ordering and cross-session concurrency",
+      "wave": 1,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "REL-01",
+        "PERF-04",
+        "PERF-05",
+        "PERF-06",
+        "COST-06",
+        "OBS-06"
+      ],
+      "design_goal": {
+        "statement": "Avoid colliding session runs while permitting controlled parallel execution across independent sessions.",
+        "evidence_status": "documented-goal"
+      },
+      "source": {
+        "url": "https://docs.openclaw.ai/concepts/queue",
+        "documented_fact": "The queue documentation describes session serialization and a configurable global concurrency cap.",
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "native-config",
+        "changed_variable": "Supported cross-session maxConcurrent setting, with the number of independent sessions fixed.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "One allowed concurrent run across a fixed set of independent sessions."
+          },
+          {
+            "id": "intervention",
+            "description": "Four allowed concurrent runs across exactly the same independent sessions, after verifying support in the pinned revision."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "Provider/tool capacity can cap throughput independently of the scheduler.",
+          "Same-session versus independent-session runs change the contention boundary and are a separate boundary comparison, not this causal contrast."
+        ],
+        "config_key": "agents.defaults.maxConcurrent"
+      },
+      "hypotheses": {
+        "benefit": "Higher cross-session capacity increases correct goodput without breaking per-session ordering.",
+        "cost": "More active work may increase peak resources, provider pressure and tail latency under saturation.",
+        "falsified_when": "If capacity rises without useful throughput improvement, or ordering breaks, the expected benefit is not established."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "lost_acknowledged_tasks",
+            "duplicate_effects"
+          ],
+          "role": "guardrail",
+          "question": "Does added capacity preserve task and effect correctness?"
+        },
+        "security": {
+          "metrics": [
+            "unauthorized_effects"
+          ],
+          "role": "guardrail",
+          "question": "Are authority boundaries preserved under concurrency?"
+        },
+        "performance": {
+          "metrics": [
+            "correct_goodput_per_s",
+            "completion_latency_ms",
+            "queue_wait_ms"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "Does useful throughput improve and when do tails worsen?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "cpu_user_seconds",
+            "cgroup_memory_peak_bytes",
+            "process_count"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What resource increment accompanies capacity?"
+        },
+        "extensibility": {
+          "metrics": [],
+          "role": "not-applicable",
+          "question": "No extension interface is changed; no extensibility benefit is claimed."
+        },
+        "observability": {
+          "metrics": [
+            "trace_event_coverage",
+            "linked_tool_call_rate"
+          ],
+          "role": "guardrail",
+          "question": "Can concurrent events still be attributed to the right task?"
+        }
+      },
+      "limitations": [
+        "This does not disable or prove the optimality of session serialization.",
+        "Run same-session contention separately to identify its boundary; do not combine it with a maxConcurrent change."
+      ],
+      "protocol": {
+        "execution_mode": "deterministic",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    },
+    {
+      "id": "ARC-02",
+      "title": "In-process extension authority and failure domain",
+      "wave": 1,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "REL-04",
+        "SEC-01",
+        "SEC-12",
+        "COST-02",
+        "EXT-01",
+        "EXT-09",
+        "OBS-03"
+      ],
+      "design_goal": {
+        "statement": "Hypothesis: in-process integration permits direct extension access with lower integration/call overhead.",
+        "evidence_status": "hypothesis"
+      },
+      "source": {
+        "url": "https://docs.openclaw.ai/gateway/security/tool-permissions",
+        "documented_fact": "The documentation treats Gateway plugins as trusted code running in the Gateway process; it does not prove a performance motive.",
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "boundary-comparison",
+        "changed_variable": "Execution route for one behavior-equivalent deterministic tool operation.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "Reference operation through a native in-process plugin."
+          },
+          {
+            "id": "intervention",
+            "description": "The same effect and payload through an officially supported external tool process, only if available in the pinned revision."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "Transport, serialization, callback coverage and process ownership differ between routes.",
+          "Equivalent tool effects do not make a full plugin and an external tool architecturally interchangeable."
+        ],
+        "config_key": null
+      },
+      "hypotheses": {
+        "benefit": "The in-process route may require fewer handoffs and expose more lifecycle integration.",
+        "cost": "Plugin blocking, memory growth or authority may affect a wider Gateway trust and failure domain.",
+        "falsified_when": "No measurable integration or overhead gain means the proposed benefit is unproven even if the wider fault boundary is observed."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "manual_interventions",
+            "recovery_latency_ms"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What unrelated work is affected by plugin exit, blocking or memory pressure?"
+        },
+        "security": {
+          "metrics": [
+            "unauthorized_effects",
+            "canary_disclosures"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What authority can each route actually exercise?"
+        },
+        "performance": {
+          "metrics": [
+            "completion_latency_ms",
+            "first_output_latency_ms"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "What is the route latency with equal task semantics?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "cpu_user_seconds",
+            "memory_pss_bytes",
+            "process_count"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "What overhead or reuse accompanies each route?"
+        },
+        "extensibility": {
+          "metrics": [
+            "core_files_modified",
+            "public_interface_cases_passed"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "What lifecycle capabilities are supported through public interfaces?"
+        },
+        "observability": {
+          "metrics": [
+            "diagnosis_accuracy",
+            "diagnosis_time_ms"
+          ],
+          "role": "guardrail",
+          "question": "Can the operator identify the faulty extension and affected work?"
+        }
+      },
+      "limitations": [
+        "This establishes a route/failure-boundary comparison, not a pure causal cost of process isolation.",
+        "A process-isolated plugin fork would be a separately labeled counterfactual, never native baseline evidence.",
+        "Trusted plugin access within its declared authority is not automatically a permission bypass."
+      ],
+      "protocol": {
+        "execution_mode": "deterministic",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    },
+    {
+      "id": "ARC-03",
+      "title": "Sandbox reuse versus per-session separation",
+      "wave": 1,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "SEC-03",
+        "SEC-04",
+        "SEC-08",
+        "COST-01",
+        "COST-02",
+        "COST-04",
+        "EXT-01",
+        "OBS-06"
+      ],
+      "design_goal": {
+        "statement": "Hypothesis: finer sandbox ownership reduces writable-state sharing at the expense of reuse and startup resources.",
+        "evidence_status": "hypothesis"
+      },
+      "source": {
+        "url": "https://docs.openclaw.ai/gateway/security/tool-permissions",
+        "documented_fact": "The sandbox configuration distinguishes agent scope and stricter session scope; scope alone is not hostile-user isolation.",
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "native-config",
+        "changed_variable": "Sandbox scope, keeping sandbox mode/backend, effective grants, mounts, image and network policy identical.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "One sandbox scope per agent for several sessions of the same synthetic agent."
+          },
+          {
+            "id": "intervention",
+            "description": "One sandbox scope per session for the same sessions and workload."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "Identical mounts may intentionally share data even with separate sandbox instances.",
+          "Host-executed plugins and elevated tools are outside the tool-sandbox boundary.",
+          "Cold image preparation and warm container reuse must be reported separately."
+        ],
+        "config_key": "agents.defaults.sandbox.scope"
+      },
+      "hypotheses": {
+        "benefit": "Session-scoped writable sandbox state may reduce cross-session canary reach and failure coupling.",
+        "cost": "Separate sandbox lifecycles may increase cold startup, memory, disk and cleanup work.",
+        "falsified_when": "If effective writable-state reach does not change, a security improvement is unproven; extra resource usage alone does not establish a tradeoff."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "recovery_latency_ms",
+            "manual_interventions"
+          ],
+          "role": "guardrail",
+          "question": "Do session failures and cleanup disturb unrelated work?"
+        },
+        "security": {
+          "metrics": [
+            "canary_disclosures",
+            "authorized_control_success_rate"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "Does writable-state separation improve without breaking allowed operations?"
+        },
+        "performance": {
+          "metrics": [
+            "completion_latency_ms",
+            "first_output_latency_ms"
+          ],
+          "role": "cost-hypothesis",
+          "question": "How much cold and warm latency accompanies separate lifecycles?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "memory_pss_bytes",
+            "disk_allocated_bytes",
+            "disk_inodes",
+            "residual_disk_bytes"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What is the per-session creation and residual cost?"
+        },
+        "extensibility": {
+          "metrics": [
+            "public_interface_cases_passed"
+          ],
+          "role": "guardrail",
+          "question": "Can the same supported tools still complete their contract?"
+        },
+        "observability": {
+          "metrics": [
+            "trace_event_coverage"
+          ],
+          "role": "guardrail",
+          "question": "Can task activity still be mapped to sandbox identity?"
+        }
+      },
+      "limitations": [
+        "Record intended sharing separately from unauthorized disclosure.",
+        "Do not infer isolation between adversarial tenants from sandbox scope; use the pinned Gateway trust contract."
+      ],
+      "protocol": {
+        "execution_mode": "deterministic",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    },
+    {
+      "id": "ARC-04",
+      "title": "Trace detail, diagnosis, privacy and observer overhead",
+      "wave": 2,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "SEC-08",
+        "COST-04",
+        "COST-06",
+        "OBS-02",
+        "OBS-03",
+        "OBS-04",
+        "OBS-06",
+        "OBS-07"
+      ],
+      "design_goal": {
+        "statement": "Hypothesis: richer accessible traces improve diagnosis while increasing collection overhead and data exposure.",
+        "evidence_status": "hypothesis"
+      },
+      "source": {
+        "url": null,
+        "documented_fact": null,
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "native-config",
+        "changed_variable": "One verified native trace/export detail setting at a time; redaction is a separate contrast.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "Documented minimal diagnostic configuration."
+          },
+          {
+            "id": "intervention",
+            "description": "Documented detailed native trace/export configuration with the same redaction and retention contract."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "An external collector adds a dependency; keep collector deployment fixed between arms.",
+          "Changing redaction, retention and verbosity together cannot isolate a verbosity effect."
+        ],
+        "config_key": null
+      },
+      "hypotheses": {
+        "benefit": "Detailed records improve blind diagnosis and event linkage.",
+        "cost": "Collection, storage, export and sensitive-data retention may increase.",
+        "falsified_when": "More events without better reconstruction or diagnosis does not establish an observability benefit."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "lost_acknowledged_tasks"
+          ],
+          "role": "guardrail",
+          "question": "Does collector failure affect task correctness?"
+        },
+        "security": {
+          "metrics": [
+            "canary_disclosures"
+          ],
+          "role": "cost-hypothesis",
+          "question": "Which synthetic sensitive fields become accessible to which roles?"
+        },
+        "performance": {
+          "metrics": [
+            "completion_latency_ms"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What latency overhead is attributable to the observer?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "cpu_user_seconds",
+            "disk_write_bytes",
+            "disk_allocated_bytes"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What does richer tracing cost?"
+        },
+        "extensibility": {
+          "metrics": [],
+          "role": "not-applicable",
+          "question": "No plugin API changes are tested in this contrast."
+        },
+        "observability": {
+          "metrics": [
+            "trace_event_coverage",
+            "diagnosis_accuracy",
+            "diagnosis_time_ms",
+            "observer_overhead_ratio"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "Does additional data materially improve fault diagnosis?"
+        }
+      },
+      "limitations": [
+        "Verify available controls against the pinned revision; unsupported controls block the native contrast.",
+        "Never request private internal model reasoning as a trace requirement."
+      ],
+      "protocol": {
+        "execution_mode": "requires-case-phase-check",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    },
+    {
+      "id": "ARC-05",
+      "title": "Context reuse, task quality and token amortization",
+      "wave": 2,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "PERF-09",
+        "PERF-10",
+        "COST-03",
+        "COST-07",
+        "SEC-08",
+        "EXT-04",
+        "OBS-06"
+      ],
+      "design_goal": {
+        "statement": "Hypothesis: native context reuse can amortize repeated work but introduces stale-context and privacy risks.",
+        "evidence_status": "hypothesis"
+      },
+      "source": {
+        "url": null,
+        "documented_fact": null,
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "native-config",
+        "changed_variable": "One supported context reuse mechanism, with the same task sequence and model settings.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "Fresh state without the selected reusable context component."
+          },
+          {
+            "id": "intervention",
+            "description": "The selected documented native reuse component enabled; reset all unrelated state."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "Task learning order, provider caching and model variance can mimic framework context benefits.",
+          "Compare fixed matched task blocks with reversals after the reuse horizon."
+        ],
+        "config_key": null
+      },
+      "hypotheses": {
+        "benefit": "Reuse reduces token charges or completion time for independently accepted deliveries.",
+        "cost": "Stored context may become stale, leak across intended boundaries or impair changed-rule tasks.",
+        "falsified_when": "Lower tokens with worse acceptance or uncounted setup is not an equal-quality efficiency gain."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "duplicate_effects"
+          ],
+          "role": "guardrail",
+          "question": "Do resumed/reused tasks preserve effect semantics?"
+        },
+        "security": {
+          "metrics": [
+            "canary_disclosures"
+          ],
+          "role": "cost-hypothesis",
+          "question": "Does retained context disclose synthetic private data?"
+        },
+        "performance": {
+          "metrics": [
+            "task_success_rate",
+            "completion_latency_ms"
+          ],
+          "role": "guardrail",
+          "question": "Does cost reduction preserve deliverable quality?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "input_tokens",
+            "output_tokens",
+            "provider_reported_cost_usd",
+            "cost_per_accepted_task_usd"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "When does reuse break even after including setup and failed calls?"
+        },
+        "extensibility": {
+          "metrics": [
+            "core_files_modified"
+          ],
+          "role": "guardrail",
+          "question": "Is reuse available without a private product fork?"
+        },
+        "observability": {
+          "metrics": [
+            "linked_tool_call_rate"
+          ],
+          "role": "guardrail",
+          "question": "Can retained context and provider spend be attributed to attempts?"
+        }
+      },
+      "limitations": [
+        "Requires separately budgeted real usage; deterministic replay cannot establish task quality or actual charges.",
+        "Include auxiliary calls, retries and unsuccessful attempts in cost denominators."
+      ],
+      "protocol": {
+        "execution_mode": "requires-case-phase-check",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    },
+    {
+      "id": "ARC-06",
+      "title": "Bounded retries, effect correctness and resource cost",
+      "wave": 2,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "REL-02",
+        "REL-05",
+        "REL-15",
+        "COST-05",
+        "COST-07",
+        "OBS-01",
+        "OBS-06"
+      ],
+      "design_goal": {
+        "statement": "Hypothesis: bounded retries improve recovery for transient failures at a cost in latency, calls and replay risk.",
+        "evidence_status": "hypothesis"
+      },
+      "source": {
+        "url": null,
+        "documented_fact": null,
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "native-config",
+        "changed_variable": "One documented native retry limit for a fixed failure schedule and effect contract.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "Lowest supported retry allowance."
+          },
+          {
+            "id": "intervention",
+            "description": "Higher bounded retry allowance with the same documented deadline and idempotency contract."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "Provider retries, SDK retries and tool retries may stack; attribute every retry owner.",
+          "Changing idempotency and retry allowance together would confound two mechanisms."
+        ],
+        "config_key": null
+      },
+      "hypotheses": {
+        "benefit": "Transient failures are recovered more often without human work.",
+        "cost": "Retries may increase deadline overshoot, duplicate effects, API spend and retained resources.",
+        "falsified_when": "Extra calls without improved recovery disprove the proposed benefit under the tested failure schedule."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "duplicate_effects",
+            "manual_interventions",
+            "recovery_latency_ms"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "Does automatic recovery preserve exactly the declared effect contract?"
+        },
+        "security": {
+          "metrics": [
+            "unauthorized_effects"
+          ],
+          "role": "guardrail",
+          "question": "Does a retry recheck required authorization?"
+        },
+        "performance": {
+          "metrics": [
+            "task_success_rate",
+            "completion_latency_ms"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What are success and deadline consequences?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "cpu_user_seconds",
+            "input_tokens",
+            "provider_reported_cost_usd"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What is the actual amplification including failed calls?"
+        },
+        "extensibility": {
+          "metrics": [],
+          "role": "not-applicable",
+          "question": "No extension interface is modified."
+        },
+        "observability": {
+          "metrics": [
+            "trace_event_coverage",
+            "linked_tool_call_rate"
+          ],
+          "role": "guardrail",
+          "question": "Are attempts, effects and charges linked rather than merged?"
+        }
+      },
+      "limitations": [
+        "Use a deterministic local metered provider first; synthetic request counts are not real USD charges.",
+        "Real cost confirmation requires the separately budgeted real-usage case."
+      ],
+      "protocol": {
+        "execution_mode": "requires-case-phase-check",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    },
+    {
+      "id": "ARC-07",
+      "title": "Gateway integration and shared failure scope",
+      "wave": 2,
+      "product": "openclaw",
+      "status": "planned",
+      "case_ids": [
+        "REL-01",
+        "REL-03",
+        "REL-04",
+        "SEC-04",
+        "PERF-04",
+        "COST-01",
+        "EXT-09",
+        "OBS-03"
+      ],
+      "design_goal": {
+        "statement": "Hypothesis: a shared long-lived control plane simplifies connection/state ownership but concentrates contention and failure scope.",
+        "evidence_status": "hypothesis"
+      },
+      "source": {
+        "url": "https://docs.openclaw.ai/concepts/architecture",
+        "documented_fact": "The architecture documentation describes one long-lived Gateway owning messaging surfaces and control-plane connections.",
+        "pin_verification": "pending"
+      },
+      "comparison": {
+        "kind": "boundary-comparison",
+        "changed_variable": "Deployment ownership boundary for two independently meaningful task streams.",
+        "arms": [
+          {
+            "id": "baseline",
+            "description": "Two independent streams handled by one Gateway."
+          },
+          {
+            "id": "intervention",
+            "description": "Two separately owned Gateways with one stream each, only if the pinned deployment supports separate identities and state roots."
+          }
+        ],
+        "causal_scope": "Only the tested variable within the pinned revision and declared controls; boundary comparisons establish association only.",
+        "held_constant": [
+          "OpenClaw source revision and installation",
+          "host resource limits and collector configuration",
+          "task inputs, accepted artifact/effect contract and arrival schedule",
+          "provider transcript for deterministic tests, or model/provider/settings for real usage",
+          "effective grants, external services and fixture revision except the declared variable"
+        ],
+        "confounders": [
+          "Gateway count changes connections, caches, state roots and deployment operation.",
+          "Separate deployments do not establish that splitting the internal Gateway architecture alone caused the difference."
+        ],
+        "config_key": null
+      },
+      "hypotheses": {
+        "benefit": "Shared ownership may reduce duplicate resident resources and operator integration work.",
+        "cost": "A blocking component or Gateway fault may affect both streams.",
+        "falsified_when": "If sharing saves no measured resources or effort, the proposed efficiency benefit remains unproven."
+      },
+      "axes": {
+        "reliability": {
+          "metrics": [
+            "lost_acknowledged_tasks",
+            "recovery_latency_ms"
+          ],
+          "role": "cost-hypothesis",
+          "question": "What task/state survives a control-plane fault?"
+        },
+        "security": {
+          "metrics": [
+            "canary_disclosures"
+          ],
+          "role": "guardrail",
+          "question": "What is the documented trust boundary for each topology?"
+        },
+        "performance": {
+          "metrics": [
+            "completion_latency_ms",
+            "queue_wait_ms"
+          ],
+          "role": "cost-hypothesis",
+          "question": "Does one stream disturb the other?"
+        },
+        "resources_cost": {
+          "metrics": [
+            "memory_pss_bytes",
+            "process_count"
+          ],
+          "role": "benefit-hypothesis",
+          "question": "What resident resource reuse is actually achieved?"
+        },
+        "extensibility": {
+          "metrics": [
+            "core_files_modified"
+          ],
+          "role": "guardrail",
+          "question": "Do both deployments use supported interfaces?"
+        },
+        "observability": {
+          "metrics": [
+            "diagnosis_accuracy",
+            "diagnosis_time_ms"
+          ],
+          "role": "guardrail",
+          "question": "Can affected streams and state ownership be reconstructed?"
+        }
+      },
+      "limitations": [
+        "This is a topology boundary comparison, not a native microservice ablation.",
+        "Do not label multiple Gateways as native distributed task scheduling."
+      ],
+      "protocol": {
+        "execution_mode": "requires-case-phase-check",
+        "independent_units_per_arm": null,
+        "sample_size_rationale": null,
+        "paired_blocks": null,
+        "allocation_order": "Randomize paired blocks; reset state; separate cold and warm conditions.",
+        "thresholds": null,
+        "failure_and_timeout_policy": "Preserve every attempted, rejected, failed and incomplete unit; report censored latency separately.",
+        "stop_rules": null,
+        "reversal_workloads": [
+          "short independent tasks",
+          "long or contended tasks",
+          "fault and cleanup boundary"
+        ]
+      },
+      "readiness": "adapter-and-preregistration-required"
+    }
+  ]
+}

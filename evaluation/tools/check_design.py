@@ -6,10 +6,12 @@ import sys
 from urllib.parse import unquote, urlsplit
 
 from suite import ROOT, load_matrix, render_catalogue
+from architecture import load_studies
 
 
 def main():
     matrix = load_matrix()
+    studies = load_studies()
     catalogue = ROOT / 'evaluation/experiment-catalogue.md'
     if catalogue.read_text(encoding='utf-8') != render_catalogue(matrix):
         raise ValueError('Catalogue differs from the matrix; regenerate with suite.py catalogue')
@@ -27,7 +29,8 @@ def main():
     cases = [e for d in matrix['dimensions'] for e in d['experiments']]
     scenarios = sum(len(e['scenarios']) for e in cases)
     print(f'PASS: OpenClaw only, 6 dimensions, {len(cases)} planned cases, '
-          f'{scenarios} scenario labels; product execution disabled; no product results')
+          f'{scenarios} scenario labels; {len(studies["studies"])} architecture studies; '
+          'product execution disabled; no product results')
 
 
 if __name__ == '__main__':

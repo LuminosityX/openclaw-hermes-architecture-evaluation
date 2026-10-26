@@ -22,4 +22,6 @@ Keep an independent outcome/event ledger separate from native traces. Faults occ
 
 ## Evidence and current status
 
+Architecture conclusions compose cases using the [cross-dimensional study protocol](../evaluation/architecture-studies.md). The three-study first wave isolates supported session concurrency and sandbox-scope settings, then compares plugin execution boundaries with explicit route confounders. Other studies address trace detail, context reuse, retries and Gateway ownership. Six dimensions remain reporting axes rather than six independent explanations. Report design intent, measured behavior and inference limits separately.
+
 All 60 families are planned; runtime adapters and acceptance fixtures are not yet implemented. Product results require fixture validation, adapter validation, execution, independent evidence verification and review. CI validates source integrity, design consistency, selector behavior and accounting arithmetic only. See the [measurement contract](../evaluation/measurement-contract.md) for record and price requirements. Historical V6 grades remain scoped to their frozen two-product rubric.
