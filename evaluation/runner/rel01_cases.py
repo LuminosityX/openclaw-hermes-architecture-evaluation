@@ -227,8 +227,14 @@ def run_s03(runtime, unit):
 RUNNERS = {'REL-01-S01': run_s01, 'REL-01-S02': run_s02, 'REL-01-S03': run_s03}
 
 
-def run_scenario(scenario, unit=1):
-    runtime = CodexRuntime()
+def run_scenario(scenario, unit=1, codex='codex'):
+    """Run one scenario of one independent unit against the pinned binary.
+
+    Returns the observation row; the family runner binds plan/runtime identity
+    and validates it against the frozen campaign plan. It never fabricates a
+    formal record on its own.
+    """
+    runtime = CodexRuntime(codex=codex)
     try:
         result = RUNNERS[scenario](runtime, unit)
         return dict(
@@ -237,12 +243,17 @@ def run_scenario(scenario, unit=1):
             fixture_validated=True, assertions=result['assertions'],
             observations=result['observations'],
             target_version='0.164.0',
-            target_commit='6aaac694803004a63c6f393d153c96d22521a6b9',
-            development_calibration=True)
+            target_commit='6aaac694803004a63c6f393d153c96d22521a6b9')
     finally:
         runtime.close()
 
 
 if __name__ == '__main__':
+    import argparse
+    parser = argparse.ArgumentParser(description='REL-01 development calibration')
+    parser.add_argument('--codex', default='codex')
+    args = parser.parse_args()
     for scenario_id in SCENARIOS:
-        print(json.dumps(run_scenario(scenario_id, unit=1), ensure_ascii=False, indent=2))
+        row = run_scenario(scenario_id, unit=1, codex=args.codex)
+        row['development_calibration'] = True
+        print(json.dumps(row, ensure_ascii=False, indent=2))

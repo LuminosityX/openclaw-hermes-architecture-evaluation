@@ -1,0 +1,82 @@
+name: Codex campaign batches
+
+on:
+  workflow_dispatch:
+    inputs:
+      note:
+        description: Execute formal prescribed units of calibrated Codex families
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-formal-campaign-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  mechanisms:
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [REL-01]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      CODEX_EVAL_CASE: ${{ matrix.case }}
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Set up Node for the pinned Codex package
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Install one shared exact Codex runtime on this disposable host
+        env:
+          npm_config_cache: ${{ runner.temp }}/codex-campaign-cache
+          npm_config_update_notifier: 'false'
+          npm_config_fund: 'false'
+          npm_config_audit: 'false'
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          pin = json.loads(Path('evaluation/design/codex-target-pin.json').read_text())
+          root = Path(__import__('os').environ['RUNNER_TEMP']) / 'codex-campaign-runtime'
+          root.mkdir()
+          (root / 'package.json').write_text(json.dumps(
+              dict(name='codex-campaign-runtime', private=True,
+                   dependencies={'@openai/codex': pin['version']})))
+          PY
+          npm install --prefix "$RUNNER_TEMP/codex-campaign-runtime"
+          test "$(du -sm "$RUNNER_TEMP/codex-campaign-runtime" "$RUNNER_TEMP/codex-campaign-cache" | awk '{s+=$1} END {print s}')" -le 2048
+      - name: Execute all prescribed independent units after installation verification
+        run: |
+          python3 evaluation/tools/run_codex_family.py \
+            --case "$CODEX_EVAL_CASE" \
+            --runtime "$RUNNER_TEMP/codex-campaign-runtime" \
+            --output "$RUNNER_TEMP/codex-campaign-result"
+      - name: Bound original records and retain provenance
+        if: always()
+        run: |
+          mkdir -p "$RUNNER_TEMP/codex-campaign-result"
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          root = Path(os.environ['RUNNER_TEMP']) / 'codex-campaign-result'
+          assert sum(p.stat().st_size for p in root.rglob('*') if p.is_file()) <= 8 * 1024 * 1024
+          PY
+      - name: Upload formal Codex experiment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: codex-campaign-${{ matrix.case }}
+          path: ${{ runner.temp }}/codex-campaign-result/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove this job's runtime, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/codex-campaign-runtime" "$RUNNER_TEMP/codex-campaign-cache" "$RUNNER_TEMP/codex-campaign-result"
