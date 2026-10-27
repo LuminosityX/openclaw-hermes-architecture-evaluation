@@ -1,0 +1,238 @@
+{
+  "_meta": {
+    "purpose": "Per-family Codex translation applied on top of the frozen OpenClaw design inventory to produce codex-matrix.json. Fields not listed here are inherited unchanged (title, scenarios, intervention, oracle, controls, evidence, metrics, coverage, billing). Scenario overrides must preserve the original scenario count. Mechanisms are rewritten for every family; other fields are overridden only where the original text names OpenClaw-specific surfaces.",
+    "target": "codex 0.164.0 (see codex-target-pin.json)",
+    "source_mapping": "codex-family-mapping.md"
+  },
+  "REL-01": {
+    "mechanism": "A turn accepted by the app-server thread and its rollout JSONL record in the owned CODEX_HOME can be committed at different times.",
+    "intervention": "Inject termination at instrumented boundaries; distinguish a turn acknowledged as persisted from a merely received request.",
+    "oracle": "Compare acknowledged turn IDs with rollout records and completed work after restarting the app-server and resuming the thread; report the unacknowledged ambiguity window separately.",
+    "scenarios": [
+      "before rollout append",
+      "after rollout append but before turn completion notification",
+      "after completion notification but before any dependent effect"
+    ]
+  },
+  "REL-02": {
+    "mechanism": "An external effect committed by a sandboxed command and the turn's completion acknowledgment can be committed at different times."
+  },
+  "REL-03": {
+    "mechanism": "A forked thread and the shared app-server daemon can both act as continuation owners of the same thread at different times.",
+    "intervention": "Terminate or partition the owning client, daemon and forked thread independently; allow a stale owner to publish after reassignment.",
+    "oracle": "Track thread ownership, resumed turns, accepted results and effect IDs in an independent ledger; a stale owner's result must not silently overwrite the current owner's result."
+  },
+  "REL-04": {
+    "mechanism": "Whether execution continues after the codex process exits, the app-server daemon restarts, or a turn stops depends on separate persistence and ownership paths.",
+    "intervention": "Terminate only the identified codex process, app-server daemon or plugin/MCP host; keep an unrelated thread active.",
+    "oracle": "Record which threads stop and which resume automatically; availability, recovery correctness, and required human work remain separate outcomes.",
+    "scenarios": [
+      "codex process exits",
+      "app-server daemon restarts",
+      "thread resume after restart",
+      "manual confirmation is required"
+    ]
+  },
+  "REL-05": {
+    "mechanism": "turn/interrupt must propagate to queued turns, running sandboxed commands, background child processes and resumable checkpoints.",
+    "intervention": "Cancel at each execution boundary with turn/interrupt and command/exec/terminate, then inspect all descendant processes and externally observable effects.",
+    "scenarios": [
+      "queued turn",
+      "running sandboxed command",
+      "background child process",
+      "checkpointed resumable work"
+    ]
+  },
+  "REL-06": {
+    "mechanism": "Thread identity lives in rollout files, session_index.jsonl and the SQLite state inside CODEX_HOME; relocating any subset can split identity."
+  },
+  "REL-07": {
+    "mechanism": "A working environment is reconstructed from repository-owned config.toml, auth inputs, MCP registrations and skills alone, without host state leakage."
+  },
+  "REL-08": {
+    "mechanism": "Path, Unicode, cancellation and state-import semantics differ between the Linux sandbox and other platforms; only Linux arms are scheduled in this campaign."
+  },
+  "REL-09": {
+    "mechanism": "Provider endpoints and credentials are read from model_providers config and auth storage; rebinding them exercises reconnection and re-auth."
+  },
+  "REL-10": {
+    "mechanism": "A consistent backup of the owned CODEX_HOME must capture rollout files and SQLite databases while turns are active."
+  },
+  "REL-11": {
+    "mechanism": "Thread-history migration (codex migrate-rollouts) and binary upgrades change persisted state in steps that can be interrupted.",
+    "scenarios": [
+      "before migration commit",
+      "during migration commit",
+      "after migration commit before the new version is ready",
+      "extension incompatible with new version"
+    ]
+  },
+  "REL-12": {
+    "mechanism": "Plugin and MCP registrations are republished and repaired through plugin/reconcile and config/mcpServer/reload without host state."
+  },
+  "REL-13": {
+    "mechanism": "MCP client sessions in rmcp-client have lifetimes and cancellation semantics independent of the MCP server process."
+  },
+  "REL-14": {
+    "mechanism": "Responses-API streaming carries fragmented tool-call arguments, usage and opaque reasoning fields that must round-trip through the native client."
+  },
+  "REL-15": {
+    "mechanism": "Provider failures (rate limits, 5xx, connection loss, deadlines, fallback, context limits) are retried on the real request path with bounded behavior."
+  },
+  "SEC-01": {
+    "mechanism": "Execution authority is projected from SandboxMode, execpolicy rules and approval flows onto shell commands, file changes, MCP tools and plugins.",
+    "scenarios": [
+      "shell command",
+      "apply_patch file change",
+      "MCP server tool",
+      "bundled plugin or skill hook",
+      "external plugin process"
+    ]
+  },
+  "SEC-02": {
+    "mechanism": "Credentials from auth storage and provider env keys propagate to sandboxed commands and MCP servers with distinct lifetimes."
+  },
+  "SEC-03": {
+    "mechanism": "Sandbox setup enforces writable roots and network policy; setup failures and path races change the enforced boundary."
+  },
+  "SEC-04": {
+    "mechanism": "Threads in one CODEX_HOME share persistence but must not share authority.",
+    "intervention": "Run two synthetic tenants concurrently, restart shared MCP hosts, and attempt cross-thread reads or credential reuse.",
+    "scenarios": [
+      "sequential thread reuse",
+      "concurrent turns on separate threads",
+      "cached tool result",
+      "restarted MCP server host"
+    ]
+  },
+  "SEC-05": {
+    "mechanism": "Effective policy is resolved from config.toml, -c overrides, profiles and app-server config writes at supported entry points.",
+    "intervention": "Identify Codex policy sources and mandatory versus optional configuration, then vary one layer across supported entry points."
+  },
+  "SEC-06": {
+    "mechanism": "Approval server requests (command execution, patch application, file change, permissions) and actual dispatch are separate steps."
+  },
+  "SEC-07": {
+    "mechanism": "OAuth grants for the account, gateway and MCP servers are obtained, refreshed and revoked through distinct native flows."
+  },
+  "SEC-08": {
+    "mechanism": "User content persists in rollout files, history, logs and exports; deletion and redaction act on each sink separately."
+  },
+  "SEC-09": {
+    "mechanism": "Untrusted instructions can arrive through retrieved content, tool results, repository files, skills and memory."
+  },
+  "SEC-10": {
+    "mechanism": "Network egress is controlled by sandbox policy and the network-proxy component under the declared sandbox modes."
+  },
+  "SEC-11": {
+    "mechanism": "The app-server daemon control socket and remote-control transport authenticate clients before control-plane access.",
+    "title": "App-server and control-plane authentication"
+  },
+  "SEC-12": {
+    "mechanism": "Plugins and marketplace entries are installed and updated from untrusted sources with manifest-declared capabilities."
+  },
+  "PERF-01": {
+    "mechanism": "Turn preparation (history assembly, tool catalogue, caches) sits on the response path before model dispatch."
+  },
+  "PERF-02": {
+    "mechanism": "CPU-bound preparation and asynchronous waiting contribute differently to turn latency.",
+    "intervention": "Use controlled CPU-bound preparation and IO-wait fixtures in the pinned Codex runtime; vary supported execution placement while preserving the task result."
+  },
+  "PERF-03": {
+    "mechanism": "Tool scheduling and state-writer locks serialize concurrent operations across threads and commands."
+  },
+  "PERF-04": {
+    "mechanism": "A slow turn or tool call can delay unrelated short requests through shared scheduling or state paths."
+  },
+  "PERF-05": {
+    "mechanism": "Admission under sustained, burst and overload conditions is governed by thread concurrency and the queue database."
+  },
+  "PERF-06": {
+    "mechanism": "Parallel sessions contend on SQLite state and thread-writer locks inside CODEX_HOME."
+  },
+  "PERF-07": {
+    "mechanism": "Codex exposes cloud tasks and an exec-server rather than a self-hosted node-dispatch contract; multi-host applicability must be probed at the pinned commit.",
+    "oracle": "Verify placement of the model loop, state owner, tools, and result commit; mark unavailable hosts as untested rather than simulating a claim. If the pinned Codex deployment does not advertise self-hosted multi-host execution, record unsupported with a capability probe and the pinned support contract; do not simulate support with a harness-owned second service."
+  },
+  "PERF-08": {
+    "mechanism": "Sustained load and recycling exercise queue stability, memory slope and state growth over bounded durations."
+  },
+  "PERF-09": {
+    "mechanism": "Task-solving ability on independently accepted deliverables is measured with the pinned real model through the native provider path."
+  },
+  "PERF-10": {
+    "mechanism": "Long conversations exceed context limits and trigger native compaction (thread/compact/start) with measurable completion effects."
+  },
+  "COST-01": {
+    "mechanism": "Resident memory has an idle baseline and a marginal cost per active thread and session."
+  },
+  "COST-02": {
+    "mechanism": "Initialization cost amortizes across cold process starts, warm daemon reuse and plugin or skill loading."
+  },
+  "COST-03": {
+    "mechanism": "Context and memory features amortize token and time cost across later tasks when they work as declared."
+  },
+  "COST-04": {
+    "mechanism": "Disk and inode usage amplify through rollout files, SQLite databases and cached artifacts."
+  },
+  "COST-05": {
+    "mechanism": "No native concurrent-execution budget is advertised at this commit; account rate limits are not local budgets.",
+    "oracle": "Probe the pinned runtime for a native shared execution or token budget mechanism. If absent, record unsupported with a capability probe and the pinned support contract, exactly like the OpenClaw campaign; do not treat harness-side limits as product budgets."
+  },
+  "COST-06": {
+    "mechanism": "Detailed hardware accounting covers processes, memory, disk, IO, network and cleanup completeness for owned runs."
+  },
+  "COST-07": {
+    "mechanism": "Provider usage reported by responses and account/usage/read must reconcile with the independent request ledger."
+  },
+  "EXT-01": {
+    "mechanism": "Extensions (plugins, MCP servers, skills) can be replaced while threads are active."
+  },
+  "EXT-02": {
+    "mechanism": "Provider routing through model_providers and external harness use through codex mcp are alternative integration depths."
+  },
+  "EXT-03": {
+    "mechanism": "Plugin manifests and skills declare versioned interfaces; old artifacts must load on new binaries."
+  },
+  "EXT-04": {
+    "mechanism": "Context maintenance (compaction, context fragments, message history) is a component contract affecting continuation."
+  },
+  "EXT-05": {
+    "mechanism": "MCP transports (stdio, Streamable HTTP) and content types must round-trip through the native MCP client."
+  },
+  "EXT-06": {
+    "mechanism": "AGENTS.md discovery and Skill packages feed instructions with precedence and path rules."
+  },
+  "EXT-07": {
+    "mechanism": "External tools, plugins and harnesses integrate through the plugin system, skill packages and MCP configuration.",
+    "intervention": "Use a declared external artifact corpus and identify the documented Codex integration route required by each artifact."
+  },
+  "EXT-08": {
+    "mechanism": "Plugin hooks run in declared order and may mutate inputs or outputs or fail; the supported hook set is enumerated by hooks/list.",
+    "intervention": "Register local reference hooks through documented Codex plugin interfaces and inspect actual invocation events and downstream effects."
+  },
+  "EXT-09": {
+    "mechanism": "Multiple plugins coexist through public manifest APIs without core edits or private imports."
+  },
+  "OBS-01": {
+    "mechanism": "Authorization decisions (approvals, execpolicy verdicts) are recorded in thread items and logs with actor attribution."
+  },
+  "OBS-02": {
+    "mechanism": "Diagnostic events export through the OTEL pipeline whose durability differs from canonical rollout state."
+  },
+  "OBS-03": {
+    "mechanism": "Blind diagnosis reconstructs known injected faults from accessible records alone."
+  },
+  "OBS-04": {
+    "mechanism": "Retention, export and modification boundaries apply to rollout, history and log records."
+  },
+  "OBS-05": {
+    "mechanism": "Operational diagnosis uses codex doctor and codex debug on injected fault classes."
+  },
+  "OBS-06": {
+    "mechanism": "Open trajectories link model requests, tool calls, hook activity and effects through rollout records and server notifications."
+  },
+  "OBS-07": {
+    "mechanism": "Practical trace access and export support defect diagnosis through rollout-trace and debug tooling."
+  }
+}

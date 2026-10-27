@@ -6,6 +6,8 @@ import json
 from pathlib import Path
 import re
 
+from product_profiles import profile_for
+
 ROOT = Path(__file__).resolve().parents[2]
 MATRIX = ROOT / 'evaluation/design/evaluation-matrix.json'
 DIMENSIONS = {
@@ -73,18 +75,23 @@ def load_matrix(path=MATRIX):
 def validate(matrix):
     require(matrix['schema_version'] == 2, 'Unsupported evaluation schema')
     require(matrix['status'] == 'planned-not-executed', 'This matrix records a plan, not product results')
-    require(matrix['scope']['products'] == ['openclaw'], 'Current evaluation must target OpenClaw only')
+    profile = profile_for(matrix['target']['product'])
+    product = profile['product']
+    display = profile['product_display']
+    require(matrix['scope']['products'] == [product], f'Current evaluation must target {display} only')
     require(matrix['scope']['comparison_enabled'] is False, 'Cross-product comparison is out of scope')
-    require(matrix['target']['product'] == 'openclaw', 'Target must be OpenClaw')
+    require(matrix['target']['product'] == product, f'Target must be {display}')
     target=matrix['target']
     require(target['selection_policy']=='latest-stable-at-campaign-start','Current-release campaign policy required')
-    require(isinstance(target['version'],str) and re.fullmatch(r'[0-9]{4}\.[0-9]+\.[0-9]+(?:-[0-9]+)?',target['version']),'Exact stable version required')
+    require(isinstance(target['version'],str) and re.fullmatch(profile['version_regex'],target['version']),'Exact stable version required')
     require(isinstance(target['source_commit'],str) and re.fullmatch(r'[0-9a-f]{40}',target['source_commit']),'Full current-release source pin required')
-    require(target['release_tag']=='v'+target['version'] and target['release_url']=='https://github.com/openclaw/openclaw/releases/tag/'+target['release_tag'],'Release tag/version pin mismatch')
-    require(target['npm_integrity'].startswith('sha512-') and target['npm_tarball']=='https://registry.npmjs.org/openclaw/-/openclaw-'+target['version']+'.tgz','Pinned published package integrity required')
+    expected_tag=profile['tag_for'](target['version'])
+    expected_url=f"https://github.com/{profile['repo_slug']}/releases/tag/{expected_tag}"
+    require(target['release_tag']==expected_tag and target['release_url']==expected_url,'Release tag/version pin mismatch')
+    require(target['npm_integrity'].startswith('sha512-') and target['npm_tarball']==profile['tarball_for'](target['version']),'Pinned published package integrity required')
     reference = matrix['historical_reference']
-    require(reference['branch'] == 'archive/v6', 'Historical branch must remain archive/v6')
-    require(reference['commit'] == 'a33644efc9490ff771d058ebf047f08550e4ccb3', 'Historical reference changed')
+    for key, value in profile['historical_reference_expect'].items():
+        require(reference.get(key) == value, f'Historical reference changed: {key}')
     for field in ['enabled', 'allow_dependency_downloads', 'allow_paid_model_calls']:
         require(matrix['execution'][field] is False, f'Product execution is disabled: {field}')
     require(type(matrix['execution']['run_count']) is int and matrix['execution']['run_count'] == 0, 'No product runs are recorded by this plan')
@@ -94,6 +101,7 @@ def validate(matrix):
     require(matrix['reporting']['outcome_axes'] == [d['id'] for d in dimensions], 'Reporting axes differ from the six dimensions')
     require(set(matrix['reporting']['result_labels']) == {'pass', 'fail', 'unsupported', 'not-run', 'inconclusive', 'harness-error'}, 'Missing result labels')
     seen, legacy_seen, metric_seen = set(), set(), set()
+    legacy_required = profile['provenance_kind'] == 'legacy-v6'
     for d in dimensions:
         prefix, coverage = DIMENSIONS[d['id']]
         require(d['prefix'] == prefix, f'Invalid prefix for {d["id"]}')
@@ -113,7 +121,7 @@ def validate(matrix):
             identifier = e['id']
             require(identifier not in seen and re.fullmatch(prefix + r'-[0-9]{2}', identifier), f'Invalid or duplicate case ID: {identifier}')
             seen.add(identifier)
-            require(e['product'] == 'openclaw', f'Non-OpenClaw case: {identifier}')
+            require(e['product'] == product, f'Non-{display} case: {identifier}')
             require(e['status'] == 'planned' and e['adapter_status'] == 'not-implemented', f'Unverified implementation claim: {identifier}')
             require(e['billing'] in PHASES.values(), f'Unknown phase: {identifier}')
             for field in ['title', 'mechanism', 'intervention', 'oracle']:
@@ -125,18 +133,23 @@ def validate(matrix):
             if set(e['coverage']) & {'task_capability', 'long_context', 'billing', 'prompt_injection'}:
                 require(e['billing'] == PHASES['real-model'], f'Capability/actual billing requires real usage: {identifier}')
             require(not {'score', 'winner', 'result', 'passed'} & set(e), f'Proposed test contains product results: {identifier}')
-            for legacy in e['legacy_ids']:
-                require(legacy not in legacy_seen, f'Duplicate historical mapping: {legacy}')
-                legacy_seen.add(legacy)
+            if legacy_required:
+                for legacy in e['legacy_ids']:
+                    require(legacy not in legacy_seen, f'Duplicate historical mapping: {legacy}')
+                    legacy_seen.add(legacy)
+            else:
+                require(e.get('openclaw_case_ids') == [identifier], f'Missing OpenClaw provenance mapping: {identifier}')
         require(coverage <= actual_coverage, f'Missing case coverage: {d["id"]}: {sorted(coverage-actual_coverage)}')
-    expected_legacy = {f'D{d:02}-{e:02}' for d in range(1, 12) for e in range(1, 7 if d == 11 else 5)}
-    require(legacy_seen == expected_legacy, 'Every previous experiment must retain exactly one historical mapping')
+    if legacy_required:
+        expected_legacy = {f'D{d:02}-{e:02}' for d in range(1, 12) for e in range(1, 7 if d == 11 else 5)}
+        require(legacy_seen == expected_legacy, 'Every previous experiment must retain exactly one historical mapping')
     return matrix
 
 
 def render_catalogue(matrix):
-    lines = ['# OpenClaw experiment catalogue', '',
-             'Status: planned, not executed. The [matrix](design/evaluation-matrix.json) is authoritative. Every case targets OpenClaw; unsupported capabilities require explicit evidence. No product adapter is implemented by this catalogue.', '']
+    profile = profile_for(matrix['target']['product'])
+    lines = [f'# {profile["catalogue_title"]}', '',
+             f'Status: planned, not executed. The [matrix]({profile["matrix_link"]}) is authoritative. Every case targets {profile["product_display"]}; unsupported capabilities require explicit evidence. No product adapter is implemented by this catalogue.', '']
     for d in matrix['dimensions']:
         lines += [f"## {d['name']} ({d['label_zh']})", '', d['scope'], '']
         for e in d['experiments']:
@@ -162,7 +175,7 @@ def select_plan(matrix, dimensions=(), cases=(), phase='deterministic'):
                 and (not cases or e['id'] in cases)
                 and (phase == 'all' or e['billing'] == PHASES[phase])]
     require(selected, 'No cases match these selectors and phase; real-usage cases require --phase real-model or all')
-    return dict(schema_version=2, kind='plan-only', product='openclaw', phase=phase,
+    return dict(schema_version=2, kind='plan-only', product=matrix['target']['product'], phase=phase,
                 execution_enabled=False, product_run_count=0, target=matrix['target'],
                 prerequisites=matrix['execution']['required_before_execution'], cases=selected)
 
@@ -172,7 +185,7 @@ def main(argv=None):
     sub = parser.add_subparsers(dest='command', required=True)
     sub.add_parser('list', help='List all six dimensions and case counts')
     sub.add_parser('catalogue', help='Print the generated Markdown catalogue')
-    plan = sub.add_parser('plan', help='Print a plan; never run OpenClaw or contact providers')
+    plan = sub.add_parser('plan', help='Print a plan; never run the pinned product or contact providers')
     plan.add_argument('--dimension', action='append', default=[], choices=list(DIMENSIONS))
     plan.add_argument('--case', action='append', default=[])
     plan.add_argument('--phase', choices=[*PHASES, 'all'], default='deterministic')
