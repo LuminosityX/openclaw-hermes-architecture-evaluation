@@ -1,6 +1,6 @@
 # OpenClaw 实验逐项事实记录（编写中）
 
-本文件记录实验操作与观察，不推导架构原因。当前完成 REL-01 和 REL-02 的 6 项；其余 251 项尚未整理。本轮固定 OpenClaw 2026.10.7，在 GitHub 托管运行器执行。REL-01 使用确定性实验服务，不调用付费模型。
+本文件记录实验操作与观察，不推导架构原因。当前完成 REL-01 至 REL-03 的 9 项；其余 248 项尚未整理。本轮固定 OpenClaw 2026.10.7，在 GitHub 托管运行器执行。REL-01 使用确定性实验服务，不调用付费模型。
 
 ## REL-01：任务准入、确认与进程中断
 
@@ -66,3 +66,35 @@
 
 - [REL-02 实验脚本](../runner/effect_recovery_cases.py)
 - [三次重复的原始证据 ZIP（110,827 字节）](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/releases/download/evidence-full-20261026/40323072237-campaign-REL-02-05b263e50b910686ee566a6499bd7e119adb4d08032dbc3da1b1c5b6f128b4da.zip)：各 `unit-N/summary.json` 的 `observations` 中保存两组 `arms`、请求结果与计数。
+
+## REL-03：子任务、中断和协调者租约
+
+### 共同环境
+
+每项独立重复 3 次。通过原生 `sessions_spawn` 建立实际子任务，确认子任务会话、原生轨迹和实验外部 MCP 服务的调用与效果账本存在后，再注入故障。外部服务由实验控制器托管，可在 Gateway 进程消失之后继续持有调用和返回结果。该组使用确定性 provider，没有付费模型调用。
+
+### REL-03-S01：子任务运行时 Gateway 重启
+
+**操作顺序：** 子任务发出 MCP 请求，外部服务在提交效果前将操作挂起；杀死 Gateway 及其原生运行时子进程，重启 Gateway。新 Gateway 就绪后，释放旧外部操作，允许其迟到结果返回。然后检查子任务状态、原生记录、外部效果账本以及另一个不相关任务。
+
+**三次记录：** 被中断的子任务均没有持续显示为虚假的运行中状态；旧操作的迟到结果均没有作为新的子任务成功记录附着；没有观察到旧操作自动重放；不相关的原生任务仍能运行。
+
+### REL-03-S02：外部效果提交后停止并继续子任务
+
+**操作顺序：** 等待外部 MCP 服务提交一次效果，但暂不返回工具结果。通过原生 `sessions.abort` 停止实际子任务，Gateway 保持运行。释放旧操作，再通过原生 `sessions.send` 向保留的同一子任务会话显式发送继续消息，检查会话标识、工具调用与外部账本。
+
+**三次有效补测记录：** 子任务均已停止而父 Gateway 未重启；旧操作迟到结果均没有作为新的子任务成功记录附着，旧操作没有被自动重放。显式继续使用同一个子任务会话 ID，三次均执行新的 MCP 调用；显式继续前账本已有一次效果，继续后累计两次。其他原生任务仍可运行。
+
+**记录更正：** 最早一组通过 HTTP 兼容接口向内部子任务保留命名空间发送消息，返回拒绝；该接口选择不符合此场景，原来的 S02 结果已隔离。此处采用修正接口后的补测。
+
+### REL-03-S03：真实租约到期但旧协调者仍存活
+
+**操作顺序：** 冻结属于原生运行时的 cgroup，实验控制器不被冻结；通过独立只读 SQLite 连接观察实际 `gateway-owner/global` 租约，真实等待五分钟到期。旧物理协调者仍存活时，在另一个回环端口启动第二个 Gateway 并检查其结果；之后杀死旧原生运行时，启动新的所有者，再释放旧外部结果并检查子任务和其他任务。数据库时间戳和源代码均未修改。
+
+**三次记录：** 租约过期而旧物理协调者仍存活时，第二个 Gateway 均未接管；旧所有者被实际杀死后，不同的原生所有者均能启动。三次均未观察到中断子任务持续虚假运行、旧结果作为新成功附着或旧操作自动重放；不相关任务仍能运行。
+
+### 原始材料
+
+- [REL-03 实验脚本](../runner/delegation_cases.py)与[实验协议](../campaigns/full-20261026-batched/delegation-protocol.md)
+- [S01、S03 原始记录](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/releases/download/evidence-full-20261026/40399418320-campaign-REL-03-6445169282734e3a811df59edb3416c3bf7acf6f2e5b5cad3363c68d7fe3e695.zip)；该文件也含已隔离的旧 S02，勿用于最终 S02 结论。
+- [S02 修正后原始记录](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/releases/download/evidence-full-20261026/40411478214-campaign-REL-03-9405f0c640358d92cd0a9a142e0f675bbb217297b4c39b67d369581781ed925b.zip)。
