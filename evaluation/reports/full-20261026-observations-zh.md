@@ -1,6 +1,6 @@
 # OpenClaw 实验逐项事实记录（编写中）
 
-本文件记录实验操作与观察，不推导架构原因。当前完成 REL-01 的 3 项；其余 254 项尚未整理。本轮固定 OpenClaw 2026.10.7，在 GitHub 托管运行器执行。REL-01 使用确定性实验服务，不调用付费模型。
+本文件记录实验操作与观察，不推导架构原因。当前完成 REL-01 和 REL-02 的 6 项；其余 251 项尚未整理。本轮固定 OpenClaw 2026.10.7，在 GitHub 托管运行器执行。REL-01 使用确定性实验服务，不调用付费模型。
 
 ## REL-01：任务准入、确认与进程中断
 
@@ -35,3 +35,34 @@
 - [REL-01 实验脚本](../runner/admission_cases.py)
 - [三次重复的原始证据 ZIP（203,791 字节）](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/releases/download/evidence-full-20261026/40374512119-campaign-REL-01-66f3f346ef1ffcfaf5856772df282cf26665a93b94eb12a74e470946007d04fa.zip)：`unit-1/summary.json`、`unit-2/summary.json`、`unit-3/summary.json` 中的 `observations`。
 - [完整实验逐项索引](full-20261026-scenario-index.md)
+
+## REL-02：外部操作、响应丢失和显式重试
+
+### 共同环境和操作
+
+每次重复启动真实 Gateway 和实验用 Streamable HTTP MCP 服务。服务以独立计数器记录实际提交的外部操作；确定性测试驱动使原生代理调用 `effects__eval_probe` 工具。先通过 Gateway 和 MCP 分别执行正向对照。每个场景分为两组：无幂等组，以及有幂等组；有幂等组的去重由实验 MCP 服务按固定效果键执行。两组均在首次调用后记录计数，再由操作端显式发起一次重试。每个场景独立重复 3 次。实验没有付费模型调用。
+
+### REL-02-S01：效果提交前连接断开
+
+**操作顺序：** MCP 服务接到工具调用后、记录外部效果前，主动断开连接；随后查看首次原生请求结果及独立计数器，再以相同目标效果显式重试一次。
+
+**三次实际记录：** 无幂等组与有幂等组均相同：首次请求的 `accepted` 为 false，重试前计数为 0；显式重试的 `accepted` 为 true，重试后计数为 1。两组在 3 次重复中均是这个结果。
+
+### REL-02-S02：效果提交后响应丢失
+
+**操作顺序：** MCP 服务先提交并计数外部效果，再丢弃对该工具调用的响应；记录首次原生请求结果和效果计数，之后显式重试一次。
+
+**三次实际记录：** 两组首次请求的 `accepted` 均为 false，显式重试前计数均为 1，重试均返回 `accepted: true`。无幂等组重试后计数为 2；有幂等组重试后计数仍为 1。3 次重复均如此。测试脚本记录没有观察到自动效果重放或自动对账。
+
+### REL-02-S03：效果提交后、工具结果记录前杀死 Gateway
+
+**操作顺序：** MCP 服务先提交外部效果，然后用门闩阻止结果返回。测试确认独立计数器已达到 1 后，向 Gateway 进程组发送 `SIGKILL`；释放门闩，确认进程退出并重启 Gateway，执行恢复正向对照后再显式重试一次。
+
+**三次实际记录：** 两组首次请求的 `accepted` 均为 false，重试前计数均为 1，显式重试均返回 `accepted: true`。无幂等组重试后计数为 2；有幂等组重试后计数仍为 1。3 次重复均如此。
+
+**幂等条件：** 这里的固定效果键由测试服务识别并去重；上述计数不能单独归为 OpenClaw 原生提供的跨外部服务去重。
+
+### 原始材料
+
+- [REL-02 实验脚本](../runner/effect_recovery_cases.py)
+- [三次重复的原始证据 ZIP（110,827 字节）](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/releases/download/evidence-full-20261026/40323072237-campaign-REL-02-05b263e50b910686ee566a6499bd7e119adb4d08032dbc3da1b1c5b6f128b4da.zip)：各 `unit-N/summary.json` 的 `observations` 中保存两组 `arms`、请求结果与计数。
