@@ -12,6 +12,8 @@ The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3e
 
 Read the [completed campaign architecture analysis](evaluation/reports/full-20261026-architecture.md) for source-backed mechanisms, cross-dimension tradeoffs, measurement limits and the retained failed acceptance observations.
 
+The [Chinese experiment-by-experiment factual report](evaluation/reports/full-20261026-observations-zh.md) describes all 257 scenario setups and observations. Its [per-unit evidence compilation](evaluation/reports/full-20261026-observations-draft-zh.md) retains measured fields and source links; machine-translated labels in that appendix are marked as unreviewed.
+
 
 | Dimension | Focus | Planned families |
 | --- | --- | --- |
