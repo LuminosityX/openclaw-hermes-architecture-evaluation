@@ -21,13 +21,19 @@ class Handler(BaseHTTPRequestHandler):
         pass
     def do_POST(self):
         body = json.loads(self.rfile.read(int(self.headers['Content-Length'])))
-        if not self.path.endswith('/chat/completions'):
+        if not (self.path.endswith('/chat/completions') or self.path.endswith('/messages')):
             self.send_error(404)
             return
         requests.append(body)
         self.send_response(200)
         self.send_header('Content-Type', 'text/event-stream')
         self.end_headers()
+        if self.path.endswith('/messages'):
+            events = [('message_start', {'type': 'message_start', 'message': {'id': 'synthetic', 'type': 'message', 'role': 'assistant', 'model': 'deepseek-flash', 'content': [], 'stop_reason': None, 'usage': {'input_tokens': 1, 'output_tokens': 0}}}), ('content_block_start', {'type': 'content_block_start', 'index': 0, 'content_block': {'type': 'text', 'text': ''}}), ('content_block_delta', {'type': 'content_block_delta', 'index': 0, 'delta': {'type': 'text_delta', 'text': 'SYNTHETIC_ACK'}}), ('content_block_stop', {'type': 'content_block_stop', 'index': 0}), ('message_delta', {'type': 'message_delta', 'delta': {'stop_reason': 'end_turn', 'stop_sequence': None}, 'usage': {'output_tokens': 1}}), ('message_stop', {'type': 'message_stop'})]
+            for name, event in events:
+                self.wfile.write(('event: ' + name + '\ndata: ' + json.dumps(event) + '\n\n').encode())
+            self.wfile.flush()
+            return
         for delta, finish in [({'role': 'assistant', 'content': 'SYNTHETIC_ACK'}, None), ({}, 'stop')]:
             chunk = {'id': 'synthetic', 'object': 'chat.completion.chunk', 'created': int(time.time()),
                      'model': 'fixture-model', 'choices': [{'index': 0, 'delta': delta, 'finish_reason': finish}]}
@@ -68,8 +74,7 @@ try:
         root = Path(tmp)
         env = dict(os.environ, PATH=str(runtime / 'node_modules/.bin') + os.pathsep + os.environ['PATH'])
         dshhome = root / 'dsh'; dshhome.mkdir()
-        (dshhome / 'settings.yaml').write_text(f'llm-deepseek:\n  protocol: chat-completions\n  baseURL: {base}\n  thinking: disabled\n')
-        dshenv = dict(env, DSH_HOME=str(dshhome), DEEPSEEK_API_KEY='synthetic-only')
+        dshenv = dict(env, DSH_HOME=str(dshhome), DEEPSEEK_BASE_URL=base, DEEPSEEK_API_KEY='synthetic-only')
         start = len(requests)
         first = invoke(['dsh', '--profile', 'headless', '--json', 'SESSION_MARKER_7345'], dshenv, root)
         sid = None
