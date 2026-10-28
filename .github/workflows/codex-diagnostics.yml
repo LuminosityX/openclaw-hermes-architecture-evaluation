@@ -1,0 +1,46 @@
+name: Codex sandbox diagnostics
+
+on:
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-diagnostics
+  cancel-in-progress: true
+
+jobs:
+  probe:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Install pinned Codex
+        run: |
+          mkdir -p "$RUNNER_TEMP/codex-diag-runtime"
+          printf '{"name":"codex-diag","private":true,"dependencies":{"@openai/codex":"0.164.0"}}' \
+            > "$RUNNER_TEMP/codex-diag-runtime/package.json"
+          npm install --prefix "$RUNNER_TEMP/codex-diag-runtime" --no-fund --no-audit
+      - name: Probe sandbox network reachability and effect transport
+        run: |
+          CODEX_BIN="$RUNNER_TEMP/codex-diag-runtime/node_modules/.bin/codex"
+          python3 evaluation/tools/codex_diagnostics.py --codex "$CODEX_BIN"
+      - name: Upload diagnostic output
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: codex-diagnostics
+          path: ${{ runner.temp }}/codex-diagnostics.json
+          retention-days: 7
+          if-no-files-found: error
+      - name: Cleanup
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/codex-diag-runtime" "$RUNNER_TEMP/codex-diagnostics.json"

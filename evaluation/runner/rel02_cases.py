@@ -68,6 +68,17 @@ def function_call_output_lines(records, call_id):
     return hits
 
 
+def output_text_bounded(outputs, limit=600):
+    """Bounded diagnostic capture of tool outputs (never returned to the model)."""
+    texts = []
+    for payload in outputs:
+        output = payload.get('output')
+        if isinstance(output, dict):
+            output = output.get('content') or output.get('output') or output
+        texts.append(str(output)[:limit])
+    return texts
+
+
 def verdict(assertions):
     return 'pass' if all(a['verdict'] == 'pass' for a in assertions) else 'fail'
 
@@ -90,7 +101,8 @@ def run_s01(runtime, unit):
     complete = task_complete_events(records, 'REL02_S01_FINAL')
     observations = dict(exit=result['exit'], ledger=counts,
                         function_calls=len(calls), call_outputs=len(outputs),
-                        task_complete=len(complete))
+                        task_complete=len(complete),
+                        tool_output_text=output_text_bounded(outputs))
     assertions = [
         dict(name='rejected-effect-not-committed-anywhere',
              verdict='pass' if counts['committed'] == 0 else 'fail',

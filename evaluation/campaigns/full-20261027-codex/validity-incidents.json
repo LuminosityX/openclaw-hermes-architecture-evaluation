@@ -1,0 +1,18 @@
+{
+  "kind": "codex-campaign-validity-incidents",
+  "incidents": [
+    {
+      "id": "V001",
+      "discovered_at_utc": "2026-10-28T03:30:00Z",
+      "affected_run_id": "40623786741",
+      "affected_family": "REL-02",
+      "affected_scenarios": ["REL-02-S01", "REL-02-S02", "REL-02-S03"],
+      "classification": "suspected-harness-defect-under-diagnosis",
+      "observation": "All nine hosted observations failed the ledger-reconciliation assertions because the independent effect ledger received zero requests, while the rollout records the exec_command tool call with an output. The same controller passed all assertions on the development host, where the sandboxed tool reached the loopback ledger.",
+      "suspected_cause": "The effect transport (loopback HTTP from inside the workspace-write sandbox) behaves differently on the hosted ubuntu-24.04 image than on the development host; the tool output text was not captured in the first controller revision, so the exact failure mode (connection blocked, command unavailable, or sandbox policy difference) is not yet evidenced.",
+      "disposition": "Observations quarantined to quarantined-results/ and excluded from the audit until the diagnosis closes. They are not counted as product failures.",
+      "repair_plan": "Capture bounded tool-output text in observations; run a hosted diagnostic probe (sandbox network reachability, curl availability, in-turn effect attempt); then either fix the harness transport (for example file-based effects inside the writable workspace) and rerun REL-02, or record a product boundary observation if the sandbox itself refuses the declared network_access grant.",
+      "original_evidence_preserved": "quarantined-results/40623786741-codex-campaign-REL-02.json.gz (unmodified)"
+    }
+  ]
+}
