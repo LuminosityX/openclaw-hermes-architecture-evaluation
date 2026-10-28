@@ -151,12 +151,12 @@
         "DSH": {
           "status": "in_progress",
           "evidence": [],
-          "note": "GitHub hosted session reconstruction calibration prepared; not a formal result."
+          "note": "Three-unit hosted calibration: success; formal protocol remains incomplete."
         },
         "OpenClaw": {
           "status": "in_progress",
           "evidence": [],
-          "note": "GitHub hosted session reconstruction calibration prepared; not a formal result."
+          "note": "Three-unit hosted calibration: success; formal protocol remains incomplete."
         }
       }
     },
@@ -226,5 +226,9 @@
         }
       }
     }
-  ]
+  ],
+  "latest_ci": {
+    "result": "success",
+    "url": "https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40622793927"
+  }
 }

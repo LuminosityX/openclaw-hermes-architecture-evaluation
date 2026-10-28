@@ -26,6 +26,8 @@ Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, acros
 | Harness · H11 审批绑定 | 待开始 | 待开始 | 待开始 |
 | Harness · H17 轨迹重建 | 待开始 | 待开始 | 待开始 |
 
+**最近一次会话校准：** success（三个独立 runner 的汇总）。[查看运行和各单元](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40622793927)。
+
 **既有 OpenClaw 冻结实验：** 253/257 场景已测，224 通过、29 保留失败观察，4 已确认不适用；969 个独立观察。[审计与证据](evaluation/campaigns/full-20261026-batched/README.md)。
 
 看板由 [进度台账](comparison/progress.json) 和冻结审计生成，反映仓库最新提交，运行中状态需更新台账。详见 [维护说明](comparison/README.md)。
