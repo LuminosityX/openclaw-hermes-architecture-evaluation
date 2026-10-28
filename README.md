@@ -2,55 +2,48 @@
 
 Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, across two complementary layers: how a system hosts agent work, and how its harness manages each execution. Six dimensions—reliability, security, performance, cost, extensibility, and observability—apply to both layers.
 
-## Live CI
+## Six dimensions, two architecture layers
+
+The platform layer examines how each system hosts and operates agent work. The harness layer examines how it assembles, controls, and recovers an individual run. Each experiment contributes evidence to one or more dimensions; a work item is not a dimension score.
+
+| Dimension | Platform question | Harness question | Initial work |
+| --- | --- | --- | --- |
+| **Reliability** | Which failures stay within a process or deployment boundary, and what state survives? | Are context and actions preserved, recovered, or retried correctly? | P01, P02, H03, H04, H05, H07, H08 |
+| **Security** | Where do state and credentials reside, and who can reach them? | Does authorization cover the operation actually dispatched? | P02, H11 |
+| **Performance** | What throughput and resource contention result from the deployment? | How does tool scheduling affect time and correctness? | P03, H08 |
+| **Resource & cost** | What are the idle and marginal costs of hosting work? | What do context handling and retries consume? | P03, H03, H04, H07 |
+| **Extensibility** | How much integration is required to submit and control work through another entry? | Which execution components can be extended without taking over critical responsibilities? | P04; harness component replacement is a future protocol |
+| **Observability** | Can operators see failures and their impact across boundaries? | Can they reconstruct approval, tool effects, and recovery? | P01, P04, H05, H11, H17 |
+
+The entries show **planned lines of investigation**, not proven product capabilities or complete coverage of a dimension. For example, state-location inspection alone does not establish security, and access integration alone does not establish harness extensibility. [Protocol details and limits](comparison/first-wave-protocol.md).
 
 [![Architecture research progress](comparison/progress.svg)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
-
-[![Comparison CI](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml/badge.svg?branch=research%2Fcomparison-calibration)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
-
-[View live comparison runs, individual jobs, logs, and artifacts](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration). GitHub supplies the badge and run page; the badge reflects the latest workflow outcome, while the run page shows jobs currently in progress. The table below tracks research work, updated from the repository ledger; it does not automatically reflect a running job.
 
 <!-- comparison-dashboard:start -->
 ## Research progress
 
 Each cell is a work item, not a success rate. Historical OpenClaw evidence is not counted as completed cross-product work.
 
-| Layer / experiment | Codex | DSH | OpenClaw |
-| --- | --- | --- | --- |
-| Platform · P01 Fault domains | Planned | Planned | Planned |
-| Platform · P02 State and deployment | Planned | Planned | Planned |
-| Platform · P03 Resources and concurrency | Planned | Planned | Planned |
-| Platform · P04 Access and operations | Planned | Planned | Planned |
-| Harness · H03 Compaction and constraints | Planned | Planned | Planned |
-| Harness · H04 Large tool outputs | Planned | Planned | Planned |
-| Harness · H05 Recovery and side effects | Planned | In progress | In progress |
-| Harness · H07 Model failure and retry | Planned | Planned | Planned |
-| Harness · H08 Tool scheduling | Planned | Planned | Planned |
-| Harness · H11 Approval binding | Planned | Planned | Planned |
-| Harness · H17 Execution trace | Planned | Planned | Planned |
+| Layer / experiment | Dimensions | Codex | DSH | OpenClaw |
+| --- | --- | --- | --- | --- |
+| Platform · P01 Fault domains | Reliability, Observability | Planned | Planned | Planned |
+| Platform · P02 State and deployment | Reliability, Security | Planned | Planned | Planned |
+| Platform · P03 Resources and concurrency | Performance, Resource & cost | Planned | Planned | Planned |
+| Platform · P04 Access and operations | Extensibility, Observability | Planned | Planned | Planned |
+| Harness · H03 Compaction and constraints | Reliability, Resource & cost | Planned | Planned | Planned |
+| Harness · H04 Large tool outputs | Reliability, Resource & cost | Planned | Planned | Planned |
+| Harness · H05 Recovery and side effects | Reliability, Observability | Planned | In progress | In progress |
+| Harness · H07 Model failure and retry | Reliability, Resource & cost | Planned | Planned | Planned |
+| Harness · H08 Tool scheduling | Performance, Reliability | Planned | Planned | Planned |
+| Harness · H11 Approval binding | Security, Observability | Planned | Planned | Planned |
+| Harness · H17 Execution trace | Observability | Planned | Planned | Planned |
 
-**Latest session calibration:** success (aggregate of three independent runners). [View run and individual jobs](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40623428889).
+**Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40623428889).
 
 **Frozen OpenClaw campaign:** 253/257 scenarios measured; 224 passed, 29 retained failures, 4 confirmed not applicable; 969 independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).
 
-Generated from the [progress ledger](comparison/progress.json) and the frozen audit. GitHub Actions shows live job steps; session calibration results synchronize automatically. See [maintenance](comparison/README.md).
+Explore [experiment status and evidence](comparison/README.md). Calibrations are not formal results.
 <!-- comparison-dashboard:end -->
-
-## What the experiments reveal
-
-| Experiment group | Architecture question | What the evidence can show |
-| --- | --- | --- |
-| Platform · fault domains | Who owns a task if its caller or service stops? | Process boundaries, surviving work, and recovery responsibility. |
-| Platform · state and deployment | Where do sessions, credentials, and workspaces live? | What survives a restart and what depends on external components. |
-| Platform · resources and concurrency | What does a shared service or per-task process cost? | Idle footprint, marginal resource use, and isolation tradeoffs. |
-| Platform · access and operations | How can a caller submit, observe, cancel, and resume work? | Integration surface, operational steps, and missing capabilities. |
-| Harness · context | What does the model retain after compaction or large tool output? | Constraint loss, retrieval paths, and the cost of keeping useful information. |
-| Harness · recovery | What happens after interruption and an external side effect? | Rebuilt conversation state, duplicate effects, and uncertainty handling. |
-| Harness · model retries | How does the system respond when a model request fails? | Retry attempts, delays, and their observable consequences. |
-| Harness · tools and approvals | How are calls ordered and actions authorized? | Dependency handling, parallelism, and whether approval covers the dispatched operation. |
-| Harness · traces | Can an operator reconstruct what happened and why? | Missing links between requests, approvals, tools, outcomes, and costs. |
-
-The [first-wave protocols](comparison/first-wave-protocol.md) spell out controls and limits. These are research questions, not claims that all three products have already passed them.
 
 ## Research and evidence
 
@@ -66,23 +59,6 @@ The [first-wave protocols](comparison/first-wave-protocol.md) spell out controls
 
 The completed OpenClaw campaign used version 2026.10.7, commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Its observations are historical evidence for that configuration, not completed three-product experiments. The new DSH target is the preview `0.2.2-alpha.2`; each hosted run records its exact installation and does not run Codex.
 
-## Repository map
+## Further information
 
-- `comparison/` — cross-product protocols, progress ledger and hosted calibration.
-- `evaluation/` — frozen OpenClaw design, runner, tests, reports and evidence.
-- `v6/` — immutable historical archive; `SOURCE_MANIFEST.json` records its integrity.
-- `docs/` — methodology, reproduction, provenance and historical guides.
-- `.github/workflows/` — checks and disposable hosted experiment jobs.
-
-## Validate locally
-
-These commands inspect repository data and code; they do not install products or run experiments.
-
-```sh
-python3 tools/check_repository.py
-python3 evaluation/tools/check_design.py
-python3 comparison/dashboard.py --check
-python3 -m unittest discover -s evaluation/tests -v
-```
-
-The [contribution guide](CONTRIBUTING.md), [security policy](SECURITY.md), [license](LICENSE), and [third-party notices](THIRD_PARTY_NOTICES.md) remain applicable. Synthetic experiment output, version pins and measurement limits are required before drawing product conclusions.
+See the [contribution guide](CONTRIBUTING.md), [security policy](SECURITY.md), [license](LICENSE), and [third-party notices](THIRD_PARTY_NOTICES.md). The [workspace guide](comparison/README.md) covers how to maintain progress and reproduce the research.

@@ -8,6 +8,10 @@ The harness layer studies how one agent run is assembled and controlled: context
 
 Use separate tracks: native product configurations; controlled harness experiments with the same model, tools, and budget where supported; and mechanism-specific investigation. Disclose uncontrolled factors. A shared model alone does not prove that a particular mechanism caused an observed difference.
 
+## Six-dimension interpretation
+
+Every item in [the status ledger](progress.json) identifies its primary dimensions. The homepage maps all six dimensions across both architectural layers. These are evidence relationships, not claims of full coverage or dimension-level scores. One observation can inform multiple dimensions: H05 can demonstrate conversation recovery and the trace available to diagnose it, but cannot establish effect safety without an independent effect ledger. P02 can locate credentials but does not by itself establish authorization or confidentiality. P04 examines integration but does not prove harness replacement. A final six-dimension assessment requires matching formal results, explicit deployment and model controls, and disclosure of missing or inapplicable capabilities.
+
 ## Before execution
 
 Freeze product version, commit when available, entry point, operating system, configuration, model, and tools. DSH 0.2.2-alpha.2 is a preview package and its package integrity must be recorded. The frozen OpenClaw campaign's version applies only to its own evidence. Draw and validate each actual deployment and responsibility map. Record model substitution, tool integration, request visibility, fault injection, resume, and approval as native, public extension, external component, unsupported, untested, or unobservable. An adapter must not implement retries, deduplication, or permissions on the product's behalf.

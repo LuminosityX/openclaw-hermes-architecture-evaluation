@@ -19,12 +19,16 @@ def render():
     counts = audit['scenario_counts']
     lines = [START, '## Research progress', '',
         'Each cell is a work item, not a success rate. Historical OpenClaw evidence is not counted as completed cross-product work.', '',
-        '| Layer / experiment | Codex | DSH | OpenClaw |', '| --- | --- | --- | --- |']
+        '| Layer / experiment | Dimensions | Codex | DSH | OpenClaw |', '| --- | --- | --- | --- | --- |']
     seen = set()
     for item in data['items']:
         if item['id'] in seen or item['layer'] not in ('platform', 'harness'):
             raise ValueError('Duplicate ID or invalid layer')
         seen.add(item['id'])
+        dimensions = item.get('dimensions', [])
+        allowed = {'Reliability', 'Security', 'Performance', 'Resource & cost', 'Extensibility', 'Observability'}
+        if not dimensions or len(set(dimensions)) != len(dimensions) or not set(dimensions) <= allowed:
+            raise ValueError('Invalid dimension mapping')
         if set(item['products']) != set(data['products']):
             raise ValueError('Each item must cover every product')
         cells = []
@@ -41,16 +45,16 @@ def render():
                     raise ValueError(f'Invalid evidence path: {name}')
             cells.append(LABEL[status])
         layer = 'Platform' if item['layer'] == 'platform' else 'Harness'
-        lines.append(f"| {layer} · {item['id']} {item['name']} | " + ' | '.join(cells) + ' |')
+        lines.append(f"| {layer} · {item['id']} {item['name']} | {', '.join(dimensions)} | " + ' | '.join(cells) + ' |')
     latest = data.get('latest_ci')
     if latest:
         url = latest['url']
         prefix = 'https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/'
         if not url.startswith(prefix) or not url[len(prefix):].isdigit() or latest['result'] not in ('success', 'failure', 'cancelled', 'skipped'):
             raise ValueError('Invalid CI progress record')
-        lines += ['', f"**Latest session calibration:** {latest['result']} (aggregate of three independent runners). [View run and individual jobs]({url})."]
+        lines += ['', f"**Latest session calibration:** {latest['result']} (three independent calibration units). [View calibration evidence]({url})."]
     lines += ['', f"**Frozen OpenClaw campaign:** {audit['measured_scenarios']}/{audit['scenarios']} scenarios measured; {counts['pass']} passed, {counts['fail']} retained failures, {counts['unsupported']} confirmed not applicable; {audit['accepted_observation_count']} independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).", '',
-        'Generated from the [progress ledger](comparison/progress.json) and the frozen audit. GitHub Actions shows live job steps; session calibration results synchronize automatically. See [maintenance](comparison/README.md).', END]
+        'Explore [experiment status and evidence](comparison/README.md). Calibrations are not formal results.', END]
     return '\n'.join(lines)
 
 
@@ -78,7 +82,7 @@ def render_visual():
                 out.append(f'<rect x="{x:.2f}" y="{y}" width="{width:.2f}" height="16" fill="{colors[status]}" rx="3"/>')
             x += width
         out.append(f'<text x="800" y="{y+13}" fill="#b9c7e1" font-family="Arial,sans-serif" font-size="13">{counts["done"]} complete · {counts["in_progress"]} active</text>')
-    out += ['<text x="52" y="257" fill="#a7b6d4" font-family="Arial,sans-serif" font-size="12">● COMPLETE     ● IN PROGRESS     ● PLANNED     |     LIVE JOBS: OPEN GITHUB ACTIONS</text>', '</svg>']
+    out += ['<text x="52" y="257" fill="#a7b6d4" font-family="Arial,sans-serif" font-size="12">● COMPLETE     ● IN PROGRESS     ● PLANNED     |     SIX DIMENSIONS · TWO ARCHITECTURE LAYERS</text>', '</svg>']
     return '\n'.join(out) + '\n'
 
 

@@ -26,7 +26,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Reliability",
+        "Observability"
+      ]
     },
     {
       "layer": "platform",
@@ -48,7 +52,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Reliability",
+        "Security"
+      ]
     },
     {
       "layer": "platform",
@@ -70,7 +78,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Performance",
+        "Resource & cost"
+      ]
     },
     {
       "layer": "platform",
@@ -92,7 +104,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Extensibility",
+        "Observability"
+      ]
     },
     {
       "layer": "harness",
@@ -114,7 +130,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Reliability",
+        "Resource & cost"
+      ]
     },
     {
       "layer": "harness",
@@ -136,7 +156,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Reliability",
+        "Resource & cost"
+      ]
     },
     {
       "layer": "harness",
@@ -158,7 +182,11 @@
           "evidence": [],
           "note": "Three-unit hosted calibration: success; formal protocol remains incomplete."
         }
-      }
+      },
+      "dimensions": [
+        "Reliability",
+        "Observability"
+      ]
     },
     {
       "layer": "harness",
@@ -180,7 +208,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Reliability",
+        "Resource & cost"
+      ]
     },
     {
       "layer": "harness",
@@ -202,7 +234,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Performance",
+        "Reliability"
+      ]
     },
     {
       "layer": "harness",
@@ -224,7 +260,11 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Security",
+        "Observability"
+      ]
     },
     {
       "layer": "harness",
@@ -246,7 +286,10 @@
           "evidence": [],
           "note": ""
         }
-      }
+      },
+      "dimensions": [
+        "Observability"
+      ]
     }
   ],
   "latest_ci": {
