@@ -111,6 +111,31 @@
       ]
     },
     {
+      "layer": "platform",
+      "id": "P05",
+      "name": "Identity and access boundaries",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Security"
+      ]
+    },
+    {
       "layer": "harness",
       "id": "H03",
       "name": "Compaction and constraints",
@@ -264,6 +289,32 @@
       "dimensions": [
         "Security",
         "Observability"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H14",
+      "name": "Tool lifecycle and integration",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Extensibility",
+        "Reliability"
       ]
     },
     {

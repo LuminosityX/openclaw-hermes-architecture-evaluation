@@ -1,0 +1,173 @@
+{
+  "schema_version": 1,
+  "protocol": "comparison/execution-protocol.md",
+  "state": "specified",
+  "cases": [
+    {
+      "id": "P01",
+      "layer": "platform",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "P02",
+      "layer": "platform",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "P03",
+      "layer": "platform",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "independent_units_per_condition": 6,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "P04",
+      "layer": "platform",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "P05",
+      "layer": "platform",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H03",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "model_and_scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H04",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "model_and_scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H05",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H07",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H08",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "model_and_scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H11",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H14",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1",
+        "C2",
+        "C3",
+        "C4"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    },
+    {
+      "id": "H17",
+      "layer": "harness",
+      "conditions": [
+        "C0",
+        "C1"
+      ],
+      "independent_units_per_condition": 3,
+      "track": "scripted",
+      "implementation": "planned"
+    }
+  ]
+}

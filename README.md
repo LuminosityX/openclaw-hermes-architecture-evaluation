@@ -9,15 +9,15 @@ The platform layer examines how each system hosts and operates agent work. The h
 | Dimension | Platform evaluation | Harness evaluation | Initial work |
 | --- | --- | --- | --- |
 | **Reliability** | Failure isolation, state persistence, and deployment recovery | Context retention, execution recovery, and retry behavior | P01, P02, H03, H04, H05, H07, H08 |
-| **Security** | State and credential ownership, access boundaries, and isolation | Authorization scope and consistency between approval and execution | P02, H11 |
+| **Security** | State and credential ownership, access boundaries, and isolation | Authorization scope and consistency between approval and execution | P02, P05, H11 |
 | **Performance** | Throughput, concurrency, and resource contention | Tool scheduling, execution latency, and dependency handling | P03, H08 |
 | **Resource & cost** | Idle footprint and marginal cost per task | Context processing, retry overhead, and model usage | P03, H03, H04, H07 |
-| **Extensibility** | Entry-point integration and operational control | Component extension and responsibility boundaries | P04; harness component replacement is a future protocol |
+| **Extensibility** | Entry-point integration and operational control | Component extension and responsibility boundaries | P04, H14 |
 | **Observability** | Fault visibility and diagnosis across system boundaries | Reconstruction of approvals, tool effects, and recovery | P01, P04, H05, H11, H17 |
 
-Explore the [experiment catalogue](comparison/experiment-index.md) for each scenario, its measurements, architectural value, and readiness.
+Explore the [experiment catalogue](comparison/experiment-index.md) and [execution protocol](comparison/execution-protocol.md) for scenarios, measurements, acceptance, and readiness.
 
-[![Architecture research progress](comparison/progress.svg?v=1737fbda3a88)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
+[![Architecture research progress](comparison/progress.svg?v=cb643a6a76b4)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
 
 <!-- comparison-dashboard:start -->
 ## Research progress
@@ -28,12 +28,14 @@ Explore the [experiment catalogue](comparison/experiment-index.md) for each scen
 | Platform · P02 State and deployment | Reliability, Security | Planned | Planned | Planned |
 | Platform · P03 Resources and concurrency | Performance, Resource & cost | Planned | Planned | Planned |
 | Platform · P04 Access and operations | Extensibility, Observability | Planned | Planned | Planned |
+| Platform · P05 Identity and access boundaries | Security | Planned | Planned | Planned |
 | Harness · H03 Compaction and constraints | Reliability, Resource & cost | Planned | Planned | Planned |
 | Harness · H04 Large tool outputs | Reliability, Resource & cost | Planned | Planned | Planned |
 | Harness · H05 Recovery and side effects | Reliability, Observability | Planned | In progress | In progress |
 | Harness · H07 Model failure and retry | Reliability, Resource & cost | Planned | Planned | Planned |
 | Harness · H08 Tool scheduling | Performance, Reliability | Planned | Planned | Planned |
 | Harness · H11 Approval binding | Security, Observability | Planned | Planned | Planned |
+| Harness · H14 Tool lifecycle and integration | Extensibility, Reliability | Planned | Planned | Planned |
 | Harness · H17 Execution trace | Observability | Planned | Planned | Planned |
 
 **Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40623428889).
@@ -47,7 +49,8 @@ Explore the [experiment catalogue](comparison/experiment-index.md) for each scen
 | --- | --- |
 | [Three-product workspace](comparison/README.md) | Scope, dashboard maintenance and evidence rules |
 | [Experiment catalogue](comparison/experiment-index.md) | Shared scenarios, measurements, architecture evidence and readiness |
-| [First-wave protocols](comparison/first-wave-protocol.md) | Detailed execution controls and acceptance criteria |
+| [Execution protocol](comparison/execution-protocol.md) | Two-layer, six-dimension scenarios and acceptance |
+| [First-wave protocols](comparison/first-wave-protocol.md) | Initial execution controls and acceptance criteria |
 | [Execution plan](comparison/plan.md) | Priorities, comparison tracks and evidence reuse |
 | [OpenClaw campaign](evaluation/README.md) | Frozen six-dimension design, tooling and execution guides |
 | [OpenClaw architecture report](evaluation/reports/full-20261026-architecture.md) | Source-backed results and tradeoffs for the frozen campaign |

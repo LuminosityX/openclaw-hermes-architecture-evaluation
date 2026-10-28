@@ -4,12 +4,7 @@ This catalogue is the shared reference for comparing Codex, DeepSeek Harness (DS
 
 ## Readiness
 
-| Stage | Experiments | Current state |
-| --- | --- | --- |
-| Detailed first-wave protocols | P01, P02/H05 session reconstruction, P03, H07 | Scenario protocols are written. DSH and OpenClaw have each passed three session-reconstruction calibration units; Codex runtime calibration is pending. |
-| Candidate specifications | P04, H03, H04, H05 side effects, H08, H11, H17 | Common scenarios are specified below. Tool access, fault injection, and observations still need adapter calibration for each product. |
-
-The [first-wave protocol](first-wave-protocol.md) defines exact entry points, isolation, repeats, and validity rules for the detailed scenarios. This catalogue supplies the shared questions and comparison contract for the full portfolio. Implementations and formal evidence will be linked from the [progress ledger](progress.json).
+The [execution protocol](execution-protocol.md) defines the full two-layer, six-dimension campaign: fixtures, product profiles, scenario conditions, controls, measurements, acceptance, and evidence. DSH and OpenClaw have passed three hosted session-reconstruction calibration units. The remaining adapters, fixtures, and CI cases are implementation work; Codex runtime calibration is pending.
 
 ## Shared comparison contract
 
@@ -23,12 +18,14 @@ Use three complementary tracks: **native product** configurations for operationa
 | [P02](#p02--state-and-deployment) | Platform | Reliability, security | State ownership and restart behavior |
 | [P03](#p03--resources-and-concurrency) | Platform | Performance, resource & cost | Lifecycle footprint and task contention |
 | [P04](#p04--access-and-operations) | Platform | Extensibility, observability | Integration and operational control |
+| [P05](execution-protocol.md#p05--security-platform-identity-and-state-boundaries) | Platform | Security | Identity, state and endpoint boundaries |
 | [H03](#h03--compaction-and-constraints) | Harness | Reliability, resource & cost | Context retention and compaction cost |
 | [H04](#h04--large-tool-outputs) | Harness | Reliability, resource & cost | Output visibility and retrieval |
 | [H05](#h05--recovery-and-side-effects) | Harness | Reliability, observability | Session and effect recovery |
 | [H07](#h07--model-failure-and-retry) | Harness | Reliability, resource & cost | Retry behavior and its cost |
 | [H08](#h08--tool-scheduling) | Harness | Performance, reliability | Concurrency, dependencies, and failures |
 | [H11](#h11--approval-binding) | Harness | Security, observability | Approval scope and actual dispatch |
+| [H14](execution-protocol.md#h14--extensibility-tool-lifecycle) | Harness | Extensibility, reliability | Tool integration and lifecycle |
 | [H17](#h17--execution-trace) | Harness | Observability | Causal reconstruction |
 
 ## Platform experiments
@@ -122,6 +119,10 @@ Use three complementary tracks: **native product** configurations for operationa
 **Measure:** Recoverable user request, call and result identifiers, authorization source, retry cause, actual effect, missing evidence, and diagnosis time.
 
 **Architecture evidence:** Tests whether the system connects its decisions, operations, and outcomes well enough to investigate a failure. **Calibration needed:** accessible native logs and a reproducible fault that all three products can exercise.
+
+## Detailed execution
+
+The [execution protocol](execution-protocol.md) contains scenario conditions, controls, repetitions, and acceptance for every item above, including P05 and H14.
 
 ## Evidence and reporting
 

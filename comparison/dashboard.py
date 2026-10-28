@@ -45,6 +45,18 @@ def render():
             cells.append(LABEL[status])
         layer = 'Platform' if item['layer'] == 'platform' else 'Harness'
         lines.append(f"| {layer} · {item['id']} {item['name']} | {', '.join(dimensions)} | " + ' | '.join(cells) + ' |')
+    campaign = json.loads((ROOT / 'comparison/campaign.json').read_text(encoding='utf-8'))
+    cases = campaign['cases']
+    if campaign['schema_version'] != 1 or {case['id'] for case in cases} != seen or len(cases) != len(seen):
+        raise ValueError('Campaign cases must match progress items')
+    for case in cases:
+        item = next(x for x in data['items'] if x['id'] == case['id'])
+        if case['layer'] != item['layer'] or not case['conditions'] or case['independent_units_per_condition'] < 3:
+            raise ValueError('Invalid campaign case')
+    for layer in ('platform', 'harness'):
+        coverage = {dim for item in data['items'] if item['layer'] == layer for dim in item['dimensions']}
+        if coverage != allowed:
+            raise ValueError(f'Missing dimension coverage for {layer}: {allowed - coverage}')
     latest = data.get('latest_ci')
     if latest:
         url = latest['url']
