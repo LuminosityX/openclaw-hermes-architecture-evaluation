@@ -50,7 +50,7 @@ def render():
             raise ValueError('Invalid CI progress record')
         lines += ['', f"**最近一次会话校准：** {latest['result']}（三个独立 runner 的汇总）。[查看运行和各单元]({url})。"]
     lines += ['', f"**既有 OpenClaw 冻结实验：** {audit['measured_scenarios']}/{audit['scenarios']} 场景已测，{counts['pass']} 通过、{counts['fail']} 保留失败观察，{counts['unsupported']} 已确认不适用；{audit['accepted_observation_count']} 个独立观察。[审计与证据](evaluation/campaigns/full-20261026-batched/README.md)。", '',
-        '看板由 [进度台账](comparison/progress.json) 和冻结审计生成，反映仓库最新提交，运行中状态需更新台账。详见 [维护说明](comparison/README.md)。', END]
+        '看板由 [进度台账](comparison/progress.json) 和冻结审计生成；运行中的步骤见 GitHub Actions，会话校准完成后自动同步台账。详见 [维护说明](comparison/README.md)。', END]
     return '\n'.join(lines)
 
 

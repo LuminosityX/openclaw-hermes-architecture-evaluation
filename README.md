@@ -30,7 +30,7 @@ Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, acros
 
 **既有 OpenClaw 冻结实验：** 253/257 场景已测，224 通过、29 保留失败观察，4 已确认不适用；969 个独立观察。[审计与证据](evaluation/campaigns/full-20261026-batched/README.md)。
 
-看板由 [进度台账](comparison/progress.json) 和冻结审计生成，反映仓库最新提交，运行中状态需更新台账。详见 [维护说明](comparison/README.md)。
+看板由 [进度台账](comparison/progress.json) 和冻结审计生成；运行中的步骤见 GitHub Actions，会话校准完成后自动同步台账。详见 [维护说明](comparison/README.md)。
 <!-- comparison-dashboard:end -->
 
 ## Research and evidence
