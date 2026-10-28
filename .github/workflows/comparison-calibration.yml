@@ -3,6 +3,9 @@ on:
   workflow_dispatch:
   push:
     branches: ['research/comparison-calibration']
+    paths:
+      - 'comparison/session_probe.py'
+      - '.github/workflows/comparison-calibration.yml'
 permissions:
   contents: read
 jobs:
@@ -44,3 +47,29 @@ jobs:
           path: ${{ runner.temp }}/comparison-evidence/
           retention-days: 30
           if-no-files-found: warn
+  update-dashboard:
+    needs: session-reconstruction
+    if: ${{ always() && github.ref == 'refs/heads/research/comparison-calibration' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: research/comparison-calibration
+      - name: Update completed CI progress if the tested commit is still current
+        env:
+          COMPARISON_RESULT: ${{ needs.session-reconstruction.result }}
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$GITHUB_SHA" ]; then
+            echo 'Branch changed after this run began; preserving the newer state.'
+            exit 0
+          fi
+          python3 comparison/update_ci_progress.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md comparison/progress.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update comparison CI progress'
+            git push origin HEAD:research/comparison-calibration
+          fi
