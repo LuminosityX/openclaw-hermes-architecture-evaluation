@@ -63,19 +63,22 @@ jobs:
         run: |
           CASE="${CASE_MATRIX%%-*}"
           CONDITION="${CASE_MATRIX#*-}"
+          UNITS=3
+          if [ "${CASE_MATRIX#P03}" != "${CASE_MATRIX}" ]; then UNITS=6; fi
           mkdir -p "$RUNNER_TEMP/comparison-evidence"
-          python3 - <<PY
-          import os
-          units = 6 if os.environ['CASE_MATRIX'].startswith('P03') else 3
-          os.environ['CODEX_COMPARISON_UNITS'] = str(units)
-          PY
-          for UNIT in $(seq 1 "$CODEX_COMPARISON_UNITS"); do
+          for UNIT in $(seq 1 "$UNITS"); do
             python3 comparison/codex_first_wave.py \
               --case "$CASE" --condition "$CONDITION" --unit "$UNIT" \
               --codex "$RUNNER_TEMP/comparison-runtime/node_modules/.bin/codex" \
               --output "$RUNNER_TEMP/comparison-evidence"
           done
           cp "$RUNNER_TEMP/comparison-runtime/package-lock.json" "$RUNNER_TEMP/comparison-evidence/"
+          # Guard: a green-looking job with zero unit records is a harness failure.
+          COUNT=$(find "$RUNNER_TEMP/comparison-evidence" -maxdepth 1 -name 'P*-*.json' | wc -l)
+          if [ "$COUNT" -lt "$UNITS" ]; then
+            echo "Expected $UNITS unit records, found $COUNT" >&2
+            exit 1
+          fi
       - name: Upload calibration evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
