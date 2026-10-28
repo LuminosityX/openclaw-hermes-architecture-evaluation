@@ -1,0 +1,20 @@
+{
+  "product": "codex",
+  "version": "0.164.0",
+  "source_commit": "6aaac694803004a63c6f393d153c96d22521a6b9",
+  "selection_policy": "latest-stable-at-campaign-start",
+  "release_tag": "rust-v0.164.0",
+  "release_url": "https://github.com/openai/codex/releases/tag/rust-v0.164.0",
+  "release_published_at": "2026-10-23T04:48:10Z",
+  "checked_at_utc": "2026-10-27T09:00:00Z",
+  "npm_integrity": "sha512-TWj7UGyPRe3Pj/A3ddNAxs1te3a/W/xAd+J0LHrrFTmsSfahGMOLF/vn88D3QCIgAT3B1rm1y/Z3NYE0rx6cZQ==",
+  "npm_tarball": "https://registry.npmjs.org/@openai/codex/-/codex-0.164.0.tgz",
+  "node_engine": ">=16",
+  "local_development_install": "codex-cli 0.164.0 at ~/.nvm/versions/node/v24.19.0/bin/codex (matches the pinned version; local runs use an isolated CODEX_HOME and never touch the user's real ~/.codex state)",
+  "pin_policy": "Resolve GitHub stable release and npm latest together before a campaign; pin version, release commit and package integrity for its duration. The dereferenced tag commit above was resolved via git ls-remote on 2026-10-27 and must be re-verified by the campaign target tool before any formal execution.",
+  "notes": [
+    "Codex release tags use the rust-v<version> format, unlike the v<version> format of the OpenClaw campaign; parameterized validators must accept this format instead of hard-coding v+version.",
+    "The npm package ships the prebuilt Rust binary; installation verification uses `codex --version` output (codex-cli <version>) instead of a JS build-info file.",
+    "node_engine '>=16' does not select an exact Node version; formal runners pin one explicit Node major (recorded per run) exactly like the OpenClaw campaign pinned Node for its engine range."
+  ]
+}

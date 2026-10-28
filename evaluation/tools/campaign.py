@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from suite import MATRIX, ROOT, load_matrix, require, unique_object
+from product_profiles import PROFILES
 
 DEFAULT_PLAN=ROOT/'evaluation/campaigns/full-20261026-batched/plan.json'
 RESULT_STATES={'pass','fail','unsupported','blocked','harness-error'}
@@ -19,7 +20,7 @@ def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,ensure_ascii=False,separators=(',',':')).encode()).hexdigest()
 
 
-def freeze(matrix):
+def freeze(matrix,campaign_id='full-20261026'):
     cases=[]
     for dimension in matrix['dimensions']:
         for case in dimension['experiments']:
@@ -28,7 +29,7 @@ def freeze(matrix):
                 oracle=case['oracle'],intervention=case['intervention'],controls=case['controls'],
                 required_evidence=case['evidence'],metrics=case['metrics'],
                 scenarios=[dict(id=f'{case["id"]}-S{i:02}',name=name) for i,name in enumerate(case['scenarios'],1)]))
-    body=dict(schema_version=1,campaign_id='full-20261026',product='openclaw',
+    body=dict(schema_version=1,campaign_id=campaign_id,product=matrix['target']['product'],
         created_at_utc=datetime.now(timezone.utc).isoformat(),matrix_sha256=digest(matrix),target=matrix['target'],
         model=dict(provider='deepseek',model='deepseek-flash',base_url='https://api.deepseek.com',
                    api_key_source='GitHub Actions repository secret DEEPSEEK_API_KEY',
@@ -50,7 +51,7 @@ def load_plan(path=DEFAULT_PLAN):
     plan=json.loads(Path(path).read_text(),object_pairs_hook=unique_object)
     body={k:v for k,v in plan.items() if k!='plan_sha256'}
     require(plan['plan_sha256']==digest(body),'Frozen campaign plan changed; create a new campaign instead of silently changing scope')
-    require(plan['product']=='openclaw' and len(plan['cases'])==60,'Full campaign must preserve all sixty experiment families')
+    require(plan['product'] in PROFILES and len(plan['cases'])==60,'Full campaign must preserve all sixty experiment families')
     ids=[s['id'] for c in plan['cases'] for s in c['scenarios']]
     require(len(ids)==len(set(ids))==257,'Full campaign must preserve all 257 scenarios')
     require(plan['workflow']['interim_architecture_conclusions'] is False,'Experiment-first campaign required')
@@ -75,7 +76,7 @@ def validate_nonapplicability(result,plan):
 
 def validate_result(result,plan,allow_development=False):
     require(result['schema_version']==1 and result['plan_sha256']==plan['plan_sha256'],'Result must bind the frozen full campaign')
-    require(result['product']=='openclaw','Result must target OpenClaw')
+    require(result['product']==plan['product'],'Result must target the campaign product')
     require(result['target_version']==plan['target']['version'] and result['target_commit']==plan['target']['source_commit'],'Result runtime pin mismatch')
     require(result['scenario_id'] in scenario_index(plan),'Unknown scenario')
     require(result['state'] in RESULT_STATES,'Unknown result state')
