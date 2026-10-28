@@ -77,7 +77,7 @@ def render_visual():
         ('blocked', 'Blocked', '#ffbd6a'),
         ('not_applicable', 'Not applicable', '#b79be9'),
     ]
-    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 365" role="img" aria-labelledby="title desc">',
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" width="980" height="365" viewBox="0 0 980 365" role="img" aria-labelledby="title desc">',
         '<title id="title">Experiment progress by product</title>',
         '<desc id="desc">A stacked bar and counts for each status for Codex, DSH, and OpenClaw.</desc>',
         '<rect width="980" height="365" rx="18" fill="#0d1527"/>',
@@ -117,8 +117,8 @@ def main():
     visual_path = ROOT / 'comparison/progress.svg'
     visual = render_visual()
     revision = hashlib.sha256(visual.encode('utf-8')).hexdigest()[:12]
-    updated, replacements = re.subn(r'comparison/progress\.svg(?:\?v=[0-9a-f]{12})?',
-                                    'comparison/progress.svg?v=' + revision, updated)
+    updated, replacements = re.subn(r'(?:https://raw\.githubusercontent\.com/zyw02/agent-arch/main/)?comparison/progress\.svg(?:\?v=[0-9a-f]{12})?',
+                                    'https://raw.githubusercontent.com/zyw02/agent-arch/main/comparison/progress.svg?v=' + revision, updated)
     if replacements != 1:
         raise ValueError('README must contain exactly one progress image')
     if args.check:
