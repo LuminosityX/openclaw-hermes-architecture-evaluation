@@ -60,29 +60,38 @@ def render():
 
 def render_visual():
     data = json.loads((ROOT / 'comparison/progress.json').read_text(encoding='utf-8'))
-    colors = {'done': '#65e7c0', 'in_progress': '#7a9cff', 'planned': '#344363',
-              'blocked': '#ffbd6a', 'not_applicable': '#8190aa'}
-    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 270" role="img" aria-labelledby="title desc">',
-        '<title id="title">Cross-product architecture research progress</title>',
-        '<desc id="desc">Work-item states from the repository ledger. Calibrations are not formal completion.</desc>',
-        '<rect width="980" height="270" rx="18" fill="#0d1527"/>',
-        '<circle cx="52" cy="52" r="8" fill="#65e7c0"><animate attributeName="opacity" values="1;0.35;1" dur="2.6s" repeatCount="indefinite"/></circle>',
-        '<text x="72" y="58" fill="#f0f5ff" font-family="Arial,sans-serif" font-size="22" font-weight="700">ARCHITECTURE RESEARCH / WORK ITEM STATUS</text>',
-        '<text x="52" y="88" fill="#a7b6d4" font-family="Arial,sans-serif" font-size="14">Platform + harness   •   ledger snapshot   •   not task success rates</text>']
-    statuses = ['done', 'in_progress', 'blocked', 'not_applicable', 'planned']
+    statuses = [
+        ('done', 'Complete', '#65e7c0'),
+        ('in_progress', 'In progress', '#7a9cff'),
+        ('planned', 'Planned', '#7383a1'),
+        ('blocked', 'Blocked', '#ffbd6a'),
+        ('not_applicable', 'Not applicable', '#b79be9'),
+    ]
+    out = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 365" role="img" aria-labelledby="title desc">',
+        '<title id="title">Experiment progress by product</title>',
+        '<desc id="desc">A stacked bar and counts for each status for Codex, DSH, and OpenClaw.</desc>',
+        '<rect width="980" height="365" rx="18" fill="#0d1527"/>',
+        '<text x="44" y="48" fill="#f0f5ff" font-family="Arial,sans-serif" font-size="24" font-weight="700">Experiment progress</text>']
     for row, product in enumerate(data['products']):
-        counts = {status: sum(item['products'][product]['status'] == status for item in data['items']) for status in statuses}
+        counts = {key: sum(item['products'][product]['status'] == key for item in data['items']) for key, _, _ in statuses}
         total = len(data['items'])
-        y = 124 + row * 41
-        out.append(f'<text x="52" y="{y+13}" fill="#e8efff" font-family="Arial,sans-serif" font-size="15" font-weight="700">{product}</text>')
-        x = 185
-        for status in statuses:
-            width = 590 * counts[status] / total if total else 0
+        y = 82 + row * 76
+        out.append(f'<text x="44" y="{y + 14}" fill="#f0f5ff" font-family="Arial,sans-serif" font-size="16" font-weight="700">{product}</text>')
+        out.append(f'<text x="936" y="{y + 14}" text-anchor="end" fill="#b9c7e1" font-family="Arial,sans-serif" font-size="13">{total} tasks</text>')
+        x = 180.0
+        for key, _, color in statuses:
+            width = 630 * counts[key] / total if total else 0
             if width:
-                out.append(f'<rect x="{x:.2f}" y="{y}" width="{width:.2f}" height="16" fill="{colors[status]}" rx="3"/>')
+                if key == 'in_progress':
+                    out.append(f'<rect x="{x:.2f}" y="{y}" width="{width:.2f}" height="18" fill="{color}"><animate attributeName="opacity" values="1;0.55;1" dur="2.6s" repeatCount="indefinite"/></rect>')
+                else:
+                    out.append(f'<rect x="{x:.2f}" y="{y}" width="{width:.2f}" height="18" fill="{color}"/>')
             x += width
-        out.append(f'<text x="800" y="{y+13}" fill="#b9c7e1" font-family="Arial,sans-serif" font-size="13">{counts["done"]} complete · {counts["in_progress"]} active</text>')
-    out += ['<text x="52" y="257" fill="#a7b6d4" font-family="Arial,sans-serif" font-size="12">● COMPLETE     ● IN PROGRESS     ● PLANNED     |     SIX DIMENSIONS · TWO ARCHITECTURE LAYERS</text>', '</svg>']
+        positions = [180, 312, 470, 585, 700]
+        for (key, label, color), px in zip(statuses, positions):
+            out.append(f'<circle cx="{px}" cy="{y + 39}" r="4" fill="{color}"/>')
+            out.append(f'<text x="{px + 9}" y="{y + 43}" fill="#c1cde3" font-family="Arial,sans-serif" font-size="12">{label}: {counts[key]}</text>')
+    out.append('</svg>')
     return '\n'.join(out) + '\n'
 
 
