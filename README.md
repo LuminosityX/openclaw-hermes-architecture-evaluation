@@ -38,7 +38,7 @@ Explore the [experiment catalogue](comparison/experiment-index.md) and [executio
 | Harness · H14 Tool lifecycle and integration | Extensibility, Reliability | Planned | Planned | Planned |
 | Harness · H17 Execution trace | Observability | Planned | Planned | Planned |
 
-**Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/agent-arch/actions/runs/40623428889).
+**Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/agent-arch/actions/runs/40654639095).
 
 [OpenClaw architecture study](evaluation/reports/full-20261026-architecture.md) · [Experiment details](comparison/README.md)
 <!-- comparison-dashboard:end -->
