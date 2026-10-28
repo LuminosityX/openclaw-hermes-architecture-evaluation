@@ -13,7 +13,7 @@ from target import verify_installation
 
 
 def main():
-    if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/openclaw-hermes-architecture-evaluation' or os.name!='nt':
+    if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/agent-architecture-evaluation' or os.name!='nt':
         raise SystemExit('Portable runtime setup is restricted to the actual native Windows GitHub job')
     parser=argparse.ArgumentParser();parser.add_argument('--prefix',type=Path,required=True);args=parser.parse_args()
     if args.prefix.resolve()!=Path(os.environ['RUNNER_TEMP']).resolve()/'openclaw-portable-runtime':raise SystemExit('Unexpected portable installation prefix')

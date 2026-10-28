@@ -209,7 +209,7 @@ def target_unit(root,node,modules,unit,source,archive):
 
 
 def main():
-    require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('GITHUB_REPOSITORY')=='zyw02/openclaw-hermes-architecture-evaluation','Actual cross-OS execution is hosted-only')
+    require(os.environ.get('GITHUB_ACTIONS')=='true' and os.environ.get('GITHUB_REPOSITORY')=='zyw02/agent-architecture-evaluation','Actual cross-OS execution is hosted-only')
     parser=argparse.ArgumentParser();parser.add_argument('--phase',choices=['source','target'],required=True);parser.add_argument('--runtime-modules',type=Path,required=True);parser.add_argument('--node',type=Path,required=True);parser.add_argument('--output',type=Path,required=True);parser.add_argument('--source',type=Path);parser.add_argument('--calibration-only',action='store_true');args=parser.parse_args()
     require((args.phase=='source' and sys.platform.startswith('linux')) or (args.phase=='target' and sys.platform=='win32'),'An actual native Linux/Windows host is required; OS simulation is rejected')
     temporary=Path(os.environ['RUNNER_TEMP']).resolve();expected=temporary/('cross-os-source' if args.phase=='source' else 'openclaw-cross-os-result')

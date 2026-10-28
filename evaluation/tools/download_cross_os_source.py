@@ -15,7 +15,7 @@ def main():
     if os.environ.get('GITHUB_ACTIONS')!='true':raise SystemExit('Cross-OS evidence transfer is hosted-only')
     parser=argparse.ArgumentParser();parser.add_argument('--output',type=Path,required=True);args=parser.parse_args()
     if args.output.resolve()!=Path(os.environ['RUNNER_TEMP']).resolve()/'cross-os-source-input':raise SystemExit('Unexpected owned source-artifact destination')
-    prefix='repos/zyw02/openclaw-hermes-architecture-evaluation/'
+    prefix='repos/zyw02/agent-architecture-evaluation/'
     artifacts=json.loads(subprocess.check_output(['gh','api',prefix+'actions/runs/'+os.environ['GITHUB_RUN_ID']+'/artifacts?per_page=100']))['artifacts']
     selected=[a for a in artifacts if a['name']=='cross-os-native-linux-source' and not a['expired']]
     if len(selected)!=1 or selected[0]['size_in_bytes']>8*1024**2:raise SystemExit('Actual source artifact is unavailable or exceeds its bound')

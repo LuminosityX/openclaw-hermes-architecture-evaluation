@@ -12,7 +12,7 @@ import zipfile
 from campaign import DEFAULT_PLAN, audit, load_plan, records_from, validate_result
 from suite import ROOT, require
 
-REPOSITORY='zyw02/openclaw-hermes-architecture-evaluation'
+REPOSITORY='zyw02/agent-architecture-evaluation'
 ARTIFACT_LIMIT=8*1024**2
 
 

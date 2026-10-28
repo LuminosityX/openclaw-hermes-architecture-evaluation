@@ -12,7 +12,7 @@ if result not in {'success', 'failure', 'cancelled', 'skipped'} or not run_id.is
     raise ValueError('Unexpected CI result or run ID')
 path = root / 'comparison/progress.json'
 data = json.loads(path.read_text(encoding='utf-8'))
-data['latest_ci'] = {'result': result, 'url': 'https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/' + run_id}
+data['latest_ci'] = {'result': result, 'url': 'https://github.com/zyw02/agent-architecture-evaluation/actions/runs/' + run_id}
 for item in data['items']:
     if item['id'] == 'H05':
         for product in ('DSH', 'OpenClaw'):

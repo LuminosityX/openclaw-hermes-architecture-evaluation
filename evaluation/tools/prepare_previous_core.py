@@ -11,7 +11,7 @@ from target import verify_installation
 
 
 def main():
-    if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/openclaw-hermes-architecture-evaluation':
+    if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/agent-architecture-evaluation':
         raise SystemExit('Historical runtime preparation is permitted only in this repository GitHub Actions job')
     parser=argparse.ArgumentParser();parser.add_argument('--purpose',choices=['extension','migration'],default='extension');parser.add_argument('--prefix',type=Path,required=True);parser.add_argument('--metadata',type=Path,required=True);args=parser.parse_args()
     temporary=Path(os.environ['RUNNER_TEMP']).resolve();prefix=args.prefix.resolve()

@@ -17,7 +17,7 @@ The platform layer examines how each system hosts and operates agent work. The h
 
 Explore the [experiment catalogue](comparison/experiment-index.md) and [execution protocol](comparison/execution-protocol.md) for scenarios, measurements, acceptance, and readiness.
 
-[![Architecture research progress](comparison/progress.svg?v=cb643a6a76b4)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
+[![Architecture research progress](comparison/progress.svg?v=cb643a6a76b4)](https://github.com/zyw02/agent-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
 
 <!-- comparison-dashboard:start -->
 ## Research progress
@@ -38,7 +38,7 @@ Explore the [experiment catalogue](comparison/experiment-index.md) and [executio
 | Harness · H14 Tool lifecycle and integration | Extensibility, Reliability | Planned | Planned | Planned |
 | Harness · H17 Execution trace | Observability | Planned | Planned | Planned |
 
-**Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40623428889).
+**Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/agent-architecture-evaluation/actions/runs/40623428889).
 
 [OpenClaw architecture study](evaluation/reports/full-20261026-architecture.md) · [Experiment details](comparison/README.md)
 <!-- comparison-dashboard:end -->
