@@ -4,7 +4,7 @@ Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, acros
 
 ## Six dimensions, two architecture layers
 
-The platform layer examines how each system hosts and operates agent work. The harness layer examines how it assembles, controls, and recovers an individual run. Each experiment contributes evidence to one or more dimensions; a work item is not a dimension score.
+The platform layer examines how each system hosts and operates agent work. The harness layer examines how it assembles, controls, and recovers an individual run. Each experiment contributes evidence to one or more dimensions.
 
 | Dimension | Platform question | Harness question | Initial work |
 | --- | --- | --- | --- |
@@ -15,14 +15,12 @@ The platform layer examines how each system hosts and operates agent work. The h
 | **Extensibility** | How much integration is required to submit and control work through another entry? | Which execution components can be extended without taking over critical responsibilities? | P04; harness component replacement is a future protocol |
 | **Observability** | Can operators see failures and their impact across boundaries? | Can they reconstruct approval, tool effects, and recovery? | P01, P04, H05, H11, H17 |
 
-The entries show **planned lines of investigation**, not proven product capabilities or complete coverage of a dimension. For example, state-location inspection alone does not establish security, and access integration alone does not establish harness extensibility. [Protocol details and limits](comparison/first-wave-protocol.md).
+Explore the [experiment protocols](comparison/first-wave-protocol.md) for the planned scenarios, measurements, and acceptance criteria.
 
 [![Architecture research progress](comparison/progress.svg?v=1737fbda3a88)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
 
 <!-- comparison-dashboard:start -->
 ## Research progress
-
-Each cell is a work item, not a success rate. Historical OpenClaw evidence is not counted as completed cross-product work.
 
 | Layer / experiment | Dimensions | Codex | DSH | OpenClaw |
 | --- | --- | --- | --- | --- |
@@ -42,7 +40,7 @@ Each cell is a work item, not a success rate. Historical OpenClaw evidence is no
 
 **Frozen OpenClaw campaign:** 253/257 scenarios measured; 224 passed, 29 retained failures, 4 confirmed not applicable; 969 independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).
 
-Explore [experiment status and evidence](comparison/README.md). Calibrations are not formal results.
+[Experiment details](comparison/README.md).
 <!-- comparison-dashboard:end -->
 
 ## Research and evidence
@@ -55,9 +53,9 @@ Explore [experiment status and evidence](comparison/README.md). Calibrations are
 | [OpenClaw campaign](evaluation/README.md) | Frozen six-dimension design, tooling and execution guides |
 | [OpenClaw architecture report](evaluation/reports/full-20261026-architecture.md) | Source-backed results and tradeoffs for the frozen campaign |
 | [Chinese scenario observations](evaluation/reports/full-20261026-observations-zh.md) | Experiment-by-experiment facts and limitations |
-| [Historical V6](docs/history/v6-methodology.md) | Earlier OpenClaw/Hermes protocol; not part of the new comparison |
+| [Historical V6](docs/history/v6-methodology.md) | Earlier OpenClaw/Hermes protocol |
 
-The completed OpenClaw campaign used version 2026.10.7, commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. Its observations are historical evidence for that configuration, not completed three-product experiments. The new DSH target is the preview `0.2.2-alpha.2`; each hosted run records its exact installation and does not run Codex.
+The completed OpenClaw campaign used version 2026.10.7, commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. The new DSH target is the preview `0.2.2-alpha.2`.
 
 ## Further information
 

@@ -20,7 +20,6 @@ def render():
     audit = json.loads((ROOT / 'evaluation/campaigns/full-20261026-batched/completion-audit.json').read_text(encoding='utf-8'))['completion']
     counts = audit['scenario_counts']
     lines = [START, '## Research progress', '',
-        'Each cell is a work item, not a success rate. Historical OpenClaw evidence is not counted as completed cross-product work.', '',
         '| Layer / experiment | Dimensions | Codex | DSH | OpenClaw |', '| --- | --- | --- | --- | --- |']
     seen = set()
     for item in data['items']:
@@ -56,7 +55,7 @@ def render():
             raise ValueError('Invalid CI progress record')
         lines += ['', f"**Latest session calibration:** {latest['result']} (three independent calibration units). [View calibration evidence]({url})."]
     lines += ['', f"**Frozen OpenClaw campaign:** {audit['measured_scenarios']}/{audit['scenarios']} scenarios measured; {counts['pass']} passed, {counts['fail']} retained failures, {counts['unsupported']} confirmed not applicable; {audit['accepted_observation_count']} independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).", '',
-        'Explore [experiment status and evidence](comparison/README.md). Calibrations are not formal results.', END]
+        '[Experiment details](comparison/README.md).', END]
     return '\n'.join(lines)
 
 
