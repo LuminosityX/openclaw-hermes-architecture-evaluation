@@ -23,7 +23,7 @@ from suite import ROOT,require
 sys.path.insert(0,str(ROOT/'evaluation/runner'))
 from portable_support import HostBounds
 
-REPO='zyw02/agent-architecture-evaluation'
+REPO='zyw02/agent-arch'
 UID=65534
 
 

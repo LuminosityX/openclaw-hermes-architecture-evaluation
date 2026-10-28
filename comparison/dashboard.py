@@ -60,7 +60,7 @@ def render():
     latest = data.get('latest_ci')
     if latest:
         url = latest['url']
-        prefix = 'https://github.com/zyw02/agent-architecture-evaluation/actions/runs/'
+        prefix = 'https://github.com/zyw02/agent-arch/actions/runs/'
         if not url.startswith(prefix) or not url[len(prefix):].isdigit() or latest['result'] not in ('success', 'failure', 'cancelled', 'skipped'):
             raise ValueError('Invalid CI progress record')
         lines += ['', f"**Latest session calibration:** {latest['result']} (three independent calibration units). [View calibration evidence]({url})."]

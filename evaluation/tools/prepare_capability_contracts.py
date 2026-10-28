@@ -9,7 +9,7 @@ from urllib.request import urlopen
 
 
 def main():
-    if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/agent-architecture-evaluation':
+    if os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('GITHUB_REPOSITORY')!='zyw02/agent-arch':
         raise SystemExit('Capability contract preparation is hosted-only')
     parser=argparse.ArgumentParser();parser.add_argument('--prefix',type=Path,required=True);args=parser.parse_args()
     expected=Path(os.environ['RUNNER_TEMP']).resolve()/'openclaw-campaign-runtime/native-capability-contracts'
