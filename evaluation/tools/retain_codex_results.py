@@ -18,7 +18,7 @@ from pathlib import Path
 import sys
 import zipfile
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / 'tools'))
 
 from campaign import load_plan, scenario_index, validate_result, records_from
