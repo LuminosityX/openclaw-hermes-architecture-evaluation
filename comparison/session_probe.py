@@ -44,7 +44,8 @@ class Handler(BaseHTTPRequestHandler):
 server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
 threading.Thread(target=server.serve_forever, daemon=True).start()
 base = f'http://127.0.0.1:{server.server_port}/v1'
-report = {'kind': 'session-reconstruction-calibration', 'formal': False, 'products': {}}
+report = {'kind': 'session-reconstruction', 'formal': os.environ.get('COMPARISON_FORMAL') == 'true',
+          'unit': int(os.environ.get('COMPARISON_UNIT', '1')), 'products': {}}
 
 def invoke(args, env, cwd):
     try:
@@ -101,7 +102,7 @@ try:
         summarize('OpenClaw', first, second, start)
 finally:
     server.shutdown(); server.server_close()
-    (out / 'session-calibration.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
+    (out / 'session-result.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n')
 print(json.dumps(report, ensure_ascii=False, indent=2))
 if not all(x['valid'] and x['history_present'] for x in report['products'].values()):
     raise SystemExit('Calibration failed or incomplete; inspect retained evidence')

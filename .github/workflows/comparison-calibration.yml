@@ -9,6 +9,10 @@ jobs:
   session-reconstruction:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        unit: [1, 2, 3]
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
@@ -30,12 +34,14 @@ jobs:
         env:
           COMPARISON_RUNTIME: ${{ runner.temp }}/comparison-runtime
           COMPARISON_OUTPUT: ${{ runner.temp }}/comparison-evidence
+          COMPARISON_FORMAL: "true"
+          COMPARISON_UNIT: ${{ matrix.unit }}
         run: python3 comparison/session_probe.py
       - name: Retain calibration and installation evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: session-reconstruction-calibration
+          name: session-reconstruction-unit-${{ matrix.unit }}
           path: ${{ runner.temp }}/comparison-evidence/
           retention-days: 30
           if-no-files-found: warn
