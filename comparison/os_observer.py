@@ -101,6 +101,15 @@ class OSObserver:
             if pid in roots:
                 root_pgids[pid] = stat['pgrp']
         if not root_pgids:
+            # Every observed root has already exited: flush pending exits so
+            # their lifecycle is still recorded, then skip this sample.
+            with self._lock:
+                for pid in list(self._tracked):
+                    gone = self._tracked.pop(pid)
+                    self.exits.append(dict(pid=pid, exe=gone.get('exe'),
+                                           last_seen_ns=gone['last_seen_ns'],
+                                           exit_observed_ns=now,
+                                           exit_kind='session-exit-or-detach'))
             return
         group_pids = {pid for pid, stat in alive.items()
                       if stat['pgrp'] in root_pgids or pid in roots}
