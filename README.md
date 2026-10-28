@@ -29,7 +29,7 @@ Each cell is a work item, not a success rate. Historical OpenClaw evidence is no
 | Harness · H11 Approval binding | Planned | Planned | Planned |
 | Harness · H17 Execution trace | Planned | Planned | Planned |
 
-**Latest session calibration:** success (aggregate of three independent runners). [View run and individual jobs](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40622793927).
+**Latest session calibration:** success (aggregate of three independent runners). [View run and individual jobs](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40623428889).
 
 **Frozen OpenClaw campaign:** 253/257 scenarios measured; 224 passed, 29 retained failures, 4 confirmed not applicable; 969 independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).
 
