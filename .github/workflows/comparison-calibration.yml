@@ -2,7 +2,7 @@ name: Three-product comparison calibration
 on:
   workflow_dispatch:
   push:
-    branches: ['research/comparison-calibration']
+    branches: [main, 'research/comparison-calibration']
     paths:
       - 'comparison/session_probe.py'
       - '.github/workflows/comparison-calibration.yml'
@@ -49,14 +49,14 @@ jobs:
           if-no-files-found: warn
   update-dashboard:
     needs: session-reconstruction
-    if: ${{ always() && github.ref == 'refs/heads/research/comparison-calibration' }}
+    if: ${{ always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/research/comparison-calibration') }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
-          ref: research/comparison-calibration
+          ref: ${{ github.ref_name }}
       - name: Update completed CI progress if the tested commit is still current
         env:
           COMPARISON_RESULT: ${{ needs.session-reconstruction.result }}
@@ -71,5 +71,5 @@ jobs:
           git add README.md comparison/progress.json comparison/progress.svg
           if ! git diff --cached --quiet; then
             git commit -m 'Update comparison CI progress'
-            git push origin HEAD:research/comparison-calibration
+            git push origin "HEAD:$GITHUB_REF_NAME"
           fi

@@ -17,7 +17,7 @@ The platform layer examines how each system hosts and operates agent work. The h
 
 Explore the [experiment protocols](comparison/first-wave-protocol.md) for the planned scenarios, measurements, and acceptance criteria.
 
-[![Architecture research progress](comparison/progress.svg?v=1737fbda3a88)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
+[![Architecture research progress](comparison/progress.svg?v=1737fbda3a88)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
 
 <!-- comparison-dashboard:start -->
 ## Research progress
