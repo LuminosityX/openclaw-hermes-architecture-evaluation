@@ -6,14 +6,14 @@ Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, acros
 
 The platform layer examines how each system hosts and operates agent work. The harness layer examines how it assembles, controls, and recovers an individual run. Each experiment contributes evidence to one or more dimensions.
 
-| Dimension | Platform question | Harness question | Initial work |
+| Dimension | Platform evaluation | Harness evaluation | Initial work |
 | --- | --- | --- | --- |
-| **Reliability** | Which failures stay within a process or deployment boundary, and what state survives? | Are context and actions preserved, recovered, or retried correctly? | P01, P02, H03, H04, H05, H07, H08 |
-| **Security** | Where do state and credentials reside, and who can reach them? | Does authorization cover the operation actually dispatched? | P02, H11 |
-| **Performance** | What throughput and resource contention result from the deployment? | How does tool scheduling affect time and correctness? | P03, H08 |
-| **Resource & cost** | What are the idle and marginal costs of hosting work? | What do context handling and retries consume? | P03, H03, H04, H07 |
-| **Extensibility** | How much integration is required to submit and control work through another entry? | Which execution components can be extended without taking over critical responsibilities? | P04; harness component replacement is a future protocol |
-| **Observability** | Can operators see failures and their impact across boundaries? | Can they reconstruct approval, tool effects, and recovery? | P01, P04, H05, H11, H17 |
+| **Reliability** | Failure isolation, state persistence, and deployment recovery | Context retention, execution recovery, and retry behavior | P01, P02, H03, H04, H05, H07, H08 |
+| **Security** | State and credential ownership, access boundaries, and isolation | Authorization scope and consistency between approval and execution | P02, H11 |
+| **Performance** | Throughput, concurrency, and resource contention | Tool scheduling, execution latency, and dependency handling | P03, H08 |
+| **Resource & cost** | Idle footprint and marginal cost per task | Context processing, retry overhead, and model usage | P03, H03, H04, H07 |
+| **Extensibility** | Entry-point integration and operational control | Component extension and responsibility boundaries | P04; harness component replacement is a future protocol |
+| **Observability** | Fault visibility and diagnosis across system boundaries | Reconstruction of approvals, tool effects, and recovery | P01, P04, H05, H11, H17 |
 
 Explore the [experiment protocols](comparison/first-wave-protocol.md) for the planned scenarios, measurements, and acceptance criteria.
 
