@@ -1,0 +1,89 @@
+name: Codex comparison calibration
+
+on:
+  workflow_dispatch:
+    inputs:
+      cases:
+        description: 'First-wave cases to run (default: P01,P02,H07,P03)'
+        type: string
+        default: 'P01,P02,H07,P03'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: codex-comparison-calibration
+  cancel-in-progress: false
+
+jobs:
+  calibrate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        case: [P01-C0, P01-C1, P02-C, H07-C0, H07-C1, P03-C1]
+    env:
+      CASE_MATRIX: ${{ matrix.case }}
+    steps:
+      - name: Check out evaluation sources
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - name: Set up Node
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24'
+      - name: Install pinned Codex on the disposable host
+        env:
+          npm_config_cache: ${{ runner.temp }}/comparison-cache
+        run: |
+          python3 - <<'PY'
+          import hashlib, json, os
+          from pathlib import Path
+          pin = json.loads(Path('evaluation/design/codex-target-pin.json').read_text())
+          root = Path(os.environ['RUNNER_TEMP']) / 'comparison-runtime'
+          root.mkdir()
+          (root / 'package.json').write_text(json.dumps(
+              dict(name='comparison-runtime', private=True,
+                   dependencies={'@openai/codex': pin['version']})))
+          PY
+          npm install --prefix "$RUNNER_TEMP/comparison-runtime" --no-fund --no-audit
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          pin = json.loads(Path('evaluation/design/codex-target-pin.json').read_text())
+          lock = json.loads((Path(os.environ['RUNNER_TEMP']) / 'comparison-runtime' / 'package-lock.json').read_text())
+          entry = lock['packages']['node_modules/@openai/codex']
+          assert entry['version'] == pin['version'], 'installed version differs from pin'
+          assert entry['integrity'] == pin['npm_integrity'], 'installed integrity differs from pin'
+          print('pinned runtime verified:', pin['version'], pin['npm_integrity'][:24] + '...')
+          PY
+      - name: Run the prescribed calibration units
+        run: |
+          CASE="${CASE_MATRIX%%-*}"
+          CONDITION="${CASE_MATRIX#*-}"
+          mkdir -p "$RUNNER_TEMP/comparison-evidence"
+          python3 - <<PY
+          import os
+          units = 6 if os.environ['CASE_MATRIX'].startswith('P03') else 3
+          os.environ['CODEX_COMPARISON_UNITS'] = str(units)
+          PY
+          for UNIT in $(seq 1 "$CODEX_COMPARISON_UNITS"); do
+            python3 comparison/codex_first_wave.py \
+              --case "$CASE" --condition "$CONDITION" --unit "$UNIT" \
+              --codex "$RUNNER_TEMP/comparison-runtime/node_modules/.bin/codex" \
+              --output "$RUNNER_TEMP/comparison-evidence"
+          done
+          cp "$RUNNER_TEMP/comparison-runtime/package-lock.json" "$RUNNER_TEMP/comparison-evidence/"
+      - name: Upload calibration evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: codex-calibration-${{ matrix.case }}
+          path: ${{ runner.temp }}/comparison-evidence/
+          retention-days: 30
+          if-no-files-found: error
+      - name: Remove runtime, cache and state
+        if: always()
+        run: sudo rm -rf -- "$RUNNER_TEMP/comparison-runtime" "$RUNNER_TEMP/comparison-cache" "$RUNNER_TEMP/comparison-evidence"
