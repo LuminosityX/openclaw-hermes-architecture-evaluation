@@ -1,0 +1,41 @@
+name: Three-product comparison calibration
+on:
+  workflow_dispatch:
+  push:
+    branches: ['research/comparison-calibration']
+permissions:
+  contents: read
+jobs:
+  session-reconstruction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.1'
+      - name: Install pinned products on disposable runner
+        env:
+          npm_config_cache: ${{ runner.temp }}/comparison-cache
+          COMPARISON_RUNTIME: ${{ runner.temp }}/comparison-runtime
+        run: |
+          mkdir -p "$COMPARISON_RUNTIME"
+          npm install --prefix "$COMPARISON_RUNTIME" --save-exact --no-audit --no-fund --registry=https://registry.npmjs.org @deepseek-ai/dsh@0.2.2-alpha.2 openclaw@2026.10.7
+          mkdir -p "$RUNNER_TEMP/comparison-evidence"
+          cp "$COMPARISON_RUNTIME/package-lock.json" "$RUNNER_TEMP/comparison-evidence/"
+          node --version > "$RUNNER_TEMP/comparison-evidence/node-version.txt"
+      - name: Run synthetic session reconstruction calibration
+        env:
+          COMPARISON_RUNTIME: ${{ runner.temp }}/comparison-runtime
+          COMPARISON_OUTPUT: ${{ runner.temp }}/comparison-evidence
+        run: python3 comparison/session_probe.py
+      - name: Retain calibration and installation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: session-reconstruction-calibration
+          path: ${{ runner.temp }}/comparison-evidence/
+          retention-days: 30
+          if-no-files-found: warn

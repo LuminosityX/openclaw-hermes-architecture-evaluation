@@ -1,10 +1,37 @@
-# OpenClaw Task Framework Evaluation
+# Agent Platform and Harness Architecture Evaluation
 
-`main` focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
+本仓库正在扩展为 **Codex、DeepSeek Harness（DSH）和 OpenClaw** 的平台层与 Harness 层架构测评。[三方工作区与方案](comparison/README.md)记录新范围；下方原有实验、报告和运行工具仍属于已冻结的 OpenClaw 专项，不代表三方测评已完成。
 
-The current work is the [full experiment campaign](evaluation/full-campaign.md): finish the frozen 60-family, 257-scenario scope, audit its completion, then write one unified source-backed architecture analysis. Calibrated families execute their formal repetitions in batches while remaining adapters are implemented. Earlier pilots and the [exploratory source review](evaluation/evidence/source-followup-20261026/README.md) remain historical exploratory evidence; they do not complete this campaign.
+<!-- comparison-dashboard:start -->
+## 测评进度看板
 
-The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, checked against GitHub stable and npm `latest` on 2026-10-26. The exact [campaign pin](evaluation/design/evaluation-matrix.json) is fixed for reproducibility. See the [current-version execution guide](evaluation/current-version.md); newer dependency installations run on disposable GitHub-hosted machines, not this local workspace.
+**三方新协议：** 下表为工作项状态，非实验成功率；历史 OpenClaw 结果不自动计入新协议。
+
+| 层次 / 工作项 | Codex | DSH | OpenClaw |
+| --- | --- | --- | --- |
+| 平台 · P01 故障域 | 待开始 | 待开始 | 待开始 |
+| 平台 · P02 状态与部署 | 待开始 | 待开始 | 待开始 |
+| 平台 · P03 资源与并发 | 待开始 | 待开始 | 待开始 |
+| 平台 · P04 接入与运维 | 待开始 | 待开始 | 待开始 |
+| Harness · H03 压缩与约束 | 待开始 | 待开始 | 待开始 |
+| Harness · H04 大工具输出 | 待开始 | 待开始 | 待开始 |
+| Harness · H05 恢复与副作用 | 待开始 | 进行中 | 进行中 |
+| Harness · H08 工具调度 | 待开始 | 待开始 | 待开始 |
+| Harness · H11 审批绑定 | 待开始 | 待开始 | 待开始 |
+| Harness · H17 轨迹重建 | 待开始 | 待开始 | 待开始 |
+
+**既有 OpenClaw 冻结实验：** 253/257 场景已测，224 通过、29 保留失败观察，4 已确认不适用；969 个独立观察。[审计与证据](evaluation/campaigns/full-20261026-batched/README.md)。
+
+看板由 [进度台账](comparison/progress.json) 和冻结审计生成，反映仓库最新提交，运行中状态需更新台账。详见 [维护说明](comparison/README.md)。
+<!-- comparison-dashboard:end -->
+
+## Existing OpenClaw campaign
+
+The existing frozen campaign focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
+
+The [full OpenClaw campaign](evaluation/full-campaign.md) completed its frozen 60-family, 257-scenario scope and completion audit. Earlier pilots and the [exploratory source review](evaluation/evidence/source-followup-20261026/README.md) remain separate historical evidence.
+
+The frozen campaign targeted **OpenClaw 2026.10.7**, release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, checked against GitHub stable and npm `latest` on 2026-10-26. The exact [campaign pin](evaluation/design/evaluation-matrix.json) is fixed for reproducibility. See the [current-version execution guide](evaluation/current-version.md); newer dependency installations run on disposable GitHub-hosted machines, not this local workspace.
 
 [Current-release evidence](evaluation/evidence/current-stable-20261026/README.md) now contains valid two-block pilots for all three first-wave studies on this version. The earlier local build remains harness-bootstrap evidence only.
 
@@ -52,7 +79,7 @@ The default plan contains deterministic mechanism tests. Actual task capability,
 
 Start with the [evaluation guide](evaluation/README.md), [experiment catalogue](evaluation/experiment-catalogue.md), [measurement contract](evaluation/measurement-contract.md) and [methodology](docs/methodology.md). The [matrix](evaluation/design/evaluation-matrix.json) defines the current six dimensions and required metrics. The [reproduction guide](docs/reproduction.md) explains validation, selection and execution prerequisites.
 
-The [architecture tradeoff studies](evaluation/architecture-studies.md) provide hypotheses for the eventual unified analysis. During the full campaign, source reading supports adapter implementation and harness repair; new architecture interpretations wait until the completion audit passes.
+The [architecture tradeoff studies](evaluation/architecture-studies.md) provide hypotheses for the eventual unified analysis. The completed campaign includes a source-backed architecture analysis linked above.
 
 The [historical bootstrap record](evaluation/evidence/README.md) contains native exploratory observations on an existing `2026.9.2` installation. It validates the test chain and is excluded from current-release conclusions. Runtime state was ephemeral and bounded; only a small synthetic JSON evidence record is retained.
 
@@ -67,5 +94,3 @@ Historical product pins and grades apply only to the [V6 protocol](v6/protocol/p
 Raw trajectories, state databases, runtime installations, results and credentials stay outside version control. Repository documentation is in English; frozen inputs, upstream quotations and multilingual test strings retain their original language.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for contribution, reporting and licensing terms.
-
-Read the [completed campaign architecture analysis](evaluation/reports/full-20261026-architecture.md) for source-backed mechanisms, cross-dimension tradeoffs, measurement limits and retained failed acceptance observations.

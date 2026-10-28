@@ -1,0 +1,230 @@
+{
+  "schema_version": 1,
+  "products": [
+    "Codex",
+    "DSH",
+    "OpenClaw"
+  ],
+  "items": [
+    {
+      "layer": "platform",
+      "id": "P01",
+      "name": "故障域",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "platform",
+      "id": "P02",
+      "name": "状态与部署",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "platform",
+      "id": "P03",
+      "name": "资源与并发",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "platform",
+      "id": "P04",
+      "name": "接入与运维",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "harness",
+      "id": "H03",
+      "name": "压缩与约束",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "harness",
+      "id": "H04",
+      "name": "大工具输出",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "harness",
+      "id": "H05",
+      "name": "恢复与副作用",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "in_progress",
+          "evidence": [],
+          "note": "GitHub hosted session reconstruction calibration prepared; not a formal result."
+        },
+        "OpenClaw": {
+          "status": "in_progress",
+          "evidence": [],
+          "note": "GitHub hosted session reconstruction calibration prepared; not a formal result."
+        }
+      }
+    },
+    {
+      "layer": "harness",
+      "id": "H08",
+      "name": "工具调度",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "harness",
+      "id": "H11",
+      "name": "审批绑定",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "harness",
+      "id": "H17",
+      "name": "轨迹重建",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    }
+  ]
+}
