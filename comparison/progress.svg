@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 980 270" role="img" aria-labelledby="title desc">
+<title id="title">Cross-product architecture research progress</title>
+<desc id="desc">Work-item states from the repository ledger. Calibrations are not formal completion.</desc>
+<rect width="980" height="270" rx="18" fill="#0d1527"/>
+<circle cx="52" cy="52" r="8" fill="#65e7c0"><animate attributeName="opacity" values="1;0.35;1" dur="2.6s" repeatCount="indefinite"/></circle>
+<text x="72" y="58" fill="#f0f5ff" font-family="Arial,sans-serif" font-size="22" font-weight="700">ARCHITECTURE RESEARCH / WORK ITEM STATUS</text>
+<text x="52" y="88" fill="#a7b6d4" font-family="Arial,sans-serif" font-size="14">Platform + harness   •   ledger snapshot   •   not task success rates</text>
+<text x="52" y="137" fill="#e8efff" font-family="Arial,sans-serif" font-size="15" font-weight="700">Codex</text>
+<rect x="185.00" y="124" width="590.00" height="16" fill="#344363" rx="3"/>
+<text x="800" y="137" fill="#b9c7e1" font-family="Arial,sans-serif" font-size="13">0 complete · 0 active</text>
+<text x="52" y="178" fill="#e8efff" font-family="Arial,sans-serif" font-size="15" font-weight="700">DSH</text>
+<rect x="185.00" y="165" width="53.64" height="16" fill="#7a9cff" rx="3"/>
+<rect x="238.64" y="165" width="536.36" height="16" fill="#344363" rx="3"/>
+<text x="800" y="178" fill="#b9c7e1" font-family="Arial,sans-serif" font-size="13">0 complete · 1 active</text>
+<text x="52" y="219" fill="#e8efff" font-family="Arial,sans-serif" font-size="15" font-weight="700">OpenClaw</text>
+<rect x="185.00" y="206" width="53.64" height="16" fill="#7a9cff" rx="3"/>
+<rect x="238.64" y="206" width="536.36" height="16" fill="#344363" rx="3"/>
+<text x="800" y="219" fill="#b9c7e1" font-family="Arial,sans-serif" font-size="13">0 complete · 1 active</text>
+<text x="52" y="257" fill="#a7b6d4" font-family="Arial,sans-serif" font-size="12">● COMPLETE     ● IN PROGRESS     ● PLANNED     |     LIVE JOBS: OPEN GITHUB ACTIONS</text>
+</svg>

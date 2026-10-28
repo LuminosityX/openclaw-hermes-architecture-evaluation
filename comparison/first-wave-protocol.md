@@ -1,25 +1,33 @@
-# 首批共同实验协议（校准中）
+# First-wave shared protocols — calibration in progress
 
-本协议只选择能通过三者的非交互入口、独立模型端点和操作系统观察的问题。Codex 不执行；其入口只依据本地 `codex exec --help` 和源码检查，未通过运行预检。DSH 0.2.2-alpha.2、OpenClaw 2026.10.7 的接入仍以运行预检为准。**没有完成三方接入校准前，不宣称已验证三方均可执行。** 用户可观察结果相同不意味着内部机制相同。
+These protocols use noninteractive entry points, an independent synthetic model endpoint, and operating-system observation. Codex is not run: its entry point has been checked through local help and source, not runtime calibration. DSH 0.2.2-alpha.2 and OpenClaw 2026.10.7 passed three hosted session-reconstruction calibration units. **Do not claim all three products can execute a scenario until all three adapters have been calibrated.** Equivalent external observations do not imply equivalent internal mechanisms.
 
-共同控制：每次独立测试单元使用新的隔离 home、工作目录、合成凭据和本地模型服务，不访问真实账户；记录完整命令、二进制版本与包完整性、配置、进程树和事件时间。服务固定返回合成文本，捕获请求与断开事件；仅记录合成内容。Codex 使用 `codex exec --json`、`codex exec resume` 与 Responses 协议；DSH 用 headless `--json`、`--session-id`；OpenClaw 用指定会话的 `agent --local`，另按平台协议测试 Gateway。不同模型协议由同一服务提供各自协议适配，固定逻辑而非强行相同 wire 格式。执行器只负责启动、终止和记录，不代替被测产品恢复或重试。
+Each independent unit uses a new isolated home, working directory, synthetic credentials, and local model service, with no real account. Record exact commands, binary versions, package integrity, configuration, process tree, and event times. The service returns fixed synthetic text and records requests and disconnects. Codex uses `codex exec --json`, `codex exec resume`, and the Responses protocol; DSH uses headless `--json` and `--session-id`; OpenClaw uses `agent --local` with an explicit session, plus a separate Gateway deployment for platform scenarios. The same fixture implements the products' different wire protocols with equivalent behavior. The controller starts, stops, and observes; it does not implement product retries or recovery.
 
-## P01：入口退出后的任务归属
+## P01 — task ownership after an entry point exits
 
-同一会话提交任务，合成服务收到模型请求后挂起；等待服务端确认后终止入口进程，观察 10 秒内模型连接、产品进程和任务是否存活，再按原生入口查询或恢复。OpenClaw 分 Gateway 与本地嵌入两种形态，分别启动；DSH headless 和 Codex exec 测自身入口。记录 PID/父子关系、请求连接、进程退出与状态、恢复请求和结果，缺乏查询接口时标未知。三次独立初始化。此测试区分执行是否由入口进程承载或由独立服务持有，以及断连后剩余工作和恢复职责；无法证明通用的崩溃恢复或 exactly-once。故障触达和终止对象由外部控制器验证。
+Submit the same task and hold the model response after the service confirms receipt. Terminate the entry process; observe the model connection, product processes, and task for 10 seconds, then inspect or resume through the native entry. Run OpenClaw Gateway and embedded configurations separately; use DSH headless and Codex exec for their respective entries. Record process IDs and ancestry, connection state, exits, recovery requests, and outcomes; mark unavailable observations unknown. Use three fresh units.
 
-## P02/H05：正常退出后的会话重建
+**Architecture question:** Does execution live in the caller or a separate service, and who owns surviving work and recovery after a disconnect? This is not a general crash-recovery or exactly-once guarantee. The external controller must verify that the fault reached the intended process.
 
-第一轮输入唯一标记 `SESSION_MARKER_<unit>`，服务返回固定 `ACK_<unit>`；正常退出后以各产品原生 resume 或同一 session ID 发送 `CONTINUE_<unit>`。合成服务独立检查第二轮请求的历史中是否同时包含第一轮用户标记、助手 ACK 和第二轮输入；记录会话标识、退出码、持久化文件位置和恢复错误。不同产品可能对历史表示不同，以语义内容为准，不依赖统一事件格式。每产品 3 个新状态目录。第二轮请求未到达或第一次请求不成功是无效预检，不能标成恢复失败。此实验显示进程边界上的**对话状态归属及重建**，不代表正在执行的工具、工作区或外部副作用恢复。
+## P02 / H05 — reconstruct a session after normal exit
 
-## P03：执行承载和资源基线
+Send `SESSION_MARKER_<unit>`; the fixture returns `ACK_<unit>`. After normal process exit, use native resume or the same session ID to send `CONTINUE_<unit>`. Independently verify that the second model request contains the earlier user marker, assistant acknowledgment, and new input. Record session identity, exit codes, persistence location, and recovery errors. Compare semantic content rather than a shared event schema. Use three fresh state directories per product. Missing first success or an unreached second request invalidates the unit; it is not a recovery failure.
 
-固定同宿主机和模型服务，测冷启动到首请求、任务运行期间的整个产品进程树 RSS 采样、退出后残留进程；OpenClaw Gateway 的启动/空闲常驻与客户端任务增量分别记录，DSH/Codex 入口及其后代同样记录。合成服务不计入产品；复用服务所需外部组件单独列出。每形态 6 个全新单元，采样周期、超时和服务响应延迟冻结。不同缓存条件不得混合，RSS 只表示进程 RSS 的总和而非物理独占内存。此实验回答进程生命周期、共享服务和单次启动的成本权衡，不据此判定实际任务吞吐或谁更优秀。
+**Architecture question:** Which state crosses a process boundary, and how is conversation context rebuilt? This does not establish recovery of in-flight tools, workspace changes, or external side effects.
 
-## H07：模型请求故障与重试
+## P03 — execution footprint and lifecycle
 
-本地模型服务针对同一 turn 先返回一次 HTTP 503，再按各产品协议返回固定 ACK；另做不注入的正向对照。记录服务端请求次数、请求间隔、用户消息是否重复入下一次请求、最终状态和耗时；外部控制器不自行重发。三次独立初始化。可识别原生重试的边界和代价，不能单独证明模型流中断或工具副作用安全。Codex 的 Responses 错误格式及重试上限需在不运行 Codex 的前提下先审阅入口配置与源码，实测能力仍未验证。
+On the same host and synthetic service, record cold start to first request, sampled RSS across the product process tree, and processes remaining after exit. For Gateway-backed OpenClaw, report service startup and idle cost separately from marginal client-task cost; record other external components separately. Exclude the fixture. Use six fresh units per deployment and freeze the sampling interval, timeout, and service delay. Do not mix cache conditions. Summed RSS is not exclusive physical memory.
 
-## 结果和完成条件
+**Architecture question:** What are the lifecycle and resource tradeoffs of a shared service versus a per-invocation process? These measurements do not establish task throughput or a universal ranking.
 
-校准与正式结果分开。预检需要正常对照、实际命中故障点、可重复识别入口及保存独立原始证据；不满足标为未测或阻塞，不算产品失败。正式结果保留失败；先逐系统报告，再列出可对齐条件及不可归因因素。新协议状态只在三次有效正式单元及证据审阅完成后标完成。以上比之前过宽的 P01/P02/P03/H05/H07 更具体；压缩、工具调度、审批和大输出暂不宣称可共同执行，待三方的工具和控制面校准后另行冻结。
+## H07 — model request failure and retry
+
+For a single turn, return HTTP 503 once, then a fixed acknowledgment in the appropriate protocol; also run a no-fault positive control. Independently record request count and intervals, user-message duplication, final state, and elapsed time. The controller never resends on the product's behalf. Use three fresh units.
+
+**Architecture question:** Where does native retry happen, and what attempts and delay does it introduce? This does not establish safety after a streamed response or tool side effect. Codex's Responses error format and retry configuration require source review; runtime behavior remains unverified.
+
+## Validity and completion
+
+Keep calibration separate from formal results. A valid unit needs a passing positive control, verified fault reachability, an identifiable native entry, and independently retained evidence. An unmet precondition is untested or blocked, not a product failure. Keep valid failed observations. Report each system first, then aligned conditions and remaining confounders. Mark a new work item complete only after the prescribed independent formal units and evidence review. Compaction, tool scheduling, approvals, and large outputs remain candidates until common tool and control surfaces are calibrated across all three systems.

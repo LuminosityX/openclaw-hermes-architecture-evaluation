@@ -9,7 +9,7 @@
     {
       "layer": "platform",
       "id": "P01",
-      "name": "故障域",
+      "name": "Fault domains",
       "products": {
         "Codex": {
           "status": "planned",
@@ -31,7 +31,7 @@
     {
       "layer": "platform",
       "id": "P02",
-      "name": "状态与部署",
+      "name": "State and deployment",
       "products": {
         "Codex": {
           "status": "planned",
@@ -53,7 +53,7 @@
     {
       "layer": "platform",
       "id": "P03",
-      "name": "资源与并发",
+      "name": "Resources and concurrency",
       "products": {
         "Codex": {
           "status": "planned",
@@ -75,7 +75,7 @@
     {
       "layer": "platform",
       "id": "P04",
-      "name": "接入与运维",
+      "name": "Access and operations",
       "products": {
         "Codex": {
           "status": "planned",
@@ -97,7 +97,7 @@
     {
       "layer": "harness",
       "id": "H03",
-      "name": "压缩与约束",
+      "name": "Compaction and constraints",
       "products": {
         "Codex": {
           "status": "planned",
@@ -119,7 +119,7 @@
     {
       "layer": "harness",
       "id": "H04",
-      "name": "大工具输出",
+      "name": "Large tool outputs",
       "products": {
         "Codex": {
           "status": "planned",
@@ -141,7 +141,7 @@
     {
       "layer": "harness",
       "id": "H05",
-      "name": "恢复与副作用",
+      "name": "Recovery and side effects",
       "products": {
         "Codex": {
           "status": "planned",
@@ -162,8 +162,30 @@
     },
     {
       "layer": "harness",
+      "id": "H07",
+      "name": "Model failure and retry",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      }
+    },
+    {
+      "layer": "harness",
       "id": "H08",
-      "name": "工具调度",
+      "name": "Tool scheduling",
       "products": {
         "Codex": {
           "status": "planned",
@@ -185,7 +207,7 @@
     {
       "layer": "harness",
       "id": "H11",
-      "name": "审批绑定",
+      "name": "Approval binding",
       "products": {
         "Codex": {
           "status": "planned",
@@ -207,7 +229,7 @@
     {
       "layer": "harness",
       "id": "H17",
-      "name": "轨迹重建",
+      "name": "Execution trace",
       "products": {
         "Codex": {
           "status": "planned",

@@ -4,34 +4,53 @@ Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, acros
 
 ## Live CI
 
+[![Architecture research progress](comparison/progress.svg)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
+
 [![Comparison CI](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml/badge.svg?branch=research%2Fcomparison-calibration)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
 
 [View live comparison runs, individual jobs, logs, and artifacts](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration). GitHub supplies the badge and run page; the badge reflects the latest workflow outcome, while the run page shows jobs currently in progress. The table below tracks research work, updated from the repository ledger; it does not automatically reflect a running job.
 
 <!-- comparison-dashboard:start -->
-## 测评进度看板
+## Research progress
 
-**三方新协议：** 下表为工作项状态，非实验成功率；历史 OpenClaw 结果不自动计入新协议。
+Each cell is a work item, not a success rate. Historical OpenClaw evidence is not counted as completed cross-product work.
 
-| 层次 / 工作项 | Codex | DSH | OpenClaw |
+| Layer / experiment | Codex | DSH | OpenClaw |
 | --- | --- | --- | --- |
-| 平台 · P01 故障域 | 待开始 | 待开始 | 待开始 |
-| 平台 · P02 状态与部署 | 待开始 | 待开始 | 待开始 |
-| 平台 · P03 资源与并发 | 待开始 | 待开始 | 待开始 |
-| 平台 · P04 接入与运维 | 待开始 | 待开始 | 待开始 |
-| Harness · H03 压缩与约束 | 待开始 | 待开始 | 待开始 |
-| Harness · H04 大工具输出 | 待开始 | 待开始 | 待开始 |
-| Harness · H05 恢复与副作用 | 待开始 | 进行中 | 进行中 |
-| Harness · H08 工具调度 | 待开始 | 待开始 | 待开始 |
-| Harness · H11 审批绑定 | 待开始 | 待开始 | 待开始 |
-| Harness · H17 轨迹重建 | 待开始 | 待开始 | 待开始 |
+| Platform · P01 Fault domains | Planned | Planned | Planned |
+| Platform · P02 State and deployment | Planned | Planned | Planned |
+| Platform · P03 Resources and concurrency | Planned | Planned | Planned |
+| Platform · P04 Access and operations | Planned | Planned | Planned |
+| Harness · H03 Compaction and constraints | Planned | Planned | Planned |
+| Harness · H04 Large tool outputs | Planned | Planned | Planned |
+| Harness · H05 Recovery and side effects | Planned | In progress | In progress |
+| Harness · H07 Model failure and retry | Planned | Planned | Planned |
+| Harness · H08 Tool scheduling | Planned | Planned | Planned |
+| Harness · H11 Approval binding | Planned | Planned | Planned |
+| Harness · H17 Execution trace | Planned | Planned | Planned |
 
-**最近一次会话校准：** success（三个独立 runner 的汇总）。[查看运行和各单元](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40622793927)。
+**Latest session calibration:** success (aggregate of three independent runners). [View run and individual jobs](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40622793927).
 
-**既有 OpenClaw 冻结实验：** 253/257 场景已测，224 通过、29 保留失败观察，4 已确认不适用；969 个独立观察。[审计与证据](evaluation/campaigns/full-20261026-batched/README.md)。
+**Frozen OpenClaw campaign:** 253/257 scenarios measured; 224 passed, 29 retained failures, 4 confirmed not applicable; 969 independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).
 
-看板由 [进度台账](comparison/progress.json) 和冻结审计生成；运行中的步骤见 GitHub Actions，会话校准完成后自动同步台账。详见 [维护说明](comparison/README.md)。
+Generated from the [progress ledger](comparison/progress.json) and the frozen audit. GitHub Actions shows live job steps; session calibration results synchronize automatically. See [maintenance](comparison/README.md).
 <!-- comparison-dashboard:end -->
+
+## What the experiments reveal
+
+| Experiment group | Architecture question | What the evidence can show |
+| --- | --- | --- |
+| Platform · fault domains | Who owns a task if its caller or service stops? | Process boundaries, surviving work, and recovery responsibility. |
+| Platform · state and deployment | Where do sessions, credentials, and workspaces live? | What survives a restart and what depends on external components. |
+| Platform · resources and concurrency | What does a shared service or per-task process cost? | Idle footprint, marginal resource use, and isolation tradeoffs. |
+| Platform · access and operations | How can a caller submit, observe, cancel, and resume work? | Integration surface, operational steps, and missing capabilities. |
+| Harness · context | What does the model retain after compaction or large tool output? | Constraint loss, retrieval paths, and the cost of keeping useful information. |
+| Harness · recovery | What happens after interruption and an external side effect? | Rebuilt conversation state, duplicate effects, and uncertainty handling. |
+| Harness · model retries | How does the system respond when a model request fails? | Retry attempts, delays, and their observable consequences. |
+| Harness · tools and approvals | How are calls ordered and actions authorized? | Dependency handling, parallelism, and whether approval covers the dispatched operation. |
+| Harness · traces | Can an operator reconstruct what happened and why? | Missing links between requests, approvals, tools, outcomes, and costs. |
+
+The [first-wave protocols](comparison/first-wave-protocol.md) spell out controls and limits. These are research questions, not claims that all three products have already passed them.
 
 ## Research and evidence
 

@@ -68,7 +68,7 @@ jobs:
           python3 comparison/update_ci_progress.py
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add README.md comparison/progress.json
+          git add README.md comparison/progress.json comparison/progress.svg
           if ! git diff --cached --quiet; then
             git commit -m 'Update comparison CI progress'
             git push origin HEAD:research/comparison-calibration

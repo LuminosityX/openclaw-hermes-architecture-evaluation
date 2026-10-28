@@ -1,38 +1,38 @@
-# 三系统两层架构测评：务实执行方案
+# Practical two-layer evaluation plan
 
-## 研究目标和边界
+## Research question
 
-平台层比较系统如何承载任务：入口、进程与机器、服务通信、状态及凭据归属、资源共享、故障传播和运维。没有 Gateway 是需要研究的架构选择：分别观察它把哪些职责放到客户端、进程、文件系统或外部服务，比较启动和常驻成本、故障域、并发隔离及实现多入口或远程访问的代价；不要把缺少某组件直接计为失败。只比较实际验证的部署形态，附责任图，外加组件须单列其版本和成本。
+The platform layer studies how a system hosts work: entry points, process and machine boundaries, communication, state and credential ownership, shared resources, failure propagation, and operations. The absence of a Gateway is itself a design choice. Identify which responsibilities move to the client, process, filesystem, or external service, then compare startup and idle cost, fault domains, isolation, and the cost of providing multiple entry points or remote access. Do not score a missing component as a failure. Compare actual validated deployments and list external components, versions, and cost separately.
 
-Harness 层比较一次 agent 运行：上下文组装与压缩、会话恢复、工具调度、审批与执行边界、取消重试、扩展和轨迹。六维（可靠性、安全性、性能、资源成本、扩展性、可观测性）用于评价两层，不作为替代机制分析的分类。
+The harness layer studies how one agent run is assembled and controlled: context assembly and compaction, session recovery, tool scheduling, approval and execution boundaries, cancellation and retries, extension, and execution traces. Reliability, security, performance, resource cost, extensibility, and observability are evaluation dimensions for each layer.
 
-产品整体轨道使用各产品原生配置；受控 Harness 轨道尽量统一模型、工具与预算，不能统一的因素显式记录；机制专项按照原生能力设计。三轨结果不混算，统一模型也不能单独证明某机制是差异根因。
+Use separate tracks: native product configurations; controlled harness experiments with the same model, tools, and budget where supported; and mechanism-specific investigation. Disclose uncontrolled factors. A shared model alone does not prove that a particular mechanism caused an observed difference.
 
-## 开工前：接入预检
+## Before execution
 
-固定产品版本、commit、入口、操作系统、配置、模型和工具。工作区已有 DSH 源码仓库 `https://github.com/deepseek-ai/deepseek-harness`，但尚未核对构建与正式实验版本；Codex 和 OpenClaw 亦须重新确认，历史 OpenClaw pin 仅适用于既有实验。为每个入口画出实际部署与责任图并观察进程、状态路径和外部依赖。记录模型替换、工具接入、请求可见性、故障注入、恢复和审批能力；区分原生、公开扩展、外部组件、不支持、未测和不可见。不得由适配器代替被测系统实现重试、去重或权限。
+Freeze product version, commit when available, entry point, operating system, configuration, model, and tools. DSH 0.2.2-alpha.2 is a preview package and its package integrity must be recorded. The frozen OpenClaw campaign's version applies only to its own evidence. Draw and validate each actual deployment and responsibility map. Record model substitution, tool integration, request visibility, fault injection, resume, and approval as native, public extension, external component, unsupported, untested, or unobservable. An adapter must not implement retries, deduplication, or permissions on the product's behalf.
 
-## 首批实验
+## Initial work items
 
-先每项做一次可行性预检，固定协议后做正式独立重复；未命中故障点、适配器错误或正向对照失败属于无效单元，产品真实失败保留。先运行最小可行子场景，再决定是否扩大；预检不是正式结果。以下编号是本工作区的工作项，尚非已冻结的正式子场景。
+[First-wave protocols](first-wave-protocol.md) specify the first four scenarios and their limits. The remaining entries are research candidates, not verified common protocols. Run a feasibility check first, then freeze a formal protocol. Invalid units include unreached faults, adapter errors, and failed positive controls; retain genuine product failures.
 
-| 层次 | 工作项 | 最小操作和共同观察 | 后续或限制 |
+| Layer | Work item | Minimum observation | Architecture value and boundary |
 | --- | --- | --- | --- |
-| 平台 | P01 责任与故障域 | 提交相同任务，分别终止入口、核心或工具进程；记录存活进程、任务影响、恢复方式 | 不存在的组件记录职责落点；不伪造 Gateway |
-| 平台 | P02 状态与部署 | 记录会话、工作区、凭据、日志归属；重启后检查可恢复内容 | 分离本地、远程及额外组件，避免混合部署形态 |
-| 平台 | P03 资源与并发 | 同机测空闲、单任务及多任务资源、完成量与失败；固定观察窗口 | 先校准负载；吞吐与质量一起报告，环境不一致不排名 |
-| 平台 | P04 接入与运维 | 经原生入口提交、观察、取消和恢复；记录配置步骤、公开接口及外部依赖 | 缺少远程入口列为能力边界及补充组件的代价 |
-| Harness | H03 压缩与约束 | 固定包含早期约束和规则更新的任务，触发原生压缩，逐条检查最终行为和成本 | 模型输入不可见时只报告黑盒结果；手动和自动分开 |
-| Harness | H04 大工具输出 | 合成内容头、中、尾放校验值，比较不同长度、可取回文件与无引用条件 | 使用独立验收；不凭失败断言截断根因 |
-| Harness | H05 恢复与副作用 | 独立账本记录创建操作，在提交前、提交后响应丢失、结果记录后中断并恢复 | 原生恢复与用户明确重试分开；记录幂等由谁提供 |
-| Harness | H08 工具调度 | 四个独立读取、依赖链和冲突写入；记录调用 ID、时序和最终状态 | 确定性 provider 和真实模型分别报告；不支持注入则采用黑盒 |
-| Harness | H11 审批绑定 | 测审批后的参数变化、撤销和恢复；记录批准、派发、实际效果 | 没有相同审批机制时说明原生保护方式与覆盖范围 |
-| Harness | H17 轨迹重建 | 只提供原生记录，盲查模型调用、授权、工具失败和外部效果；用账本核对 | 不要求私有思维链；不知道可标未知，外部账本不算原生日志 |
+| Platform | P01 Fault domain | Terminate an entry, core, or tool process during the same task; record survival and recovery | Reveals ownership and fault propagation; do not invent a Gateway where none exists |
+| Platform | P02 State and deployment | Locate session, workspace, credentials, and logs; inspect recovery after restart | Separates process and persistence ownership, including external components |
+| Platform | P03 Resources and concurrency | Measure idle, one-task, and multi-task resources, completion, and failures | Quantifies the cost of lifecycle and sharing; calibrate load before ranking |
+| Platform | P04 Access and operations | Submit, observe, cancel, and resume through native entry points; record setup and dependencies | Identifies integration and operational responsibilities, including the cost of missing remote access |
+| Harness | H03 Compaction | Trigger native compaction in a task with early constraints and an updated rule | Measures constraint retention, task quality, and cost; invisible inputs limit attribution |
+| Harness | H04 Large outputs | Put checksums at the beginning, middle, and end of outputs, with and without a retrievable file | Tests visibility and recovery; failure alone does not establish truncation as the cause |
+| Harness | H05 Recovery | Interrupt before and after an externally logged side effect and resume | Separates conversation recovery from effects, retries, and ownership of idempotency |
+| Harness | H08 Scheduling | Use independent reads, a dependency chain, and conflicting writes | Reveals ordering, concurrency, and partial failure; separate scripted from real-model results |
+| Harness | H11 Approval | Change parameters or revoke policy around an approval and record actual dispatch | Tests whether authorization covers the executed action; document alternative native safeguards |
+| Harness | H17 Trace reconstruction | Blindly reconstruct model calls, approval, tool failure, and effects from native records | Measures causal visibility; the external ledger is a verifier, not a native log |
 
-## 数据、样本及执行顺序
+## Execution and evidence
 
-每单元记录版本、配置哈希、fixture、任务、故障触达、时间边界、原生事件、外部账本、结果、用量完整性和适配器责任。保护敏感数据，使用合成凭据。受控机制场景先以至少 3 个独立初始化单元描述现象；性能场景至少 6 个独立单元并交错运行顺序；真实模型使用多个任务实例及重复，并报告实例级结果和预算。数量是起步配置，预检后冻结；小样本不支持可靠的尾部或总体排名。观察不到的指标为未知而非零。
+For each unit retain version, configuration hash, fixture, task, fault reachability, timing boundaries, native events, external effect ledger, acceptance, usage completeness, and adapter responsibilities. Use synthetic secrets. Begin with at least three independent units for deterministic mechanisms and six for performance; interleave product order. Real-model work needs multiple independent task instances and repeated runs. Freeze sample sizes and timeouts after calibration. Small samples do not justify tail or population rankings; unobserved values are unknown, not zero.
 
-先完成三方接入预检和平台责任图，再实现 P01–P04 与 H03/H04/H05/H08/H11/H17 的共同最小子场景，进行预检，冻结模型、权限、预算和验收，然后正式运行；再根据缺口扩展。旧 OpenClaw 结果按子场景判断：证据与协议完全一致可继承观察；相关但缺对照作为历史基线并补测；不满足则只复用设施。历史性能和成功率不与新批次直接合并。
+Complete entry-point checks and deployment maps; calibrate common minimum scenarios; freeze model, permissions, budgets, and acceptance; then run formal units and expand where evidence warrants. Assess old OpenClaw results per subscenario: inherit an observation only when evidence and protocol match; otherwise retain it as a historical baseline or reuse only the facilities. Do not combine historical performance or success rates with a new matched batch.
 
-完成项须指向证据，报告设计机制、条件、观察、任务影响、代价和适用边界；平台与 Harness 分表呈现，失败、不适用和未测分开。最终结论不得将外部组件的职责归给产品，也不得将任务成功率直接归因于架构。
+Each conclusion links mechanism, conditions, observations, task impact, cost, and applicability. Present platform and harness results separately. Keep failure, unsupported, and untested distinct. Do not attribute external-component behavior to the product, or task success directly to architecture.
