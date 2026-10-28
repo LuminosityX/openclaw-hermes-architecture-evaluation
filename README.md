@@ -38,9 +38,7 @@ Explore the [experiment protocols](comparison/first-wave-protocol.md) for the pl
 
 **Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/40623428889).
 
-**Frozen OpenClaw campaign:** 253/257 scenarios measured; 224 passed, 29 retained failures, 4 confirmed not applicable; 969 independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).
-
-[Experiment details](comparison/README.md).
+[OpenClaw architecture study](evaluation/reports/full-20261026-architecture.md) · [Experiment details](comparison/README.md)
 <!-- comparison-dashboard:end -->
 
 ## Research and evidence

@@ -17,8 +17,6 @@ def render():
     data = json.loads((ROOT / 'comparison/progress.json').read_text(encoding='utf-8'))
     if data['schema_version'] != 1 or data['products'] != ['Codex', 'DSH', 'OpenClaw']:
         raise ValueError('Unsupported ledger schema or products')
-    audit = json.loads((ROOT / 'evaluation/campaigns/full-20261026-batched/completion-audit.json').read_text(encoding='utf-8'))['completion']
-    counts = audit['scenario_counts']
     lines = [START, '## Research progress', '',
         '| Layer / experiment | Dimensions | Codex | DSH | OpenClaw |', '| --- | --- | --- | --- | --- |']
     seen = set()
@@ -54,8 +52,7 @@ def render():
         if not url.startswith(prefix) or not url[len(prefix):].isdigit() or latest['result'] not in ('success', 'failure', 'cancelled', 'skipped'):
             raise ValueError('Invalid CI progress record')
         lines += ['', f"**Latest session calibration:** {latest['result']} (three independent calibration units). [View calibration evidence]({url})."]
-    lines += ['', f"**Frozen OpenClaw campaign:** {audit['measured_scenarios']}/{audit['scenarios']} scenarios measured; {counts['pass']} passed, {counts['fail']} retained failures, {counts['unsupported']} confirmed not applicable; {audit['accepted_observation_count']} independent observations. [Audit and evidence](evaluation/campaigns/full-20261026-batched/README.md).", '',
-        '[Experiment details](comparison/README.md).', END]
+    lines += ['', '[OpenClaw architecture study](evaluation/reports/full-20261026-architecture.md) · [Experiment details](comparison/README.md)', END]
     return '\n'.join(lines)
 
 
