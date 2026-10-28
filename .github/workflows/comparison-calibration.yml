@@ -34,7 +34,6 @@ jobs:
         env:
           COMPARISON_RUNTIME: ${{ runner.temp }}/comparison-runtime
           COMPARISON_OUTPUT: ${{ runner.temp }}/comparison-evidence
-          COMPARISON_FORMAL: "true"
           COMPARISON_UNIT: ${{ matrix.unit }}
         run: python3 comparison/session_probe.py
       - name: Retain calibration and installation evidence
