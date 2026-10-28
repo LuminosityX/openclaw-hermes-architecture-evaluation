@@ -17,7 +17,7 @@ The platform layer examines how each system hosts and operates agent work. The h
 
 The entries show **planned lines of investigation**, not proven product capabilities or complete coverage of a dimension. For example, state-location inspection alone does not establish security, and access integration alone does not establish harness extensibility. [Protocol details and limits](comparison/first-wave-protocol.md).
 
-[![Architecture research progress](comparison/progress.svg)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
+[![Architecture research progress](comparison/progress.svg?v=1737fbda3a88)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Aresearch%2Fcomparison-calibration)
 
 <!-- comparison-dashboard:start -->
 ## Research progress

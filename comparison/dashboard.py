@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Render the repository progress ledger into the README; no network or experiments."""
 import argparse
+import hashlib
+import re
 import json
 from pathlib import Path
 
@@ -106,6 +108,11 @@ def main():
     updated = original[:original.index(START)] + render() + original[original.index(END) + len(END):]
     visual_path = ROOT / 'comparison/progress.svg'
     visual = render_visual()
+    revision = hashlib.sha256(visual.encode('utf-8')).hexdigest()[:12]
+    updated, replacements = re.subn(r'comparison/progress\.svg(?:\?v=[0-9a-f]{12})?',
+                                    'comparison/progress.svg?v=' + revision, updated)
+    if replacements != 1:
+        raise ValueError('README must contain exactly one progress image')
     if args.check:
         if not visual_path.exists() or visual_path.read_text(encoding='utf-8') != visual:
             raise SystemExit('Progress visual is stale; run python3 comparison/dashboard.py')
