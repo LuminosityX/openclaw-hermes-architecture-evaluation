@@ -3,10 +3,10 @@ name: Codex campaign batches
 on:
   workflow_dispatch:
     inputs:
-      note:
-        description: Execute formal prescribed units of calibrated Codex families
+      cases:
+        description: 'Comma-separated calibrated families to execute (e.g. REL-02), or all'
         type: string
-        default: ''
+        default: 'all'
 
 permissions:
   contents: read
@@ -16,11 +16,38 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  select:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      cases: ${{ steps.select.outputs.cases }}
+    steps:
+      - name: Select the calibrated families for this dispatch
+        id: select
+        run: |
+          python3 - <<'PY'
+          import json, os
+          calibrated = ['REL-01', 'REL-02']
+          requested = '${{ inputs.cases }}'.strip()
+          if requested.lower() == 'all':
+              selected = calibrated
+          else:
+              requested = [item.strip() for item in requested.split(',') if item.strip()]
+              unknown = [item for item in requested if item not in calibrated]
+              assert not unknown, f'Unknown or uncalibrated families: {unknown}'
+              selected = requested
+          assert selected, 'No families selected'
+          with open(os.environ['GITHUB_ENV'], 'a') as env:
+              env.write(f'CASES_JSON={json.dumps(selected)}\n')
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as out:
+              out.write(f'cases={json.dumps(selected)}\n')
+          PY
   mechanisms:
+    needs: select
     strategy:
       fail-fast: false
       matrix:
-        case: [REL-01, REL-02]
+        case: ${{ fromJSON(needs.select.outputs.cases) }}
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     env:
