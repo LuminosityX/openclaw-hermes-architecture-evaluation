@@ -15,7 +15,7 @@ The platform layer examines how each system hosts and operates agent work. The h
 | **Extensibility** | Entry-point integration and operational control | Component extension and responsibility boundaries | P04; harness component replacement is a future protocol |
 | **Observability** | Fault visibility and diagnosis across system boundaries | Reconstruction of approvals, tool effects, and recovery | P01, P04, H05, H11, H17 |
 
-Explore the [experiment protocols](comparison/first-wave-protocol.md) for the planned scenarios, measurements, and acceptance criteria.
+Explore the [experiment catalogue](comparison/experiment-index.md) for each scenario, its measurements, architectural value, and readiness.
 
 [![Architecture research progress](comparison/progress.svg?v=1737fbda3a88)](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
 
@@ -46,7 +46,8 @@ Explore the [experiment protocols](comparison/first-wave-protocol.md) for the pl
 | Start here | Contents |
 | --- | --- |
 | [Three-product workspace](comparison/README.md) | Scope, dashboard maintenance and evidence rules |
-| [First-wave protocols](comparison/first-wave-protocol.md) | Concrete platform and harness scenarios, controls and limits |
+| [Experiment catalogue](comparison/experiment-index.md) | Shared scenarios, measurements, architecture evidence and readiness |
+| [First-wave protocols](comparison/first-wave-protocol.md) | Detailed execution controls and acceptance criteria |
 | [Execution plan](comparison/plan.md) | Priorities, comparison tracks and evidence reuse |
 | [OpenClaw campaign](evaluation/README.md) | Frozen six-dimension design, tooling and execution guides |
 | [OpenClaw architecture report](evaluation/reports/full-20261026-architecture.md) | Source-backed results and tradeoffs for the frozen campaign |
