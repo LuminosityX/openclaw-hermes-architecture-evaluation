@@ -1,0 +1,350 @@
+{
+  "schema_version": 1,
+  "products": [
+    "Codex",
+    "DSH",
+    "OpenClaw"
+  ],
+  "items": [
+    {
+      "layer": "platform",
+      "id": "P01",
+      "name": "Fault domains",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Reliability",
+        "Observability"
+      ]
+    },
+    {
+      "layer": "platform",
+      "id": "P02",
+      "name": "State and deployment",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Reliability",
+        "Security"
+      ]
+    },
+    {
+      "layer": "platform",
+      "id": "P03",
+      "name": "Resources and concurrency",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Performance",
+        "Resource & cost"
+      ]
+    },
+    {
+      "layer": "platform",
+      "id": "P04",
+      "name": "Access and operations",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Extensibility",
+        "Observability"
+      ]
+    },
+    {
+      "layer": "platform",
+      "id": "P05",
+      "name": "Identity and access boundaries",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Security"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H03",
+      "name": "Compaction and constraints",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Reliability",
+        "Resource & cost"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H04",
+      "name": "Large tool outputs",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Reliability",
+        "Resource & cost"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H05",
+      "name": "Recovery and side effects",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "in_progress",
+          "evidence": [],
+          "note": "Three-unit hosted calibration: success; formal protocol remains incomplete."
+        },
+        "OpenClaw": {
+          "status": "in_progress",
+          "evidence": [],
+          "note": "Three-unit hosted calibration: success; formal protocol remains incomplete."
+        }
+      },
+      "dimensions": [
+        "Reliability",
+        "Observability"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H07",
+      "name": "Model failure and retry",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Reliability",
+        "Resource & cost"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H08",
+      "name": "Tool scheduling",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Performance",
+        "Reliability"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H11",
+      "name": "Approval binding",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Security",
+        "Observability"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H14",
+      "name": "Tool lifecycle and integration",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Extensibility",
+        "Reliability"
+      ]
+    },
+    {
+      "layer": "harness",
+      "id": "H17",
+      "name": "Execution trace",
+      "products": {
+        "Codex": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "DSH": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        },
+        "OpenClaw": {
+          "status": "planned",
+          "evidence": [],
+          "note": ""
+        }
+      },
+      "dimensions": [
+        "Observability"
+      ]
+    }
+  ],
+  "latest_ci": {
+    "result": "success",
+    "url": "https://github.com/zyw02/agent-arch/actions/runs/40623428889"
+  }
+}

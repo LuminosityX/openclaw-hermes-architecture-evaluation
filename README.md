@@ -1,71 +1,64 @@
-# OpenClaw Task Framework Evaluation
+# Agent Platform and Harness Architecture Evaluation
 
-`main` focuses on **OpenClaw only**, organized around six dimensions of using an agent framework to complete tasks. Hermes and the former eleven-dimension comparison are historical references, outside the current test scope.
+Architecture research for **Codex, DeepSeek Harness (DSH), and OpenClaw**, across two complementary layers: how a system hosts agent work, and how its harness manages each execution. Six dimensions—reliability, security, performance, cost, extensibility, and observability—apply to both layers.
 
-The current work is the [full experiment campaign](evaluation/full-campaign.md): finish the frozen 60-family, 257-scenario scope, audit its completion, then write one unified source-backed architecture analysis. Calibrated families execute their formal repetitions in batches while remaining adapters are implemented. Earlier pilots and the [exploratory source review](evaluation/evidence/source-followup-20261026/README.md) remain historical exploratory evidence; they do not complete this campaign.
+## Six dimensions, two architecture layers
 
-The current campaign targets **OpenClaw 2026.10.7**, release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`, checked against GitHub stable and npm `latest` on 2026-10-26. The exact [campaign pin](evaluation/design/evaluation-matrix.json) is fixed for reproducibility. See the [current-version execution guide](evaluation/current-version.md); newer dependency installations run on disposable GitHub-hosted machines, not this local workspace.
+The platform layer examines how each system hosts and operates agent work. The harness layer examines how it assembles, controls, and recovers an individual run. Each experiment contributes evidence to one or more dimensions.
 
-[Current-release evidence](evaluation/evidence/current-stable-20261026/README.md) now contains valid two-block pilots for all three first-wave studies on this version. The earlier local build remains harness-bootstrap evidence only.
+| Dimension | Platform evaluation | Harness evaluation | Initial work |
+| --- | --- | --- | --- |
+| **Reliability** | Failure isolation, state persistence, and deployment recovery | Context retention, execution recovery, and retry behavior | P01, P02, H03, H04, H05, H07, H08 |
+| **Security** | State and credential ownership, access boundaries, and isolation | Authorization scope and consistency between approval and execution | P02, P05, H11 |
+| **Performance** | Throughput, concurrency, and resource contention | Tool scheduling, execution latency, and dependency handling | P03, H08 |
+| **Resource & cost** | Idle footprint and marginal cost per task | Context processing, retry overhead, and model usage | P03, H03, H04, H07 |
+| **Extensibility** | Entry-point integration and operational control | Component extension and responsibility boundaries | P04, H14 |
+| **Observability** | Fault visibility and diagnosis across system boundaries | Reconstruction of approvals, tool effects, and recovery | P01, P04, H05, H11, H17 |
 
-**Status:** [253 of 257 scenarios have completed formal cloud execution](evaluation/campaigns/full-20261026-batched/README.md), with 969 independent observations: 224 scenarios pass and 29 retain failed acceptance observations. 4 other scenarios have verified native nonapplicability, disclosed separately from measured coverage. No scenarios remain incomplete. The complete execution audit has passed. The completed audit now permits unified source-backed architecture analysis.
+Explore the [experiment catalogue](comparison/experiment-index.md) and [execution protocol](comparison/execution-protocol.md) for scenarios, measurements, acceptance, and readiness.
 
-Read the [completed campaign architecture analysis](evaluation/reports/full-20261026-architecture.md) for source-backed mechanisms, cross-dimension tradeoffs, measurement limits and the retained failed acceptance observations.
+[![Architecture research progress](https://raw.githubusercontent.com/zyw02/agent-arch/main/comparison/progress.svg?v=e061a71a0291)](https://github.com/zyw02/agent-arch/actions/workflows/comparison-calibration.yml?query=branch%3Amain)
 
-The [Chinese experiment-by-experiment factual report](evaluation/reports/full-20261026-observations-zh.md) describes all 257 scenario setups and observations. Its [per-unit evidence compilation](evaluation/reports/full-20261026-observations-draft-zh.md) retains measured fields and source links; machine-translated labels in that appendix are marked as unreviewed.
+<!-- comparison-dashboard:start -->
+## Research progress
 
+| Layer / experiment | Dimensions | Codex | DSH | OpenClaw |
+| --- | --- | --- | --- | --- |
+| Platform · P01 Fault domains | Reliability, Observability | Planned | Planned | Planned |
+| Platform · P02 State and deployment | Reliability, Security | Planned | Planned | Planned |
+| Platform · P03 Resources and concurrency | Performance, Resource & cost | Planned | Planned | Planned |
+| Platform · P04 Access and operations | Extensibility, Observability | Planned | Planned | Planned |
+| Platform · P05 Identity and access boundaries | Security | Planned | Planned | Planned |
+| Harness · H03 Compaction and constraints | Reliability, Resource & cost | Planned | Planned | Planned |
+| Harness · H04 Large tool outputs | Reliability, Resource & cost | Planned | Planned | Planned |
+| Harness · H05 Recovery and side effects | Reliability, Observability | Planned | In progress | In progress |
+| Harness · H07 Model failure and retry | Reliability, Resource & cost | Planned | Planned | Planned |
+| Harness · H08 Tool scheduling | Performance, Reliability | Planned | Planned | Planned |
+| Harness · H11 Approval binding | Security, Observability | Planned | Planned | Planned |
+| Harness · H14 Tool lifecycle and integration | Extensibility, Reliability | Planned | Planned | Planned |
+| Harness · H17 Execution trace | Observability | Planned | Planned | Planned |
 
-| Dimension | Focus | Planned families |
-| --- | --- | --- |
-| Reliability / 可靠性 | Task loss, duplicate effects, state consistency, retries, cancellation, recovery and dependency failures | 15 |
-| Security / 安全性 | User privacy, isolation, permissions, prompt injection, network egress, gateway access and extension supply chains | 12 |
-| Performance / 性能 | Problem-solving success, deliverable quality, latency, concurrency, overload and sustained capacity | 10 |
-| Resource usage and cost / 资源占用与成本 | CPU, RSS/PSS/cgroup memory, swap, disk/inodes/IO, network, processes, tokens and USD charges | 7 |
-| Extensibility / 可扩展性 | Public plugin interfaces, hooks, lifecycle, composition, tools and integration contracts | 9 |
-| Observability / 可观测性 | Accessible agent trajectories, event linkage, export, fault reconstruction and observer overhead | 7 |
+**Latest session calibration:** success (three independent calibration units). [View calibration evidence](https://github.com/zyw02/agent-arch/actions/runs/40623428889).
 
-## Getting started
+[OpenClaw architecture study](evaluation/reports/full-20261026-architecture.md) · [Experiment details](comparison/README.md)
+<!-- comparison-dashboard:end -->
 
-Requirements: Git and Python 3.11 or later; no third-party Python packages are needed for these commands.
+## Research and evidence
 
-```sh
-git clone https://github.com/zyw02/openclaw-hermes-architecture-evaluation.git
-cd openclaw-hermes-architecture-evaluation
-python3 tools/check_repository.py
-python3 evaluation/tools/check_design.py
-python3 -m unittest discover -s evaluation/tests -v
-python3 evaluation/tools/suite.py list
-```
+| Start here | Contents |
+| --- | --- |
+| [Three-product workspace](comparison/README.md) | Scope, dashboard maintenance and evidence rules |
+| [Experiment catalogue](comparison/experiment-index.md) | Shared scenarios, measurements, architecture evidence and readiness |
+| [Execution protocol](comparison/execution-protocol.md) | Two-layer, six-dimension scenarios and acceptance |
+| [First-wave protocols](comparison/first-wave-protocol.md) | Initial execution controls and acceptance criteria |
+| [Execution plan](comparison/plan.md) | Priorities, comparison tracks and evidence reuse |
+| [OpenClaw campaign](evaluation/README.md) | Frozen six-dimension design, tooling and execution guides |
+| [OpenClaw architecture report](evaluation/reports/full-20261026-architecture.md) | Source-backed results and tradeoffs for the frozen campaign |
+| [Chinese scenario observations](evaluation/reports/full-20261026-observations-zh.md) | Experiment-by-experiment facts and limitations |
+| [Historical V6](docs/history/v6-methodology.md) | Earlier OpenClaw/Hermes protocol |
 
-Select a plan by dimension or case. These commands only print JSON; they never start OpenClaw, install software, or call a provider.
+The completed OpenClaw campaign used version 2026.10.7, commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`. The new DSH target is the preview `0.2.2-alpha.2`.
 
-```sh
-python3 evaluation/tools/suite.py plan --dimension reliability
-python3 evaluation/tools/suite.py plan --dimension security --case SEC-08
-python3 evaluation/tools/suite.py plan --dimension performance --phase real-model
-python3 evaluation/tools/suite.py plan --phase all
-```
+## Further information
 
-The default plan contains deterministic mechanism tests. Actual task capability, model prompt-injection susceptibility and provider charges require real usage. The selected provider is `deepseek-flash`; the user explicitly chose no campaign monetary ceiling. Selecting a plan alone does not enable execution.
-
-## Current evaluation
-
-Start with the [evaluation guide](evaluation/README.md), [experiment catalogue](evaluation/experiment-catalogue.md), [measurement contract](evaluation/measurement-contract.md) and [methodology](docs/methodology.md). The [matrix](evaluation/design/evaluation-matrix.json) defines the current six dimensions and required metrics. The [reproduction guide](docs/reproduction.md) explains validation, selection and execution prerequisites.
-
-The [architecture tradeoff studies](evaluation/architecture-studies.md) provide hypotheses for the eventual unified analysis. During the full campaign, source reading supports adapter implementation and harness repair; new architecture interpretations wait until the completion audit passes.
-
-The [historical bootstrap record](evaluation/evidence/README.md) contains native exploratory observations on an existing `2026.9.2` installation. It validates the test chain and is excluded from current-release conclusions. Runtime state was ephemeral and bounded; only a small synthetic JSON evidence record is retained.
-
-Measure actual task outcomes and independently observed effects. Keep failed, cancelled and incomplete attempts in denominators; missing counters or prices remain unknown. A passing CI check validates repository tooling, not OpenClaw reliability, safety or task quality.
-
-## Historical materials
-
-`archive/v6` is the locked historical branch at `a33644efc9490ff771d058ebf047f08550e4ccb3`. `v6/` on `main` remains unchanged and retains the former OpenClaw/Hermes controllers, fixtures, frozen protocol, source references, dependency snapshots and Windows bundle. Do not use those paired controllers as the current OpenClaw runner.
-
-Historical product pins and grades apply only to the [V6 protocol](v6/protocol/protocol_v1.json). See the [historical methodology](docs/history/v6-methodology.md), [historical reproduction guide](docs/history/v6-reproduction.md), [evidence review](docs/history/v6-evidence-review.md) and [provenance](docs/provenance.md). Each future OpenClaw run must independently pin its installed revision, configuration, plugins, model and provider; historical pins are not new-run defaults.
-
-Raw trajectories, state databases, runtime installations, results and credentials stay outside version control. Repository documentation is in English; frozen inputs, upstream quotations and multilingual test strings retain their original language.
-
-See [CONTRIBUTING.md](CONTRIBUTING.md), [SECURITY.md](SECURITY.md), [LICENSE](LICENSE) and [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) for contribution, reporting and licensing terms.
-
-Read the [completed campaign architecture analysis](evaluation/reports/full-20261026-architecture.md) for source-backed mechanisms, cross-dimension tradeoffs, measurement limits and retained failed acceptance observations.
+See the [contribution guide](CONTRIBUTING.md), [security policy](SECURITY.md), [license](LICENSE), and [third-party notices](THIRD_PARTY_NOTICES.md). The [workspace guide](comparison/README.md) covers how to maintain progress and reproduce the research.

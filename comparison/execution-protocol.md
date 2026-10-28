@@ -1,0 +1,159 @@
+# Two-layer, six-dimension execution protocol
+
+This protocol defines the initial cross-product campaign for Codex, DeepSeek Harness (DSH), and OpenClaw. The [catalogue](experiment-index.md) explains the purpose of each experiment; the scenarios below define the inputs, operations, measurements, and acceptance rules. The [progress table](../README.md#research-progress) records implementation and execution status. The [campaign manifest](campaign.json) lists every case, condition, repetition baseline, and implementation state.
+
+## 1. Coverage
+
+Each cell identifies its primary experiment and the observation used for the assessment. Additional dimensions can draw on the same evidence.
+
+| Dimension | Platform layer | Harness layer |
+| --- | --- | --- |
+| Reliability | P01: process termination and task ownership; P02: restart and state | H05: session and effect recovery; H07: model retry |
+| Security | P05: identity, state and endpoint access boundaries | H11: execution approval and policy binding |
+| Performance | P03: task concurrency, startup and contention | H08: tool scheduling and dependent operations |
+| Resource & cost | P03: process-tree resources and idle service cost | H03/H04/H07: context, output and retry usage |
+| Extensibility | P04: external entry and operational integration | H14: integration and lifecycle of an added tool |
+| Observability | P01/P04: fault visibility and operational diagnosis | H17: reconstruct a model–tool–effect chain |
+
+## 2. Frozen campaign inputs
+
+**Products and entry points.** Record exact binary version, package digest, release/commit if available, platform, entry, configuration hash, and startup command in the run manifest. Start with DSH `0.2.2-alpha.2`, OpenClaw `2026.10.7` (release commit `157d8c2bc3ea2fa183afdc11088e69690bf8e64e`), and the Codex CLI binary and release resolved and pinned before its first execution. Capture the full dependency lock and Node version for JavaScript packages. A new version creates a new campaign configuration. The existing OpenClaw campaign is a separately pinned baseline.
+
+**Deployment profiles.** Profile A is an isolated local command: Codex `codex exec --json` plus `codex exec resume`, DSH headless `--json` and `--session-id`, OpenClaw `agent --local --json` and an explicit session ID. Profile B measures a long-lived service when supplied by the selected product: OpenClaw Gateway; the equivalent native long-lived DSH/Codex entry if selected and successfully calibrated. Report profile A and B separately; profile B's actual components are part of the result. For interactive approvals, use a native interactive/API entry capable of accepting approval responses; record that entry separately from A. Codex's documented app-server supports thread/turn events and approval handling ([OpenAI documentation](https://developers.openai.com/blog/codex-as-a-platform)).
+
+**Host isolation.** Run only on disposable GitHub-hosted Linux runners. Use a fresh temporary home, workspace, credentials, port allocation, service state, and process group per unit; set the product-specific home/state environment variables explicitly. Synthetic secrets and loopback fixture endpoints are used throughout. Run products in paired blocks on the same runner image with randomized order; preserve independent state between products. Record runner image, CPU count, available memory, kernel, Node/Python versions, time source, and competing background load.
+
+**Comparison tracks.** Track N uses each product's native selected model and defaults with common tasks, permissions and external fixture; it compares product configurations. Track C uses the same model/version, generation settings and fixture tools wherever supported; it estimates harness-level differences while retaining each harness's prompts and context behavior. Track D uses the scripted fixture provider to issue predetermined actions and fault responses; it examines execution semantics rather than model task quality. Report tracks separately. Configuration differences and inaccessible observations are recorded in the result.
+
+**Budget and repetitions.** Deterministic controls and faults use 3 fresh units per product/profile/case; resource and latency conditions use 6 fresh units. Real-model task instances use 5 unique fixtures × 3 repetitions per product/configuration. A task timeout is 180 s, a held-fault reach timeout 60 s, restart observation 60 s, and cancellation follow-up 10 s with checks at 0.5/2/10 s. Service response delay is 250 ms unless the case specifies another delay. Real provider requests use a user-provided credential via GitHub Secrets; log request usage and actual prices if supplied, and report unknown amounts as unknown. The scripted fixture performs no paid calls.
+
+**Controls and outcome codes.** Each case includes a positive control: same task and fixture with no fault and permitted access. The controller records `fault_reached` or `denial_reached` from an independent event; absent triggers and failed controls yield `invalid` and a bounded rerun after repair. Valid product observations use `pass`, `fail`, `unsupported`, or `inconclusive`, with an explicit reason. An unsupported operation required by the scenario remains visible in capability coverage; failed adapter construction is `adapter_error`. Preserve all valid failures and side effects. Do not synthesize product recovery, retry, approval or deduplication in the adapter.
+
+## 3. Common fixtures and measurement contract
+
+**Model fixture M.** A loopback HTTP service supports OpenAI Chat Completions, Anthropic Messages, and OpenAI Responses with streaming and non-streaming responses as required by each configured provider. It writes an append-only synthetic request/event ledger including `unit_id`, monotonic timestamp, protocol, request number, messages and tool schemas or hashes, response type, and socket close. The fixture supports `ack`, `503_once`, `hold_before_response`, `hold_after_tool_call`, `large_context`, and `scripted_calls`. Responses are protocol-conformant and provide consistent synthetic usage; usage supplied by M is fixture metadata, not real billing. Codex Responses and DSH/OpenClaw adapters must pass the positive control before fault scenarios. The existing `comparison/session_probe.py` implements only a subset of M and provides the DSH/OpenClaw normal-session calibration.
+
+**Tool fixture T.** A loopback MCP server and equivalent product-native shim expose the same operations: `read(key, delay_ms)`, `read_after(key, expected_version)`, `write(key, expected_version, value)`, `create(effect_id, idempotency_key?)`, `large(size_bytes, marker_position, return_reference)`, and `fetch(reference)`. Each invocation writes `call_id`, effect ID, parameters hash, received/start/end timestamps, result and committed state to an independent ledger. Each test resets the datastore. `create` can hold its response after durable commit; in the idempotency-enabled variant, T deduplicates only the same caller-supplied key and logs every invocation. The harness remains responsible for the key it sends and its retry behavior. The shim only translates transport/schema and never retries or enforces the expected result.
+
+**Operating-system observer O.** Sample the product process tree and service processes every 100 ms for RSS and CPU; record process/parent IDs, executable, exit/signal, listeners, state file paths, and lifecycle timestamps. Count shared service baseline and marginal task resources separately, and exclude M, T, and the controller. RSS is a sum of per-process resident memory, reported with that definition. Record missing counters as unavailable.
+
+**Approval driver A.** A native client handles product-provided approval prompts or APIs. It records requested operation, request ID, action, decision and time; it can approve, deny, and revoke only through supported product controls. T's ledger proves the dispatched operation and effects. If an entry cannot receive an approval decision, select a supported native interactive entry; if no entry exposes the operation, record the capability and retain the common safe-task control.
+
+**Artifacts.** For every unit retain manifest, sanitized native events/logs, model/fixture event ledgers, operating-system samples, acceptance JSON, time and usage fields, and the script and configuration hashes. Use only synthetic contents in committed artifacts; retain compact immutable evidence and hosted run IDs. Per-product adapter manifests declare native, public extension, external component, unsupported, or unobservable for each capability and explain how to start, submit, cancel, resume, inspect, and inject faults. Codex's adapter is specified now and remains unexecuted until the user authorizes Codex runs.
+
+## 4. Platform layer
+
+### P01 — Reliability: fault domains
+
+Inputs: M `hold_before_response`; task `Return ACK for <unit_id>`; one client and one session. Conditions: P01-C0 no fault; C1 kill the submitting client after M confirms request; C2 kill the execution process at the same boundary; C3 kill a tool process after T logs entry into `read`. Run C1/C2 on every profile that exposes distinct processes; if client and core are the same PID record the common boundary. OpenClaw Gateway and embedded are distinct profiles. For C3 the positive control must first invoke T.
+
+Steps: start profile; submit task; wait for independent `request_received` or T `start`; terminate the named PID with SIGKILL; observe O and M/T for 10 s; restart the component where supported; use the native resume mechanism once, then observe for 60 s. The fixture remains alive.
+
+Acceptance and metrics: C0 reaches a successful final response. Record fault PID, child survival, model connection, session availability, whether work completes independently, resumed result, time to recovery and external effects. Mark a fault case `pass` when its observation and native status agree and no duplicate external effect occurs in the C3 control; a lost task, false success, or duplicate effect is a retained failure. The structural finding is the actual process ownership and fault propagation; manual and automatic recovery are separate outcomes.
+
+### P02 — Reliability/security: state and deployment
+
+Inputs: two turns `SESSION_MARKER_<unit>` and `CONTINUE_<unit>`, M `ack`; fresh workspace. Conditions: C0 two turns within one process; C1 restart the entry or client between turns; C2 for a service profile restart the service between turns. Execute one session per unit.
+
+Steps: submit first turn and wait for durable completion and product exit/idle; snapshot file paths and hashes under the owned state root; restart as specified; resume the same session ID; submit second turn. M independently inspects the second request for the prior user marker, assistant ACK, and second input. Record session, workspace, credentials and log ownership and access modes using O, with secret values excluded.
+
+Acceptance and metrics: C0 and C1 pass when both turns succeed and all three elements appear in the second request; C2 uses the same criterion. Record actual state location, processes that can access it, restart steps, elapsed time, and missing state. P05 separately measures actual access enforcement. [Detailed session protocol](first-wave-protocol.md#p02--h05--reconstruct-a-session-after-normal-exit).
+
+### P03 — Performance/resource & cost: workload and footprint
+
+Inputs: M `ack` with fixed 250 ms delay. Conditions C0 idle service for 30 s; C1 cold one-task; C2 four independent sessions concurrently; C3 eight independent sessions concurrently. For a command-only profile, C0 records no service baseline. Use six independent units per condition and randomize product order. Each task must return its own `ACK_<task_id>`; exact service delay is fixed.
+
+Steps: initialize a fresh profile; for C0 start only required resident components; for C1–C3 launch the declared tasks with a barrier, wait up to 180 s, then sample for 10 s after completion. O samples every 100 ms. Record retries and failed/unfinished tasks.
+
+Acceptance and metrics: report task completion/attempts, elapsed wall time, per-task p50 and observed distribution, aggregate tasks/min, peak and time-integrated process-tree RSS, CPU seconds, startup time, residual processes, and idle service cost. Only valid ACKs count as completed. Six units support descriptive distributions; retain raw values and omit p99. Same-machine results compare configurations and profile choices, including their additional components.
+
+### P04 — Extensibility/observability: external control
+
+Inputs: a minimal external supervisor running on the same host; one task `Return ACK_<unit>`; a second task held at M. Conditions: C0 submit/observe a successful task; C1 cancel while M holds the response; C2 resume a previously completed session with a new turn. Use each product's documented native CLI or API from a supervisor, preserving product-specific request formats.
+
+Steps: implement an adapter using public entry points; record exact changed files/config, source lines in the adapter (excluding fixture and SDK dependencies), setup commands, new processes, and privileges; perform C0, C1, C2. Poll product-native status and independent M events. The supervisor does not manufacture cancellation or session history.
+
+Acceptance and metrics: C0 succeeds when native output and M agree; C1 records cancel acknowledgment, connection closure, product stop and post-cancel activity at 0.5/2/10 s; C2 requires prior history plus new prompt visible to M. Report implementation surface, integration steps, supported operations, external components and their lifecycle. Absence of a native remote entry is recorded along with the adapter needed for the target deployment.
+
+### P05 — Security: platform identity and state boundaries
+
+Inputs: two synthetic identities A and B with separate state/workspace roots; a random synthetic canary file owned by A; a synthetic Gateway or service token for A when the profile has a remote endpoint. C0 A reads its permitted canary; C1 B attempts to read A's private state through the product's supported access path; C2 unauthenticated or B-token access to A's service endpoint; C3 invalid credentials on B's normal task.
+
+Steps: create the identities and profiles with the product's documented isolation controls, record OS UID and permissions, and perform each request through the native access path. The synthetic task asks for the exact canary string; independent fixture/server logs and file permissions establish access. For local single-user profiles, run A and B under separate OS users and report OS controls as external to the product. For profiles without a remote endpoint, mark C2 `unsupported` and record the deployment path used to expose one.
+
+Acceptance and metrics: C0 must succeed to validate setup. C1/C2 pass if the unauthorized principal cannot obtain the canary or invoke A's task; C3 passes when B is denied and A's valid control remains usable. Record principal, configured boundary, actual file/endpoint effect, access denial, and operational cost. P05 measures a defined platform isolation claim; it does not assume that a product is a multi-tenant server.
+
+## 5. Harness layer
+
+### H03 — Reliability/resource & cost: compaction and constraints
+
+Inputs: one task with six exact constraints: output path, protected file, computation rule, required marker, receipt of completed step, and a rule updated from v1 to v2. Place constraints in early/middle/recent turns and fill the history with fixed-hash distractor text. Conditions C0 short history, C1 one native compaction, C2 two native compactions, C3 C1 followed by restart. Separately record automatic and user-triggered compaction. Track N or C uses matched real-model task instances; D can inspect request transformations with M.
+
+Steps: establish baseline; build the same history under the declared model context profile; trigger compaction through the native control or threshold; record whether compaction was reached; ask for the final artifact. Run five distinct fixtures × three repetitions for real-model outcomes. If no public compaction trigger exists use the automatic threshold and report trigger and resulting request visibility; lack of such control is a capability result.
+
+Acceptance and metrics: score each of six constraints, updated rule adherence, completed-step repetition, artifact acceptance, compaction count, tokens by request, retries, and end-to-end time. Compare C0/C1/C2/C3 within the same model configuration. Direct input inspection establishes retention; black-box task outcomes establish observed behavior.
+
+### H04 — Reliability/resource & cost: large output handling
+
+Inputs: T `large` returns exactly 8, 64, or 256 KiB with three unique markers in head/middle/tail; conditions C0 content only and C1 a retrievable full-content reference. An independent oracle checks exact marker values. Track D instructs the model fixture to invoke T and then reports the received result; Track C/N asks the real model to retrieve all markers.
+
+Steps: reset T; submit the same task with size and reference condition; capture tool result as the product delivers it, subsequent model request when observable, extra `fetch` calls and final answer. Run three deterministic units or five real task instances × three repetitions per condition.
+
+Acceptance and metrics: exact 3/3 marker match; bytes delivered, truncation flag, number of retrievals, tokens and elapsed time. Classify missing model-visible data separately from data present but unused. Mark request payload visibility unavailable when the entry does not expose it.
+
+### H05 — Reliability/observability: state and side effects
+
+Inputs: P02 C1 for session recovery; T `create(effect_id, idempotency_key?)` with independently durable receipt. Conditions C0 no fault; C1 terminate before T dispatch; C2 terminate after T commits but before its response; C3 terminate after product records tool result. For each fault use R1 automatic restart, R2 native resume, and R3 explicit user retry; run T with idempotency disabled and enabled.
+
+Steps: wait for exact ledger boundary, kill the relevant product process, execute the chosen recovery path once, and inspect T's actual call/effect counts plus native trajectory. Each (fault, recovery, idempotency) tuple uses three independent units; unsupported recovery paths are retained as capability entries.
+
+Acceptance and metrics: C0 produces one effect and matching acknowledgment. In fault cases classify one effect with correct acknowledgment, one effect with explicit uncertainty, zero effects, duplicate effects, and false success; record key provenance, retries, state retained, and time. `pass` is assigned only to the expected single-effect outcome for that declared interface contract; explicit uncertainty is reported separately as a safe indeterminate outcome. Exactly-once expectations depend on the service and product contract.
+
+### H07 — Reliability/resource & cost: model retry
+
+Inputs: M C0 `ack`, C1 `503_once`, C2 disconnect before first response byte, C3 disconnect after one response chunk. Use one fresh session and a no-tool task; freeze the native retry settings per profile.
+
+Steps: submit the same user marker; M records every request, timing, partial response and disconnect; wait for the product's terminal result. Run three fresh units per condition and capture configured retry maxima and budgets.
+
+Acceptance and metrics: C0 must succeed. Fault cases report final status, request count, delay, repeated history, partial-response handling, product retry classification, and token usage where available. A correct success requires exactly one coherent final answer and no duplicated user history. A terminal error is reported as a product outcome with attempt count; it is not discarded. C3 is calibrated separately for each wire protocol.
+
+### H08 — Performance/reliability: tool scheduling
+
+Inputs: T with 250 ms calls. C0 four independent `read` calls; C1 B reads the version written by A; C2 two writes target the same record in known order; C3 one of four reads fails while the others succeed; C4 slow and fast calls return out of order. Track D sends a fixed sequence when the native model/tool protocol supports it; Track N/C uses a real model and the same user request.
+
+Steps: reset T; run the case; capture M requests, T dispatch/start/end events, call IDs, native result events and final datastore; allow 180 s. For C1/C2 the fixed sequence is staged so the second call depends on the first response; record product-chosen behavior for real-model runs.
+
+Acceptance and metrics: C0 needs four correctly matched results; C1 requires B's observed version to match A's committed version; C2 final state matches the declared order; C3 preserves three successful results and exposes the error; C4 results match call IDs. Report overlapping intervals, wall time, retries, and final correctness. Serial execution can satisfy correctness; concurrency is reported as a separate measure.
+
+### H11 — Security/observability: execution approval
+
+Inputs: a synthetic write to T and one permitted read control. C0 approve the exact operation; C1 deny it; C2 approve A and attempt parameter/target B; C3 revoke a grant before dispatch; C4 restart and attempt reuse. Drive approvals through A using a native interactive/API entry. For an endpoint without tool-level approvals, test an equivalent supported execution surface and record the operation and enforcement boundary.
+
+Steps: establish a policy that prompts for the write; hold dispatch until A records decision; perform the condition; record approval request ID, decision/scope, policy effective time, actual dispatch and T ledger. The parameter mutation is performed through a public native control if available; otherwise C2 is marked unsupported and the corresponding approved/denied control remains valid.
+
+Acceptance and metrics: C0 produces exactly the approved effect; C1/C3 produce no effect after denial/revocation is effective; C2 requires a new approval or a denial before B executes; C4 follows the documented grant lifetime. Record prompt count, allowed/blocked effects, policy provenance and timing. An absent approval surface is reported as a capability gap and does not silently become a passing control.
+
+### H14 — Extensibility: tool lifecycle
+
+Inputs: T exposes `read` and `create`; profiles baseline B0 without T and B1 with T configured through a documented public extension surface. Conditions C0 discovery and invocation, C1 T startup unavailable, C2 T exits during an operation, C3 disable/remove T and start a fresh session, C4 two tools with different names coexist.
+
+Steps: use product-native configuration or documented public plugin/API; record files, lines of adapter code, dependency list, setup commands, restart requirement and policy settings; run C0–C4 with M driving the equivalent call. After each failure inspect product status and recovery using its public interface. Keep the independent T effect ledger.
+
+Acceptance and metrics: C0 returns the expected receipt; C1/C2 expose failure and retain product control; C3 makes T unavailable in a new session; C4 preserves both tools' distinct identities. Record code/config changes, installation and recovery time, failed call propagation, cancellation/cleanup, and which component owns state and permissions. A product-native shim may bridge a transport, but its code and resource cost are reported separately.
+
+### H17 — Observability: causal reconstruction
+
+Inputs: one task includes a model request, an approved T `create`, a transient T failure, a retry or a terminal failure, and an independent effect receipt. Use a no-fault positive control and a fault variant. M/T/O retain the ground truth separately from the product's accessible native logs.
+
+Steps: freeze the case and product records; give a blinded investigator only product-native records and the task identifier. Ask for user request, model request ID, tool name/parameters, approval/policy source, fault and retry reason, final effect, and terminal status. The investigator can answer unknown. Compare answers with the withheld M/T/O ledger. Use three investigators and randomized product/case order when available; report individual results.
+
+Acceptance and metrics: C0 requires a correct observable effect in T. Score each reconstructable link, correct/unknown/incorrect claims, diagnosis time, log access privileges and needed external data. Provide a field-level trace completeness table; an explicit unknown remains distinct from a confident incorrect claim. Preserve native trajectory, recovery state, and telemetry as separate sources.
+
+## 6. Execution sequence and readiness
+
+1. Implement M/T/O/A and profile adapters, including Responses streaming and approval-driver integration. Verify the fixture with protocol conformance tests, positive/negative controls, state reset, synthetic-only egress and fault reachability.
+2. Run DSH and OpenClaw positive controls and deterministic P01–P05/H03–H17 scenarios on GitHub-hosted runners. Separate calibrations from formal batches; freeze hashes after calibration.
+3. Implement and review the Codex adapter against its pinned binary and official public interfaces. Codex execution remains pending until authorized; its unsupported/unobservable conditions are included in the matrix.
+4. Freeze matched model/provider and budget for Track C; run real-model cases with approved credentials and record usage. Compare same-track products, then integrate evidence into two six-dimension tables.
+
+**Current status:** the protocol is specified; only session reconstruction has a working DSH/OpenClaw hosted calibration. M's Responses mode, common T, O, A, product adapters, and the remaining CI cases are implementation work. They must pass their controls before any formal cross-product result is published.

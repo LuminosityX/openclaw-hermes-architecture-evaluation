@@ -1,0 +1,75 @@
+name: Three-product comparison calibration
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, 'research/comparison-calibration']
+    paths:
+      - 'comparison/session_probe.py'
+      - '.github/workflows/comparison-calibration.yml'
+permissions:
+  contents: read
+jobs:
+  session-reconstruction:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    strategy:
+      fail-fast: false
+      matrix:
+        unit: [1, 2, 3]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '24.22.1'
+      - name: Install pinned products on disposable runner
+        env:
+          npm_config_cache: ${{ runner.temp }}/comparison-cache
+          COMPARISON_RUNTIME: ${{ runner.temp }}/comparison-runtime
+        run: |
+          mkdir -p "$COMPARISON_RUNTIME"
+          npm install --prefix "$COMPARISON_RUNTIME" --save-exact --no-audit --no-fund --registry=https://registry.npmjs.org @deepseek-ai/dsh@0.2.2-alpha.2 openclaw@2026.10.7
+          mkdir -p "$RUNNER_TEMP/comparison-evidence"
+          cp "$COMPARISON_RUNTIME/package-lock.json" "$RUNNER_TEMP/comparison-evidence/"
+          node --version > "$RUNNER_TEMP/comparison-evidence/node-version.txt"
+      - name: Run synthetic session reconstruction calibration
+        env:
+          COMPARISON_RUNTIME: ${{ runner.temp }}/comparison-runtime
+          COMPARISON_OUTPUT: ${{ runner.temp }}/comparison-evidence
+          COMPARISON_UNIT: ${{ matrix.unit }}
+        run: python3 comparison/session_probe.py
+      - name: Retain calibration and installation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: session-reconstruction-unit-${{ matrix.unit }}
+          path: ${{ runner.temp }}/comparison-evidence/
+          retention-days: 30
+          if-no-files-found: warn
+  update-dashboard:
+    needs: session-reconstruction
+    if: ${{ always() && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/research/comparison-calibration') }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.ref_name }}
+      - name: Update completed CI progress if the tested commit is still current
+        env:
+          COMPARISON_RESULT: ${{ needs.session-reconstruction.result }}
+        run: |
+          if [ "$(git rev-parse HEAD)" != "$GITHUB_SHA" ]; then
+            echo 'Branch changed after this run began; preserving the newer state.'
+            exit 0
+          fi
+          python3 comparison/update_ci_progress.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add README.md comparison/progress.json comparison/progress.svg
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update comparison CI progress'
+            git push origin "HEAD:$GITHUB_REF_NAME"
+          fi

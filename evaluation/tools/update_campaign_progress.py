@@ -56,7 +56,7 @@ def update():
         ids={s['id'] for s in scenarios}
         rows=[r for r in valid if r['scenario_id'] in ids]
         runs=sorted({str(r['run_id']) for r in rows})
-        links=', '.join(f'[{run}](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/{run})' for run in runs)
+        links=', '.join(f'[{run}](https://github.com/zyw02/agent-arch/actions/runs/{run})' for run in runs)
         header+=f'| {case["id"]} {case["title"]} | {len(scenarios)} | {len(rows)} | {links} |\n'
     if nonapplicable:
         header+='\nVerified nonapplicability requires an actual native capability probe and pinned support-contract evidence; missing implementations and unavailable environments never qualify. These are not measured performance samples.\n\n'
@@ -65,7 +65,7 @@ def update():
             scenarios=[s for s in report['scenario_status'] if s['case_id']==case['id'] and s['state']=='unsupported']
             if not scenarios:continue
             ids={s['id'] for s in scenarios};runs=sorted({str(r['run_id']) for r in records if r['scenario_id'] in ids and r['state']=='unsupported'})
-            links=', '.join(f'[{run}](https://github.com/zyw02/openclaw-hermes-architecture-evaluation/actions/runs/{run})' for run in runs)
+            links=', '.join(f'[{run}](https://github.com/zyw02/agent-arch/actions/runs/{run})' for run in runs)
             header+=f'| {case["id"]} {case["title"]} | {len(scenarios)} | {links} |\n'
     header+='\n| Required dimension | Measured scenarios | Verified native nonapplicability | Incomplete | Planned |\n| --- | ---: | ---: | ---: | ---: |\n'
     for dimension,planned in Counter(s['dimension'] for s in report['scenario_status']).items():
