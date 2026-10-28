@@ -22,6 +22,7 @@ import tempfile
 import time
 
 from codex_provider_fixture import ResponsesFixture
+from codex_effect_ledger import EffectLedger
 
 CONFIG_TEMPLATE = """\
 # Generated for an isolated Codex mechanism run; never written to a real home.
@@ -33,6 +34,9 @@ name = "Owned deterministic fixture provider"
 base_url = "{base_url}"
 env_key = "CODEX_FIXTURE_KEY"
 wire_api = "responses"
+
+[sandbox_workspace_write]
+network_access = true
 """
 
 
@@ -48,6 +52,7 @@ class CodexRuntime:
         self.workspace.mkdir(parents=True, exist_ok=True)
         self.sandbox = sandbox
         self.fixture = ResponsesFixture(model=model).start()
+        self.ledger = EffectLedger().start()
         (self.home / 'config.toml').write_text(
             CONFIG_TEMPLATE.format(model=model, base_url=self.fixture.base_url), encoding='utf-8')
         self.env = dict(os.environ)
@@ -158,4 +163,5 @@ class CodexRuntime:
 
     def close(self):
         self.fixture.close()
+        self.ledger.close()
         shutil.rmtree(self.root, ignore_errors=True)

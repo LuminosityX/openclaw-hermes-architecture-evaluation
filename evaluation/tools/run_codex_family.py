@@ -30,8 +30,12 @@ CODEX_SOURCES = {
     'REL-01': ['evaluation/runner/rel01_cases.py',
                'evaluation/runner/codex_runtime.py',
                'evaluation/runner/codex_provider_fixture.py'],
+    'REL-02': ['evaluation/runner/rel02_cases.py',
+               'evaluation/runner/codex_runtime.py',
+               'evaluation/runner/codex_provider_fixture.py',
+               'evaluation/runner/codex_effect_ledger.py'],
 }
-CONTROLLER_MODULE = {'REL-01': 'rel01_cases'}
+CONTROLLER_MODULE = {'REL-01': 'rel01_cases', 'REL-02': 'rel02_cases'}
 PIN = ROOT / 'evaluation/design/codex-target-pin.json'
 
 

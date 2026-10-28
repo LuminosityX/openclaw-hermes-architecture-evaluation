@@ -32,10 +32,15 @@ class ResponsesFixture:
         self.release.set()
         self.hold_mode = False
         self.reply_text = 'FIXTURE_FINAL_REPLY'
+        # Optional per-request script: entry {'call': {'name','arguments'(dict)}}
+        # emits a function_call item; {'reply': 'TEXT'} emits a final message.
+        # Entries are indexed by request sequence; the last entry repeats.
+        self.script = []
         self.fail_next_with = None  # e.g. (503, {'error': 'upstream'})
         self.usage = dict(input_tokens=101, output_tokens=7, total_tokens=108)
         self._sequence = 0
         self._lock = threading.Lock()
+        self.last_request_body = None   # bounded development capture for adapter calibration
         owner = self
 
         class Handler(BaseHTTPRequestHandler):
@@ -95,6 +100,7 @@ class ResponsesFixture:
                     self.end_headers()
                     return
                 body = json.loads(self.rfile.read(size))
+                owner.last_request_body = body
                 with owner._lock:
                     owner._sequence += 1
                     sequence = owner._sequence
@@ -121,14 +127,24 @@ class ResponsesFixture:
                 self._stream_reply(sequence)
 
             def _stream_reply(self, sequence):
+                reply_text = owner.reply_text
+                call = None
+                if owner.script:
+                    step = owner.script[min(sequence - 1, len(owner.script) - 1)]
+                    reply_text = step.get('reply', reply_text)
+                    call = step.get('call')
                 self.send_response(200)
                 self.send_header('Content-Type', 'text/event-stream')
                 self.send_header('Cache-Control', 'no-cache')
                 self.send_header('Connection', 'close')
                 self.end_headers()
                 response_id = f'resp_fixture_{sequence}'
-                item = {'type': 'message', 'id': f'item_{sequence}', 'role': 'assistant',
-                        'content': [{'type': 'output_text', 'text': owner.reply_text}]}
+                if call is not None:
+                    item = {'type': 'function_call', 'call_id': f'call_fixture_{sequence}',
+                            'name': call['name'], 'arguments': json.dumps(call['arguments'])}
+                else:
+                    item = {'type': 'message', 'id': f'item_{sequence}', 'role': 'assistant',
+                            'content': [{'type': 'output_text', 'text': reply_text}]}
                 usage = dict(owner.usage)
                 events = [
                     ('response.created', {'type': 'response.created', 'response': {'id': response_id}}),
@@ -147,7 +163,8 @@ class ResponsesFixture:
                     except (BrokenPipeError, ConnectionResetError):
                         self._record('client-disconnected', sequence=sequence, note='during stream')
                         return
-                self._record('response-sent', sequence=sequence, response_id=response_id)
+                self._record('response-sent', sequence=sequence, response_id=response_id,
+                             function_call=item['name'] if call is not None else None)
 
         self._server = ThreadingHTTPServer(('127.0.0.1', 0), Handler)
         self.port = self._server.server_address[1]
